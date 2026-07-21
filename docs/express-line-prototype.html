@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Express Line — Prototype</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f3f4f6; color: #1a1a1a; }
+
+/* ── Top bar ── */
+.topbar { background: #1a3a6b; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 16px; }
+.topbar img { height: 32px; }
+.topbar h1 { font-size: 15px; font-weight: 600; }
+.topbar .badge { background: #f59e0b; color: #000; font-size: 10px; padding: 2px 8px; border-radius: 8px; font-weight: 700; }
+.topbar .spacer { flex: 1; }
+.topbar .user { font-size: 12px; opacity: 0.8; }
+
+/* ── Tabs ── */
+.tabs { max-width: 1500px; margin: 16px auto 0; display: flex; gap: 4px; padding: 0 16px; }
+.tab { padding: 10px 24px; font-size: 13px; font-weight: 600; border: 1px solid #d1d5db; border-bottom: none;
+  border-radius: 8px 8px 0 0; cursor: pointer; background: #e5e7eb; color: #6b7280; transition: all 0.15s; }
+.tab:hover { background: #f9fafb; }
+.tab.active { background: #fff; color: #1a3a6b; border-color: #d1d5db; position: relative; }
+.tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: #fff; }
+.tab .notif { background: #dc2626; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-left: 6px; }
+
+/* ── Panels ── */
+.panel { max-width: 1500px; margin: 0 auto; padding: 16px; display: none; }
+.panel.active { display: block; }
+
+/* ── Shared table styles ── */
+.table-wrap { overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid #d1d5db; max-height: 55vh; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+thead th { background: #1a3a6b; color: #fff; padding: 7px 4px; text-align: left; font-size: 10px; font-weight: 600; white-space: nowrap; position: sticky; top: 0; z-index: 2; }
+tbody tr { border-bottom: 1px solid #e5e7eb; }
+tbody td { padding: 2px 3px; position: relative; }
+tbody td input[type="text"] { width: 100%; border: 1px solid transparent; background: transparent; padding: 3px 4px; font-size: 11px; border-radius: 3px; font-family: inherit; }
+tbody td input[type="text"]:focus { border-color: #2563eb; background: #fff; outline: none; }
+td.cb-cell { text-align: center; width: 40px; }
+td.cb-cell input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; }
+td.row-num { text-align: center; color: #9ca3af; font-size: 10px; width: 30px; font-weight: 600; cursor: pointer; user-select: none; }
+td.row-num:hover { background: #e0e7ff; }
+tr.row-selected { background: #dbeafe !important; }
+tr.row-selected td.row-num { background: #2563eb; color: #fff; }
+td.del-cell { text-align: center; width: 28px; }
+.del-btn { background: none; border: none; color: #dc2626; font-size: 15px; cursor: pointer; padding: 2px 5px; border-radius: 4px; }
+.del-btn:hover { background: #fef2f2; }
+
+/* ── Change highlight colors ── */
+td.ch-cell { background: #fef3c7 !important; }           /* yellow — cell changed */
+tr.ch-moved td { background: #f3f4f6 !important; }       /* grey — row moved */
+tr.ch-new td { background: #dcfce7 !important; }         /* green — new row */
+tr.ch-deleted td { background: #fee2e2 !important; text-decoration: line-through; color: #9ca3af; }  /* red — deleted */
+tr.ch-dup td { background: #fee2e2 !important; }            /* red light — duplicate row */
+tr.ch-dup td input[type="text"] { color: #991b1b; }
+/* cell change overrides row color */
+tr.ch-moved td.ch-cell { background: #fef3c7 !important; }
+
+/* ── Change badge ── */
+.ch-badge { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 600; margin-left: 4px; vertical-align: middle; }
+.ch-badge.new { background: #dcfce7; color: #166534; }
+.ch-badge.mod { background: #fef3c7; color: #92400e; }
+.ch-badge.moved { background: #e5e7eb; color: #374151; }
+.ch-badge.del { background: #fee2e2; color: #991b1b; }
+.ch-badge.dup { background: #fee2e2; color: #991b1b; }
+
+/* ── Paste zone ── */
+.paste-zone { border: 2px dashed #9ca3af; border-radius: 8px; padding: 14px; text-align: center; font-size: 13px; color: #6b7280; background: #fff; cursor: text; transition: all 0.2s; margin-bottom: 12px; }
+.paste-zone:focus { outline: none; border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+
+/* ── Toolbar ── */
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.toolbar button { padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; }
+.btn-blue { background: #2563eb; color: #fff; } .btn-blue:hover { background: #1d4ed8; }
+.btn-green { background: #16a34a; color: #fff; } .btn-green:hover { background: #15803d; }
+.btn-red { background: #dc2626; color: #fff; } .btn-red:hover { background: #b91c1c; }
+.btn-gray { background: #6b7280; color: #fff; } .btn-gray:hover { background: #4b5563; }
+.btn-purple { background: #7c3aed; color: #fff; } .btn-purple:hover { background: #6d28d9; }
+.toolbar .stats { font-size: 12px; color: #1a3a6b; font-weight: 600; margin-left: auto; }
+
+/* ── MCL changes summary ── */
+.changes-panel { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; }
+.changes-panel h3 { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 8px; }
+.change-item { font-size: 11px; padding: 4px 0; border-bottom: 1px solid #fef3c7; display: flex; align-items: center; gap: 8px; }
+.change-item:last-child { border-bottom: none; }
+.change-item .ch-icon { font-size: 14px; }
+.change-check { width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+
+/* ── Chat ── */
+.chat-panel { background: #fff; border: 1px solid #d1d5db; border-radius: 8px; padding: 12px 16px; margin-top: 12px; }
+.chat-panel h3 { font-size: 13px; font-weight: 700; color: #1a3a6b; margin-bottom: 8px; }
+.chat-messages { max-height: 200px; overflow-y: auto; margin-bottom: 8px; }
+.chat-msg { padding: 6px 10px; margin-bottom: 4px; border-radius: 6px; font-size: 11px; }
+.chat-msg.mcl { background: #dbeafe; }
+.chat-msg.client { background: #dcfce7; }
+.chat-msg .sender { font-weight: 700; }
+.chat-msg .time { color: #9ca3af; font-size: 10px; margin-left: 8px; }
+.chat-input { display: flex; gap: 6px; }
+.chat-input input { flex: 1; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 10px; font-size: 12px; }
+.chat-input button { padding: 6px 16px; }
+
+/* ── Activity Log ── */
+.log-panel { background: #fff; border: 1px solid #d1d5db; border-radius: 8px; padding: 12px 16px; margin-top: 12px; }
+.log-panel h3 { font-size: 13px; font-weight: 700; color: #1a3a6b; margin-bottom: 8px; }
+.log-entries { max-height: 250px; overflow-y: auto; }
+.log-entry { font-size: 10px; padding: 3px 0; border-bottom: 1px solid #f3f4f6; color: #4b5563; }
+.log-entry .log-time { color: #9ca3af; margin-right: 6px; }
+.log-entry .log-user { font-weight: 600; margin-right: 4px; }
+
+/* ── Version selector ── */
+.version-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 12px; }
+.version-bar select { border: 1px solid #d1d5db; border-radius: 6px; padding: 4px 8px; font-size: 12px; }
+.version-bar .ver-label { font-weight: 600; color: #1a3a6b; }
+.version-bar .ver-count { color: #6b7280; }
+
+/* ── Hint ── */
+.hint { font-size: 11px; color: #9ca3af; margin-top: 6px; }
+
+/* ── MCL readonly inputs ── */
+.mcl-view input[type="text"] { color: #374151; cursor: default; }
+.mcl-view input[type="text"]:focus { border-color: transparent; background: transparent; }
+
+/* ── Tooltip on changed cell ── */
+td.ch-cell::after {
+  content: attr(data-prev);
+  display: none; position: absolute; bottom: 100%; left: 0; background: #1f2937; color: #fff;
+  font-size: 10px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; z-index: 10;
+}
+td.ch-cell:hover::after { display: block; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Express Line — Booking Portal</h1>
+  <span class="badge">PROTOTYPE</span>
+  <div class="spacer"></div>
+  <div class="user" id="currentUser">cliente@expressline.com</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('client')">
+    Cliente — Express Line
+  </div>
+  <div class="tab" onclick="switchTab('mcl')">
+    MCL — Revisión
+    <span class="notif" id="mclNotif" style="display:none">0</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- CLIENT PANEL                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="panel active" id="panelClient">
+
+  <div class="paste-zone" id="pasteZone" tabindex="0">
+    Haz click aqui y pega con Ctrl+V para cargar filas desde Excel
+  </div>
+
+  <div class="toolbar">
+    <button class="btn-blue" onclick="addEmptyRow()">+ 1 fila</button>
+    <button class="btn-purple" onclick="addMultipleRows()">+ N filas</button>
+    <button class="btn-red" id="btnDelSelected" onclick="deleteSelectedRows()" style="display:none">Eliminar</button>
+    <button class="btn-gray" onclick="clearAll()">Limpiar todo</button>
+    <button class="btn-green" onclick="clientSave()">Guardar cambios</button>
+    <span class="stats" id="statsClient"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Flight</th><th>1st Leg AWB</th><th>2nd Leg AWB</th><th>ULD</th>
+          <th>PCs</th><th>CW</th><th>Pickup From</th><th>Ready Pickup</th><th>Last Day Free</th>
+          <th>Deliver To</th><th>Dest</th><th>Cut Off</th><th>ETD</th>
+          <th>Hold BG#</th><th>Hold Box#</th><th>LB</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="clientBody"></tbody>
+    </table>
+  </div>
+  <div class="hint" id="clientHint"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- MCL PANEL                                                             -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panelMcl">
+
+  <div class="version-bar">
+    <span class="ver-label">Version:</span>
+    <select id="versionSelect" onchange="mclLoadVersion()"></select>
+    <span class="ver-count" id="verCount"></span>
+  </div>
+
+  <!-- Changes summary -->
+  <div class="changes-panel" id="changesPanel" style="display:none">
+    <h3>Cambios detectados <span id="changesCount"></span></h3>
+    <div id="changesList"></div>
+    <div style="margin-top:8px; text-align:right;">
+      <button class="btn-green" onclick="mclAckAll()" style="font-size:11px; padding:5px 14px;">Marcar todos como vistos</button>
+    </div>
+  </div>
+
+  <div class="table-wrap mcl-view">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th></th><th>Flight</th><th>1st Leg AWB</th><th>2nd Leg AWB</th><th>ULD</th>
+          <th>PCs</th><th>CW</th><th>Pickup From</th><th>Ready Pickup</th><th>Last Day Free</th>
+          <th>Deliver To</th><th>Dest</th><th>Cut Off</th><th>ETD</th>
+          <th>Hold BG#</th><th>Hold Box#</th><th>LB</th>
+        </tr>
+      </thead>
+      <tbody id="mclBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-panel">
+    <h3>Chat — Booking completo</h3>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Escribe un comentario..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn-blue" onclick="sendChat()">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Activity Log -->
+  <div class="log-panel">
+    <h3>Activity Log</h3>
+    <div class="log-entries" id="logEntries"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA MODEL
+// ═══════════════════════════════════════════════════════════════════════════
+const COL_KEYS = ['flight','awb1','awb2','uldType','pieces','cw','pickupFrom','readyPickup','lastDayFree','deliverTo','dest','cutoff','etd','holdBg','holdBox','battery']
+const COL_LABELS = { flight:'Flight', awb1:'1st Leg', awb2:'2nd Leg', uldType:'ULD', pieces:'PCs', cw:'CW', pickupFrom:'Pickup From', readyPickup:'Ready Pickup', lastDayFree:'Last Day Free', deliverTo:'Deliver To', dest:'Dest', cutoff:'Cut Off', etd:'ETD', holdBg:'Hold BG#', holdBox:'Hold Box#', battery:'LB' }
+
+const COLUMNS = [
+  { key: 'flight', width: '85px' }, { key: 'awb1', width: '115px' }, { key: 'awb2', width: '115px' },
+  { key: 'uldType', width: '70px' }, { key: 'pieces', width: '50px' }, { key: 'cw', width: '55px' },
+  { key: 'pickupFrom', width: '95px' }, { key: 'readyPickup', width: '90px' }, { key: 'lastDayFree', width: '90px' },
+  { key: 'deliverTo', width: '95px' }, { key: 'dest', width: '50px' }, { key: 'cutoff', width: '90px' },
+  { key: 'etd', width: '90px' }, { key: 'holdBg', width: '85px' }, { key: 'holdBox', width: '85px' },
+  { key: 'battery', type: 'checkbox' },
+]
+
+let rows = []
+let nextId = 1
+let selectedRows = new Set()
+let lastClickedRow = -1
+
+// Snapshots: array of versions. Each version = { timestamp, user, rows: deep copy }
+let versions = []
+let chatMessages = []
+let activityLog = []
+
+let currentView = 'client' // 'client' | 'mcl'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function isYes(val) {
+  if (typeof val === 'boolean') return val
+  const s = String(val).trim().toUpperCase()
+  return s === 'YES' || s === 'Y' || s === 'SI' || s === 'X' || s === '1' || s === 'TRUE'
+}
+
+function deepCopy(obj) { return JSON.parse(JSON.stringify(obj)) }
+
+function makeEmptyRow() {
+  return { _id: nextId++, flight:'', awb1:'', awb2:'', uldType:'', pieces:'', cw:'',
+    pickupFrom:'', readyPickup:'', lastDayFree:'', deliverTo:'', dest:'', cutoff:'', etd:'',
+    holdBg:'', holdBox:'', battery: false }
+}
+
+function timeStr() {
+  const d = new Date()
+  return d.toLocaleString('en-US', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' })
+}
+
+function dateTimeStr() {
+  return new Date().toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false })
+}
+
+function rowFingerprint(r) {
+  return COL_KEYS.map(k => String(r[k] ?? '')).join('|')
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIPBOARD PARSING
+// ═══════════════════════════════════════════════════════════════════════════
+function splitLogicalLines(text) {
+  const lines = []; let current = ''; let inQuotes = false
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '"') {
+      if (inQuotes && text[i+1] === '"') { current += '"'; i++ }
+      else inQuotes = !inQuotes
+      continue
+    }
+    if ((ch === '\n' || ch === '\r') && !inQuotes) {
+      if (ch === '\r' && text[i+1] === '\n') i++
+      if (current.trim()) lines.push(current); current = ''
+    } else if ((ch === '\n' || ch === '\r') && inQuotes) {
+      if (ch === '\r' && text[i+1] === '\n') i++; current += ' '
+    } else { current += ch }
+  }
+  if (current.trim()) lines.push(current)
+  return lines
+}
+
+function isOrphanRow(cells) {
+  const awb1 = (cells[1]||'').trim(), awb2 = (cells[2]||'').trim(), fl = (cells[0]||'').trim()
+  if (/\d{3}-\d{7,}/.test(awb1)) return false
+  if (/\d{3}-\d{7,}/.test(awb2)) return false
+  if (fl && /[A-Z0-9]{2}[-\s]?\d{2,}/i.test(fl)) return false
+  return true
+}
+
+function mergeOrphan(prev, orphan) {
+  const m = [...prev]
+  for (let i = 0; i < orphan.length; i++) {
+    const v = (orphan[i]||'').trim(); if (!v) continue
+    if (i >= m.length) { m.push(v); continue }
+    m[i] = (m[i]||'').trim() ? m[i] + ' ' + v : v
+  }
+  return m
+}
+
+function parseClipboardRaw(text) {
+  const raw = splitLogicalLines(text).map(l => l.split('\t').map(c => c.trim()))
+  const merged = []
+  for (const cells of raw) {
+    if (merged.length > 0 && isOrphanRow(cells)) merged[merged.length-1] = mergeOrphan(merged[merged.length-1], cells)
+    else merged.push(cells)
+  }
+  return merged
+}
+
+function parseClipboardRows(text) {
+  const lines = splitLogicalLines(text)
+  const allCells = []
+  for (const line of lines) {
+    const cells = line.split('\t').map(c => c.trim())
+    const f = cells[0]?.toLowerCase()
+    if (f === 'flight #' || f === 'flight' || f === '#' || f === 'no') continue
+    if (allCells.length > 0 && isOrphanRow(cells)) allCells[allCells.length-1] = mergeOrphan(allCells[allCells.length-1], cells)
+    else allCells.push(cells)
+  }
+  return allCells.filter(c => c.filter(x=>x).length >= 2).map(cellsToRow)
+}
+
+function cellsToRow(cells) {
+  return { _id: nextId++, flight: cells[0]||'', awb1: cells[1]||'', awb2: cells[2]||'',
+    uldType: cells[3]||'', pieces: cells[4]||'', cw: cells[5]||'',
+    pickupFrom: (cells[6]||'').replace(/[\r\n]+/g,' '), readyPickup: cells[7]||'',
+    lastDayFree: cells[8]||'', deliverTo: (cells[9]||'').replace(/[\r\n]+/g,' '),
+    dest: cells[10]||'', cutoff: cells[11]||'', etd: cells[12]||'',
+    holdBg: cells[13]||'', holdBox: cells[14]||'', battery: isYes(cells[15]) }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHANGE DETECTION
+// ═══════════════════════════════════════════════════════════════════════════
+function detectChanges(oldRows, newRows) {
+  const changes = [] // { type: 'new'|'deleted'|'moved'|'modified', rowIdx, cells?, prevRow? }
+
+  const oldFP = oldRows.map(r => rowFingerprint(r))
+  const newFP = newRows.map(r => rowFingerprint(r))
+  const oldUsed = new Array(oldRows.length).fill(false)
+  const newUsed = new Array(newRows.length).fill(false)
+
+  // 1. Exact matches (same fingerprint) — detect moves
+  for (let n = 0; n < newRows.length; n++) {
+    for (let o = 0; o < oldRows.length; o++) {
+      if (oldUsed[o] || newUsed[n]) continue
+      if (newFP[n] === oldFP[o]) {
+        oldUsed[o] = true; newUsed[n] = true
+        if (n !== o) changes.push({ type: 'moved', rowIdx: n, fromIdx: o })
+        break
+      }
+    }
+  }
+
+  // 2. Match remaining by awb1+awb2 key — detect modifications
+  for (let n = 0; n < newRows.length; n++) {
+    if (newUsed[n]) continue
+    const nKey = newRows[n].awb1 + '||' + newRows[n].awb2
+    for (let o = 0; o < oldRows.length; o++) {
+      if (oldUsed[o]) continue
+      const oKey = oldRows[o].awb1 + '||' + oldRows[o].awb2
+      if (nKey === oKey && nKey !== '||') {
+        oldUsed[o] = true; newUsed[n] = true
+        // Find changed cells
+        const changedCells = []
+        for (const k of COL_KEYS) {
+          const ov = String(oldRows[o][k] ?? ''), nv = String(newRows[n][k] ?? '')
+          if (ov !== nv) changedCells.push({ key: k, oldVal: ov, newVal: nv })
+        }
+        if (changedCells.length > 0) {
+          changes.push({ type: 'modified', rowIdx: n, cells: changedCells, prevRow: oldRows[o] })
+        }
+        break
+      }
+    }
+  }
+
+  // 3. Match remaining by awb1 only — detect 2nd leg changes etc
+  for (let n = 0; n < newRows.length; n++) {
+    if (newUsed[n]) continue
+    const nAwb1 = newRows[n].awb1
+    if (!nAwb1) continue
+    for (let o = 0; o < oldRows.length; o++) {
+      if (oldUsed[o]) continue
+      if (oldRows[o].awb1 === nAwb1) {
+        oldUsed[o] = true; newUsed[n] = true
+        const changedCells = []
+        for (const k of COL_KEYS) {
+          const ov = String(oldRows[o][k] ?? ''), nv = String(newRows[n][k] ?? '')
+          if (ov !== nv) changedCells.push({ key: k, oldVal: ov, newVal: nv })
+        }
+        if (changedCells.length > 0) {
+          changes.push({ type: 'modified', rowIdx: n, cells: changedCells, prevRow: oldRows[o] })
+        }
+        break
+      }
+    }
+  }
+
+  // 4. Match remaining by same position (index) — catches edits on rows without AWB keys
+  for (let n = 0; n < newRows.length; n++) {
+    if (newUsed[n]) continue
+    if (n < oldRows.length && !oldUsed[n]) {
+      oldUsed[n] = true; newUsed[n] = true
+      const changedCells = []
+      for (const k of COL_KEYS) {
+        const ov = String(oldRows[n][k] ?? ''), nv = String(newRows[n][k] ?? '')
+        if (ov !== nv) changedCells.push({ key: k, oldVal: ov, newVal: nv })
+      }
+      if (changedCells.length > 0) {
+        changes.push({ type: 'modified', rowIdx: n, cells: changedCells, prevRow: oldRows[n] })
+      }
+    }
+  }
+
+  // 5. Remaining unmatched new rows → new
+  for (let n = 0; n < newRows.length; n++) {
+    if (!newUsed[n]) changes.push({ type: 'new', rowIdx: n })
+  }
+
+  // 6. Remaining unmatched old rows → deleted
+  for (let o = 0; o < oldRows.length; o++) {
+    if (!oldUsed[o]) changes.push({ type: 'deleted', prevRow: oldRows[o], rowIdx: -1 })
+  }
+
+  return changes
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════════════════
+function switchTab(view) {
+  currentView = view
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i === (view==='client'?0:1)))
+  document.getElementById('panelClient').classList.toggle('active', view==='client')
+  document.getElementById('panelMcl').classList.toggle('active', view==='mcl')
+  document.getElementById('currentUser').textContent = view === 'client' ? 'cliente@expressline.com' : 'agente@mincurllogistics.com'
+  if (view === 'mcl') mclRefresh()
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIENT — RENDER TABLE
+// ═══════════════════════════════════════════════════════════════════════════
+function findDuplicates(data) {
+  const seen = new Map() // awb1 → first index
+  const dups = new Set()
+  data.forEach((r, i) => {
+    const key = (r.awb1 || '').trim()
+    if (!key) return
+    if (seen.has(key)) { dups.add(seen.get(key)); dups.add(i) }
+    else seen.set(key, i)
+  })
+  return dups
+}
+
+function renderClientTable() {
+  const tbody = document.getElementById('clientBody')
+  tbody.innerHTML = ''
+  const dupSet = findDuplicates(rows)
+
+  rows.forEach((row, rowIdx) => {
+    const tr = document.createElement('tr')
+    if (dupSet.has(rowIdx)) tr.classList.add('ch-dup')
+    if (selectedRows.has(rowIdx)) tr.classList.add('row-selected')
+
+    const tdNum = document.createElement('td')
+    tdNum.className = 'row-num'
+    tdNum.textContent = rowIdx + 1
+    if (dupSet.has(rowIdx)) { tdNum.title = 'AWB duplicado: ' + row.awb1 }
+    tdNum.addEventListener('click', e => handleRowSelect(rowIdx, e))
+    tr.appendChild(tdNum)
+
+    COLUMNS.forEach((col, colIdx) => {
+      const td = document.createElement('td')
+      td.dataset.row = rowIdx; td.dataset.col = colIdx
+
+      if (col.type === 'checkbox') {
+        td.className = 'cb-cell'
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!row[col.key]
+        cb.addEventListener('change', () => { row[col.key] = cb.checked; updateStats() })
+        td.appendChild(cb)
+      } else {
+        const inp = document.createElement('input'); inp.type = 'text'; inp.value = row[col.key] || ''
+        if (col.width) inp.style.width = col.width
+        inp.addEventListener('input', () => { row[col.key] = inp.value; updateStats() })
+        inp.addEventListener('focus', () => setActiveCell(rowIdx, colIdx))
+        inp.addEventListener('paste', e => {
+          const text = e.clipboardData.getData('text/plain')
+          if (text.includes('\t') || text.split(/\r?\n/).filter(l=>l.trim()).length > 1) {
+            e.preventDefault(); e.stopPropagation(); pasteAtCell(rowIdx, colIdx, text)
+          }
+        })
+        td.appendChild(inp)
+      }
+      tr.appendChild(td)
+    })
+
+    const tdDel = document.createElement('td'); tdDel.className = 'del-cell'
+    const btn = document.createElement('button'); btn.className = 'del-btn'; btn.textContent = '\u00d7'
+    btn.addEventListener('click', () => { rows.splice(rowIdx, 1); renderClientTable() })
+    tdDel.appendChild(btn); tr.appendChild(tdDel)
+
+    tbody.appendChild(tr)
+  })
+  updateStats()
+  updateSelectionUI()
+}
+
+let activeRowIdx = -1, activeColIdx = -1
+function setActiveCell(r,c) { activeRowIdx = r; activeColIdx = c }
+
+function pasteAtCell(startRow, startCol, text) {
+  const rawLines = parseClipboardRaw(text)
+  for (let r = 0; r < rawLines.length; r++) {
+    const targetRow = startRow + r
+    while (targetRow >= rows.length) rows.push(makeEmptyRow())
+    for (let c = 0; c < rawLines[r].length; c++) {
+      const tc = startCol + c; if (tc >= COL_KEYS.length) break
+      const k = COL_KEYS[tc], v = rawLines[r][c]?.trim().replace(/[\r\n]+/g,' ') || ''
+      rows[targetRow][k] = k === 'battery' ? isYes(v) : v
+    }
+  }
+  renderClientTable()
+}
+
+function handleRowSelect(idx, e) {
+  if (e.shiftKey && lastClickedRow >= 0) {
+    for (let i = Math.min(lastClickedRow,idx); i <= Math.max(lastClickedRow,idx); i++) selectedRows.add(i)
+  } else if (e.ctrlKey || e.metaKey) {
+    selectedRows.has(idx) ? selectedRows.delete(idx) : selectedRows.add(idx)
+  } else {
+    if (selectedRows.size===1 && selectedRows.has(idx)) selectedRows.clear()
+    else { selectedRows.clear(); selectedRows.add(idx) }
+  }
+  lastClickedRow = idx; updateSelectionUI()
+}
+
+function updateSelectionUI() {
+  document.querySelectorAll('#clientBody tr').forEach((tr,i) => {
+    tr.classList.toggle('row-selected', selectedRows.has(i))
+    const td = tr.querySelector('td.row-num')
+    if (td) { td.style.background = selectedRows.has(i)?'#2563eb':''; td.style.color = selectedRows.has(i)?'#fff':'' }
+  })
+  const btn = document.getElementById('btnDelSelected')
+  if (selectedRows.size > 0) { btn.style.display=''; btn.textContent = `Eliminar ${selectedRows.size} fila${selectedRows.size>1?'s':''}` }
+  else btn.style.display = 'none'
+}
+
+function deleteSelectedRows() {
+  const sorted = [...selectedRows].sort((a,b) => b-a)
+  for (const i of sorted) if (i >= 0 && i < rows.length) rows.splice(i, 1)
+  selectedRows.clear(); lastClickedRow = -1; renderClientTable()
+}
+
+function addEmptyRow() { rows.push(makeEmptyRow()); renderClientTable() }
+function addMultipleRows() { const n = parseInt(prompt('Cuantas filas?','10')); if(n>0) for(let i=0;i<n;i++) rows.push(makeEmptyRow()); renderClientTable() }
+function clearAll() { if(rows.length>0 && !confirm('Limpiar todo?')) return; rows=[]; nextId=1; renderClientTable() }
+
+function updateStats() {
+  const pcs = rows.reduce((s,r) => s + (parseInt(r.pieces)||0), 0)
+  const cw = rows.reduce((s,r) => s + (parseFloat(r.cw)||0), 0)
+  const flights = [...new Set(rows.map(r=>r.flight).filter(Boolean))]
+  const dups = findDuplicates(rows)
+  let txt = `${rows.length} filas | ${flights.length} vuelos | ${pcs.toLocaleString()} pcs | ${cw.toLocaleString()} kg`
+  if (dups.size > 0) txt += ` | ⚠ ${dups.size} duplicadas`
+  document.getElementById('statsClient').textContent = txt
+}
+
+// ── Paste zone ──
+const pasteZone = document.getElementById('pasteZone')
+pasteZone.addEventListener('paste', e => {
+  e.preventDefault()
+  const text = e.clipboardData.getData('text/plain'); if (!text.trim()) return
+  const parsed = parseClipboardRows(text)
+  if (!parsed.length) { alert('No se encontraron filas validas.'); return }
+  if (rows.length > 0) { if (!confirm(`Ya hay ${rows.length} filas. OK para agregar, Cancelar para reemplazar.`)) rows = [] }
+  rows.push(...parsed); renderClientTable()
+  pasteZone.textContent = `${parsed.length} filas pegadas`
+  setTimeout(() => pasteZone.textContent = 'Haz click aqui y pega con Ctrl+V para cargar filas desde Excel', 3000)
+})
+
+// ── Client Save ──
+function clientSave() {
+  const clean = rows.filter(r => r.flight || r.awb1 || r.awb2 || r.pieces || r.cw)
+  if (clean.length === 0) { alert('No hay datos para guardar.'); return }
+  const dups = findDuplicates(clean)
+  if (dups.size > 0) {
+    const dupAwbs = [...new Set([...dups].map(i => clean[i].awb1))].join(', ')
+    alert('Hay AWBs duplicados: ' + dupAwbs + '\nCorrige antes de guardar.')
+    return
+  }
+
+  const prevVersion = versions.length > 0 ? versions[versions.length-1] : null
+  const prevRows = prevVersion ? prevVersion.rows : []
+
+  // Detect changes
+  const changes = detectChanges(prevRows, clean)
+
+  // Save version
+  const ver = { timestamp: dateTimeStr(), user: 'cliente@expressline.com', rows: deepCopy(clean), changes }
+  versions.push(ver)
+
+  // Log activity
+  addLog('cliente@expressline.com', `Guardó versión ${versions.length} (${clean.length} filas)`)
+  for (const ch of changes) {
+    if (ch.type === 'new') addLog('cliente@expressline.com', `Nueva fila: ${clean[ch.rowIdx]?.awb1 || 'sin AWB'} / ${clean[ch.rowIdx]?.awb2 || ''}`)
+    else if (ch.type === 'deleted') addLog('cliente@expressline.com', `Eliminó fila: ${ch.prevRow?.awb1 || 'sin AWB'} / ${ch.prevRow?.awb2 || ''}`)
+    else if (ch.type === 'moved') addLog('cliente@expressline.com', `Movió fila ${ch.fromIdx+1} → ${ch.rowIdx+1}: ${clean[ch.rowIdx]?.awb1 || ''}`)
+    else if (ch.type === 'modified') {
+      const descs = ch.cells.map(c => `${COL_LABELS[c.key]}: "${c.oldVal}" → "${c.newVal}"`).join(', ')
+      addLog('cliente@expressline.com', `Modificó ${clean[ch.rowIdx]?.awb1 || ''}: ${descs}`)
+    }
+  }
+
+  // Update MCL notification
+  updateMclNotif()
+
+  alert(`Versión ${versions.length} guardada: ${clean.length} filas, ${changes.length} cambio(s) detectados.`)
+}
+
+function updateMclNotif() {
+  const unacked = versions.filter(v => v.changes && v.changes.length > 0 && !v.acked).length
+  const notif = document.getElementById('mclNotif')
+  if (unacked > 0) { notif.textContent = unacked; notif.style.display = '' }
+  else notif.style.display = 'none'
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MCL — RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function mclRefresh() {
+  // Populate version selector
+  const sel = document.getElementById('versionSelect')
+  sel.innerHTML = ''
+  if (versions.length === 0) {
+    sel.innerHTML = '<option>Sin versiones</option>'
+    document.getElementById('verCount').textContent = ''
+    document.getElementById('mclBody').innerHTML = '<tr><td colspan="18" style="text-align:center;padding:30px;color:#9ca3af">El cliente aún no ha guardado datos</td></tr>'
+    document.getElementById('changesPanel').style.display = 'none'
+    renderChat(); renderLog()
+    return
+  }
+
+  versions.forEach((v, i) => {
+    const opt = document.createElement('option'); opt.value = i
+    opt.textContent = `v${i+1} — ${v.timestamp} (${v.user.split('@')[0]})`
+    sel.appendChild(opt)
+  })
+  sel.value = versions.length - 1
+  document.getElementById('verCount').textContent = `${versions.length} versión(es)`
+
+  mclLoadVersion()
+  renderChat()
+  renderLog()
+}
+
+function mclLoadVersion() {
+  const idx = parseInt(document.getElementById('versionSelect').value)
+  if (isNaN(idx) || !versions[idx]) return
+  const ver = versions[idx]
+  const prevVer = idx > 0 ? versions[idx-1] : null
+
+  const tbody = document.getElementById('mclBody')
+  tbody.innerHTML = ''
+
+  const changes = ver.changes || []
+  const changeMap = new Map() // rowIdx → change
+  const deletedRows = []
+  for (const ch of changes) {
+    if (ch.type === 'deleted') deletedRows.push(ch)
+    else changeMap.set(ch.rowIdx, ch)
+  }
+
+  // Changed cell keys per row
+  const cellChangeMap = new Map() // rowIdx → Set of keys
+  for (const ch of changes) {
+    if (ch.type === 'modified' && ch.cells) {
+      cellChangeMap.set(ch.rowIdx, new Map(ch.cells.map(c => [c.key, c.oldVal])))
+    }
+  }
+
+  // Render current rows
+  const mclDups = findDuplicates(ver.rows)
+  ver.rows.forEach((row, rowIdx) => {
+    const tr = document.createElement('tr')
+    const ch = changeMap.get(rowIdx)
+
+    if (mclDups.has(rowIdx)) tr.classList.add('ch-dup')
+    else if (ch?.type === 'new') tr.classList.add('ch-new')
+    else if (ch?.type === 'moved') tr.classList.add('ch-moved')
+
+    // Row number
+    const tdNum = document.createElement('td'); tdNum.className = 'row-num'; tdNum.textContent = rowIdx + 1
+    tr.appendChild(tdNum)
+
+    // Change badge
+    const tdBadge = document.createElement('td'); tdBadge.style.width = '50px'
+    if (ch) {
+      const span = document.createElement('span'); span.className = 'ch-badge'
+      if (ch.type === 'new') { span.classList.add('new'); span.textContent = 'NUEVO' }
+      else if (ch.type === 'moved') { span.classList.add('moved'); span.textContent = `↕ ${ch.fromIdx+1}→${rowIdx+1}` }
+      else if (ch.type === 'modified') { span.classList.add('mod'); span.textContent = `${ch.cells.length} cambio(s)` }
+      tdBadge.appendChild(span)
+    }
+    tr.appendChild(tdBadge)
+
+    // Data cells
+    const cellChanges = cellChangeMap.get(rowIdx)
+    COLUMNS.forEach(col => {
+      const td = document.createElement('td')
+      if (col.type === 'checkbox') {
+        td.className = 'cb-cell'
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!row[col.key]; cb.disabled = true
+        td.appendChild(cb)
+      } else {
+        const inp = document.createElement('input'); inp.type = 'text'; inp.value = row[col.key] || ''; inp.readOnly = true
+        if (col.width) inp.style.width = col.width
+        td.appendChild(inp)
+      }
+      // Highlight changed cell
+      if (cellChanges && cellChanges.has(col.key)) {
+        td.classList.add('ch-cell')
+        td.setAttribute('data-prev', `Antes: ${cellChanges.get(col.key) || '(vacío)'}`)
+      }
+      tr.appendChild(td)
+    })
+
+    tbody.appendChild(tr)
+  })
+
+  // Render deleted rows
+  for (const del of deletedRows) {
+    const tr = document.createElement('tr'); tr.classList.add('ch-deleted')
+    const tdNum = document.createElement('td'); tdNum.className = 'row-num'; tdNum.textContent = '—'; tr.appendChild(tdNum)
+    const tdBadge = document.createElement('td')
+    const span = document.createElement('span'); span.className = 'ch-badge del'; span.textContent = 'ELIMINADO'
+    tdBadge.appendChild(span); tr.appendChild(tdBadge)
+    COLUMNS.forEach(col => {
+      const td = document.createElement('td')
+      if (col.type === 'checkbox') { td.className = 'cb-cell'; td.textContent = del.prevRow[col.key] ? '✓' : '' }
+      else { const inp = document.createElement('input'); inp.type='text'; inp.value = del.prevRow[col.key]||''; inp.readOnly=true; if(col.width)inp.style.width=col.width; td.appendChild(inp) }
+      tr.appendChild(td)
+    })
+    tbody.appendChild(tr)
+  }
+
+  // Render changes panel
+  renderChangesPanel(changes, ver)
+}
+
+function renderChangesPanel(changes, ver) {
+  const panel = document.getElementById('changesPanel')
+  const list = document.getElementById('changesList')
+  list.innerHTML = ''
+
+  if (changes.length === 0 || ver.acked) { panel.style.display = 'none'; return }
+  panel.style.display = ''
+  document.getElementById('changesCount').textContent = `(${changes.length})`
+
+  for (const ch of changes) {
+    const div = document.createElement('div'); div.className = 'change-item'
+
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'change-check'
+    cb.checked = !!ch.acked
+    cb.addEventListener('change', () => { ch.acked = cb.checked; updateMclNotif() })
+    div.appendChild(cb)
+
+    let icon = '', desc = ''
+    if (ch.type === 'new') {
+      icon = '🟢'; const r = ver.rows[ch.rowIdx]
+      desc = `Nueva fila #${ch.rowIdx+1}: ${r?.awb1||'sin AWB'} / ${r?.awb2||''}`
+    } else if (ch.type === 'deleted') {
+      icon = '🔴'; desc = `Eliminada: ${ch.prevRow?.awb1||'sin AWB'} / ${ch.prevRow?.awb2||''}`
+    } else if (ch.type === 'moved') {
+      icon = '⬜'; const r = ver.rows[ch.rowIdx]
+      desc = `Fila movida de #${ch.fromIdx+1} a #${ch.rowIdx+1}: ${r?.awb1||''}`
+    } else if (ch.type === 'modified') {
+      icon = '🟡'; const r = ver.rows[ch.rowIdx]
+      const detail = ch.cells.map(c => `${COL_LABELS[c.key]}: "${c.oldVal||'(vacío)'}" → "${c.newVal||'(vacío)'}"`).join(' | ')
+      desc = `Modificada #${ch.rowIdx+1} (${r?.awb1||''}): ${detail}`
+    }
+
+    const iconSpan = document.createElement('span'); iconSpan.className = 'ch-icon'; iconSpan.textContent = icon
+    div.appendChild(iconSpan)
+
+    const descSpan = document.createElement('span'); descSpan.textContent = desc; descSpan.style.flex = '1'
+    div.appendChild(descSpan)
+
+    list.appendChild(div)
+  }
+}
+
+function mclAckAll() {
+  const idx = parseInt(document.getElementById('versionSelect').value)
+  if (isNaN(idx) || !versions[idx]) return
+  for (const ch of (versions[idx].changes || [])) ch.acked = true
+  versions[idx].acked = true
+  addLog('agente@mincurllogistics.com', `Marcó como vistos todos los cambios de v${idx+1}`)
+  // Only hide the summary panel, keep table colors/badges
+  document.getElementById('changesPanel').style.display = 'none'
+  updateMclNotif()
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════════════════════════════
+function sendChat() {
+  const input = document.getElementById('chatInput')
+  const text = input.value.trim(); if (!text) return
+  const sender = currentView === 'mcl' ? 'agente@mincurllogistics.com' : 'cliente@expressline.com'
+  chatMessages.push({ sender, text, time: dateTimeStr(), side: currentView === 'mcl' ? 'mcl' : 'client' })
+  addLog(sender, `Chat: "${text}"`)
+  input.value = ''
+  renderChat()
+}
+
+function renderChat() {
+  const container = document.getElementById('chatMessages')
+  container.innerHTML = ''
+  for (const msg of chatMessages) {
+    const div = document.createElement('div'); div.className = 'chat-msg ' + msg.side
+    div.innerHTML = `<span class="sender">${msg.sender.split('@')[0]}</span><span class="time">${msg.time}</span><br>${msg.text}`
+    container.appendChild(div)
+  }
+  container.scrollTop = container.scrollHeight
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ACTIVITY LOG
+// ═══════════════════════════════════════════════════════════════════════════
+function addLog(user, action) {
+  activityLog.push({ time: dateTimeStr(), user, action })
+}
+
+function renderLog() {
+  const container = document.getElementById('logEntries')
+  container.innerHTML = ''
+  for (let i = activityLog.length - 1; i >= 0; i--) {
+    const e = activityLog[i]
+    const div = document.createElement('div'); div.className = 'log-entry'
+    div.innerHTML = `<span class="log-time">${e.time}</span><span class="log-user">${e.user.split('@')[0]}:</span>${e.action}`
+    container.appendChild(div)
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if ((e.key==='Delete'||(e.key==='Backspace'&&e.target.tagName!=='INPUT')) && selectedRows.size>0 && currentView==='client') {
+    e.preventDefault(); deleteSelectedRows(); return
+  }
+  if (activeRowIdx<0||activeColIdx<0||e.target.tagName!=='INPUT'||currentView!=='client') return
+  let nr=activeRowIdx, nc=activeColIdx
+  if (e.key==='ArrowDown'||e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); nr=Math.min(nr+1,rows.length-1) }
+  else if (e.key==='ArrowUp'||e.key==='Enter'&&e.shiftKey) { e.preventDefault(); nr=Math.max(nr-1,0) }
+  else if (e.key==='Tab'&&!e.shiftKey) { e.preventDefault(); nc++; if(nc>=COLUMNS.length){nc=0;nr=Math.min(nr+1,rows.length-1)} }
+  else if (e.key==='Tab'&&e.shiftKey) { e.preventDefault(); nc--; if(nc<0){nc=COLUMNS.length-1;nr=Math.max(nr-1,0)} }
+  else return
+  const td = document.querySelector(`#clientBody td[data-row="${nr}"][data-col="${nc}"]`)
+  if (td) { const inp = td.querySelector('input'); if(inp){inp.focus();inp.select()} }
+})
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+renderClientTable()
+</script>
+</body>
+</html>

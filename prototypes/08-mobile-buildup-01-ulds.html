@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mobile Build-up - Pantalla 1: Mis ULDs</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{'mcl-blue':'#1e3a5f','mcl-gold':'#c9a84c'}}}}</script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; max-width: 430px; margin: 0 auto; min-height: 100vh; }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
+</style>
+</head>
+<body class="bg-gray-100">
+
+<!-- ============================================================ -->
+<!-- PANTALLA 1-A: SELECCION DE VUELO                             -->
+<!-- (Se muestra primero, antes de ver los ULDs)                  -->
+<!-- ============================================================ -->
+
+<section id="screen-flight" class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <div class="bg-mcl-blue text-white px-4 py-3 flex items-center gap-3">
+    <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    <div>
+      <p class="text-sm font-bold">ULD Build-up</p>
+      <p class="text-[10px] opacity-60">Seleccionar vuelo</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="px-4 pt-4 pb-2">
+    <input type="text" placeholder="Buscar vuelo, aerolinea o destino..."
+      class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-mcl-blue shadow-sm" />
+  </div>
+
+  <!-- Flight list -->
+  <div class="flex-1 overflow-y-auto px-4 space-y-2 pb-4">
+
+    <!-- Flight card -->
+    <button onclick="document.getElementById('screen-flight').style.display='none'; document.getElementById('screen-ulds').style.display='flex';"
+      class="w-full bg-white rounded-xl border border-gray-200 p-4 text-left active:bg-blue-50 transition-colors shadow-sm">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-bold text-gray-800 text-base">LA601</span>
+        <span class="text-xs text-gray-400">May 17, 2026</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-gray-500">LATAM Cargo</span>
+        <span class="text-xs font-semibold text-mcl-blue">BOG, UIO, GYE</span>
+      </div>
+      <div class="mt-2 flex items-center gap-2">
+        <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full" style="width: 26%"></div>
+        </div>
+        <span class="text-[10px] text-gray-400">12/45 pzas</span>
+      </div>
+    </button>
+
+    <button class="w-full bg-white rounded-xl border border-gray-200 p-4 text-left active:bg-blue-50 transition-colors shadow-sm">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-bold text-gray-800 text-base">AV920</span>
+        <span class="text-xs text-gray-400">May 17, 2026</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-gray-500">Avianca Cargo</span>
+        <span class="text-xs font-semibold text-mcl-blue">BOG</span>
+      </div>
+      <div class="mt-2 flex items-center gap-2">
+        <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full" style="width: 0%"></div>
+        </div>
+        <span class="text-[10px] text-gray-400">0/120 pzas</span>
+      </div>
+    </button>
+
+    <button class="w-full bg-white rounded-xl border border-gray-200 p-4 text-left active:bg-blue-50 transition-colors shadow-sm">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-bold text-gray-800 text-base">CM450</span>
+        <span class="text-xs text-gray-400">May 18, 2026</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-gray-500">Copa Cargo</span>
+        <span class="text-xs font-semibold text-mcl-blue">PTY, GUA</span>
+      </div>
+      <div class="mt-2 flex items-center gap-2">
+        <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full bg-green-500 rounded-full" style="width: 100%"></div>
+        </div>
+        <span class="text-[10px] text-green-600 font-medium">32/32 pzas - Completo</span>
+      </div>
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- PANTALLA 1-B: MIS ULDs (despues de seleccionar vuelo)        -->
+<!-- ============================================================ -->
+
+<section id="screen-ulds" class="min-h-screen flex flex-col" style="display:none">
+
+  <!-- Header sticky con info vuelo -->
+  <div class="bg-mcl-blue text-white px-4 py-3 sticky top-0 z-20">
+    <div class="flex items-center justify-between mb-1">
+      <div class="flex items-center gap-2">
+        <button onclick="document.getElementById('screen-ulds').style.display='none'; document.getElementById('screen-flight').style.display='flex';"
+          class="p-1 -ml-1 opacity-60">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <div>
+          <p class="text-sm font-bold">LA601 <span class="font-normal opacity-60">| LATAM</span></p>
+        </div>
+      </div>
+      <span class="text-xs opacity-60">May 17, 2026</span>
+    </div>
+    <!-- Stats row -->
+    <div class="flex items-center gap-4 text-[11px] mt-1">
+      <span class="opacity-70">AWBs: <b class="text-white">8</b></span>
+      <span class="opacity-70">Piezas: <b class="text-white">12 / 45</b></span>
+      <span class="opacity-70">Peso: <b class="text-white">320 / 1,200 kg</b></span>
+    </div>
+    <!-- Progress bar -->
+    <div class="h-1 bg-white/20 rounded-full mt-2 overflow-hidden">
+      <div class="h-full bg-mcl-gold rounded-full" style="width: 26%"></div>
+    </div>
+  </div>
+
+  <!-- AWBs resumen (colapsable) -->
+  <details class="bg-white border-b border-gray-200">
+    <summary class="px-4 py-2.5 text-xs font-semibold text-gray-500 cursor-pointer flex items-center gap-1">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      Ver AWBs del vuelo (8)
+    </summary>
+    <div class="px-4 pb-3 space-y-1.5">
+      <!-- AWB row -->
+      <div class="flex items-center justify-between text-xs">
+        <div>
+          <span class="font-mono font-bold text-gray-700">057-12345678</span>
+          <span class="text-gray-400 ml-1">Merflex</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-16 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 20%"></div>
+          </div>
+          <span class="text-gray-500 w-10 text-right">5/24</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between text-xs">
+        <div>
+          <span class="font-mono font-bold text-gray-700">057-87654321</span>
+          <span class="text-gray-400 ml-1">Cargo Int'l</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-16 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-green-500 rounded-full" style="width: 100%"></div>
+          </div>
+          <span class="text-green-600 w-10 text-right font-medium">10/10</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between text-xs">
+        <div>
+          <span class="font-mono font-bold text-gray-700">057-11223344</span>
+          <span class="text-gray-400 ml-1">Express Co.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-16 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 0%"></div>
+          </div>
+          <span class="text-gray-500 w-10 text-right">0/6</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between text-xs">
+        <div>
+          <span class="font-mono font-bold text-amber-600">057-99887766</span>
+          <span class="text-amber-500 ml-1">Cierre forzado</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-amber-600 w-10 text-right font-medium text-[10px]">3/5 FC</span>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ULD List -->
+  <div class="flex-1 overflow-y-auto px-4 pt-3 pb-24 space-y-3">
+
+    <!-- Section: Abiertos -->
+    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Abiertos (3)</p>
+
+    <!-- ULD Card 1 - Open, partially filled -->
+    <button onclick="document.getElementById('screen-ulds').style.display='none'; document.getElementById('screen-assign').style.display='flex';"
+      class="w-full bg-white rounded-xl border border-gray-200 p-4 text-left active:bg-blue-50 transition-colors shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">MD</span>
+          <span class="font-mono font-bold text-base text-gray-800">PMC 1234LA</span>
+        </div>
+        <span class="text-xs text-gray-400">BOG</span>
+      </div>
+      <!-- Capacity bar -->
+      <div class="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+        <span>3 AWBs | 8 piezas</span>
+        <span>320 / 2,000 kg (16%)</span>
+      </div>
+      <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-blue-500 rounded-full" style="width: 16%"></div>
+      </div>
+      <!-- AWBs summary mini -->
+      <div class="mt-2 space-y-0.5">
+        <div class="flex justify-between text-[10px] text-gray-400">
+          <span class="font-mono">057-12345678</span><span>5 pcs | 150 kg</span>
+        </div>
+        <div class="flex justify-between text-[10px] text-gray-400">
+          <span class="font-mono">057-87654321</span><span>2 pcs | 120 kg</span>
+        </div>
+        <div class="flex justify-between text-[10px] text-gray-400">
+          <span class="font-mono">057-11223344</span><span>1 pc | 50 kg</span>
+        </div>
+      </div>
+    </button>
+
+    <!-- ULD Card 2 - Open, empty -->
+    <button class="w-full bg-white rounded-xl border border-gray-200 p-4 text-left active:bg-blue-50 transition-colors shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">LD</span>
+          <span class="font-mono font-bold text-base text-gray-800">AKE 5678LA</span>
+        </div>
+        <span class="text-xs text-gray-400">UIO</span>
+      </div>
+      <div class="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+        <span>0 AWBs | 0 piezas</span>
+        <span>0 / 1,134 kg (0%)</span>
+      </div>
+      <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-blue-500 rounded-full" style="width: 0%"></div>
+      </div>
+      <p class="text-[10px] text-gray-300 mt-2">Sin piezas asignadas</p>
+    </button>
+
+    <!-- ULD Card 3 - Open, almost full -->
+    <button class="w-full bg-white rounded-xl border border-gray-200 p-4 text-left active:bg-blue-50 transition-colors shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">ESP</span>
+          <span class="font-mono font-bold text-base text-gray-800">PLA 9012LA</span>
+        </div>
+        <span class="text-xs text-gray-400">GYE</span>
+      </div>
+      <div class="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+        <span>1 AWB | 4 piezas</span>
+        <span>890 / 1,000 kg (89%)</span>
+      </div>
+      <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-amber-500 rounded-full" style="width: 89%"></div>
+      </div>
+    </button>
+
+    <!-- Section: Cerrados -->
+    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-4">Cerrados (1)</p>
+
+    <div class="w-full bg-gray-50 rounded-xl border border-gray-200 p-4 opacity-70">
+      <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">MD</span>
+          <span class="font-mono font-bold text-sm text-gray-800">PMC 0001LA</span>
+          <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">Cerrado</span>
+        </div>
+      </div>
+      <p class="text-[10px] text-gray-400">BOG | 12 pcs | 1,850 kg</p>
+    </div>
+  </div>
+
+  <!-- Fixed bottom: Crear ULD -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-bottom" style="max-width:430px; margin:0 auto;">
+    <button onclick="document.getElementById('screen-ulds').style.display='none'; document.getElementById('screen-create').style.display='flex';"
+      class="w-full py-3.5 bg-mcl-blue text-white text-sm font-bold rounded-xl active:bg-blue-900 shadow-lg">
+      + Crear ULD
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- PANTALLA 1-C: CREAR ULD (fullscreen form)                    -->
+<!-- ============================================================ -->
+
+<section id="screen-create" class="min-h-screen flex flex-col bg-white" style="display:none">
+
+  <!-- Header -->
+  <div class="bg-mcl-blue text-white px-4 py-3 flex items-center gap-3">
+    <button onclick="document.getElementById('screen-create').style.display='none'; document.getElementById('screen-ulds').style.display='flex';"
+      class="p-1 -ml-1 opacity-60">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <div>
+      <p class="text-sm font-bold">Nuevo ULD</p>
+      <p class="text-[10px] opacity-60">LA601 | LATAM | BOG, UIO, GYE</p>
+    </div>
+  </div>
+
+  <div class="flex-1 px-4 py-6 space-y-6">
+
+    <!-- CONF -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Configuracion</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="py-4 rounded-xl border-2 border-purple-400 bg-purple-50 text-purple-700 font-bold text-sm text-center" id="btn-md">
+          Main<br>Deck
+        </button>
+        <button class="py-4 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center active:border-blue-400" id="btn-ld">
+          Lower<br>Deck
+        </button>
+        <button class="py-4 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center active:border-amber-400" id="btn-esp">
+          Especial
+        </button>
+      </div>
+    </div>
+
+    <!-- TYPE -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Tipo</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="py-3 rounded-xl border-2 border-mcl-blue bg-blue-50 text-mcl-blue font-bold text-sm text-center">PMC</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center">PAG</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center">PLA</button>
+      </div>
+      <!-- Info del tipo seleccionado -->
+      <div class="mt-2 flex items-center justify-between text-[11px] text-gray-400 bg-gray-50 rounded-lg px-3 py-1.5">
+        <span>PMC | Main Deck</span>
+        <span>Max: 4,500 kg | Tara: 120 kg | Net: 4,380 kg</span>
+      </div>
+    </div>
+
+    <!-- Number -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Numero de ULD</label>
+      <input type="text" value="1234LA" placeholder="Ej: 1234LA"
+        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 text-xl font-mono font-bold text-center tracking-wider focus:outline-none focus:border-mcl-blue" />
+      <p class="text-center text-sm font-mono font-bold text-mcl-blue mt-2">PMC 1234LA</p>
+    </div>
+
+    <!-- Destination -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Destino</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="py-3 rounded-xl border-2 border-mcl-blue bg-blue-50 text-mcl-blue font-bold text-sm text-center">BOG</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center">UIO</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center">GYE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed bottom -->
+  <div class="border-t border-gray-200 px-4 py-3 safe-bottom">
+    <button onclick="document.getElementById('screen-create').style.display='none'; document.getElementById('screen-ulds').style.display='flex';"
+      class="w-full py-3.5 bg-green-600 text-white text-sm font-bold rounded-xl active:bg-green-700 shadow-lg">
+      Crear ULD
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- NOTA: La Pantalla 2 (Asignar) esta en el archivo 08-02       -->
+<!-- ============================================================ -->
+
+<!-- Placeholder para navegacion -->
+<section id="screen-assign" class="min-h-screen flex flex-col" style="display:none">
+  <div class="bg-mcl-blue text-white px-4 py-3 flex items-center gap-3">
+    <button onclick="document.getElementById('screen-assign').style.display='none'; document.getElementById('screen-ulds').style.display='flex';"
+      class="p-1 -ml-1 opacity-60">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <p class="text-sm font-bold">PMC 1234LA <span class="font-normal opacity-60">| BOG</span></p>
+  </div>
+  <div class="flex-1 flex items-center justify-center text-gray-400 text-sm">
+    Ver archivo 08-mobile-buildup-02-assign.html
+  </div>
+</section>
+
+</body>
+</html>

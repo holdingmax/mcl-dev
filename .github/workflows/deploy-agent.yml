@@ -1,0 +1,57 @@
+name: "ANDS — Agente Nocturno de Despliegue Seguro"
+
+on:
+  schedule:
+    # 5:00 AM EST = 9:00 AM UTC (madrugada deploy window)
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy even if Claude says no'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy-agent:
+    name: ANDS Deploy Agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install agent dependencies
+        working-directory: .github/agents
+        run: npm ci
+
+      - name: Run ANDS agent
+        working-directory: .github/agents
+        run: node deploy/index.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          FORCE_DEPLOY: ${{ github.event.inputs.force_deploy || 'false' }}
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ands-report-${{ github.run_number }}
+          path: .github/agents/reports/
+          retention-days: 30

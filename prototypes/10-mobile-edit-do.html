@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile Edit DO — Prototype</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f3f4f6; min-height: 100vh; max-width: 420px; margin: 0 auto; }
+
+  .header { background: #1e3a5f; color: #fff; padding: 14px 16px; text-align: center; position: sticky; top: 0; z-index: 10; }
+  .header h1 { font-size: 16px; font-weight: 700; }
+  .header .sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .back-btn { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #fff; background: none; border: none; font-size: 20px; cursor: pointer; }
+
+  .content { padding: 12px 16px; }
+
+  /* Date label */
+  .date-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .date-label .dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+  .do-count { font-size: 11px; color: #9ca3af; font-weight: 400; margin-left: auto; }
+
+  /* DO List View */
+  .do-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: box-shadow 0.15s; }
+  .do-card:active { box-shadow: 0 0 0 2px #1e3a5f; }
+  .do-card .do-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .do-number { font-size: 15px; font-weight: 800; color: #1e3a5f; font-family: monospace; }
+  .do-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .do-status.pending { background: #fef3c7; color: #92400e; }
+  .do-status.draft { background: #e5e7eb; color: #6b7280; }
+  .do-awbs { font-size: 11px; color: #6b7280; margin-bottom: 6px; }
+  .do-awbs span { font-family: monospace; font-weight: 600; color: #374151; }
+  .do-ulds { display: flex; flex-wrap: wrap; gap: 4px; }
+  .uld-chip { background: #f0f4f8; border: 1px solid #d0d5dd; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-family: monospace; font-weight: 600; color: #1e3a5f; }
+  .do-meta { font-size: 10px; color: #9ca3af; margin-top: 6px; }
+
+  /* Search toggle */
+  .search-toggle { display: flex; align-items: center; justify-content: center; gap: 6px; background: none; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #6b7280; cursor: pointer; width: 100%; margin-bottom: 12px; }
+  .search-toggle:active { background: #f9fafb; }
+  .search-toggle .icon { font-size: 14px; }
+
+  .search-bar { background: #fff; border-radius: 10px; border: 1px solid #1e3a5f; padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; display: none; }
+  .search-bar.open { display: flex; }
+  .search-bar input { border: none; outline: none; font-size: 13px; flex: 1; }
+  .search-bar .close-search { background: none; border: none; color: #9ca3af; font-size: 18px; cursor: pointer; padding: 0 4px; }
+
+  /* Edit View */
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; margin-bottom: 6px; margin-top: 14px; }
+  .section-label:first-child { margin-top: 0; }
+
+  .info-row { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 12px; margin-bottom: 8px; }
+  .info-row .label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-row .value { font-size: 14px; font-weight: 700; color: #1e3a5f; font-family: monospace; }
+
+  .awb-list { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; margin-bottom: 8px; }
+  .awb-item { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; }
+  .awb-item:last-child { border-bottom: none; }
+  .awb-item .awb-num { font-family: monospace; font-weight: 700; font-size: 13px; color: #1e3a5f; }
+  .awb-item .awb-client { font-size: 11px; color: #6b7280; }
+  .awb-item .badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; font-size: 9px; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .badge.c { background: #22c55e; }
+  .badge.p { background: #f59e0b; }
+
+  /* ULD Edit Section */
+  .uld-edit-list { margin-bottom: 8px; }
+  .uld-edit-row { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .uld-edit-row input { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; font-size: 14px; font-family: monospace; font-weight: 700; text-transform: uppercase; }
+  .uld-edit-row input:focus { outline: none; border-color: #1e3a5f; box-shadow: 0 0 0 2px rgba(30,58,95,0.15); }
+  .uld-edit-row .remove-btn { width: 32px; height: 32px; border-radius: 8px; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .uld-edit-row .remove-btn:active { background: #fee2e2; }
+
+  .add-uld-btn { width: 100%; background: #f0f4f8; border: 1.5px dashed #93a3b8; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 600; color: #1e3a5f; cursor: pointer; text-align: center; margin-bottom: 12px; }
+  .add-uld-btn:active { background: #e2e8f0; }
+
+  /* Buttons */
+  .save-btn { width: 100%; background: #1e3a5f; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+  .save-btn:active { background: #15304f; }
+  .save-btn:disabled { opacity: 0.5; }
+  .save-btn.saving { background: #6b7280; }
+
+  .cancel-btn { width: 100%; background: transparent; color: #9ca3af; border: none; padding: 12px; font-size: 12px; cursor: pointer; text-align: center; margin-top: 4px; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #065f46; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; z-index: 100; }
+  .toast.show { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 40px 20px; color: #9ca3af; display: none; }
+  .empty .icon { font-size: 36px; margin-bottom: 8px; }
+  .empty .msg { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- VIEW 1: DO List (today's DOs)                -->
+<!-- ============================================ -->
+<div id="view-list">
+  <div class="header">
+    <h1>Edit Delivery Order</h1>
+    <div class="sub">Selecciona una DO para editar ULDs</div>
+  </div>
+  <div class="content">
+
+    <!-- Today's DOs (auto-loaded) -->
+    <div class="date-label">
+      <span class="dot"></span> Hoy — 05/18/2026
+      <span class="do-count">3 DOs</span>
+    </div>
+
+    <div id="do-list">
+      <!-- DO Card 1 -->
+      <div class="do-card" onclick="openEdit('DO-0000108')">
+        <div class="do-header">
+          <span class="do-number">DO-0000108</span>
+          <span class="do-status pending">Pending</span>
+        </div>
+        <div class="do-awbs">
+          <span>045-22209865</span>, <span>045-22209806</span>, <span>045-22209482</span>, <span>045-22209854</span>
+        </div>
+        <div class="do-ulds">
+          <span class="uld-chip">PAG69570R7</span>
+          <span class="uld-chip">PAG66890R7</span>
+          <span class="uld-chip">PAG71794R7</span>
+          <span class="uld-chip">PAG63020R7</span>
+          <span class="uld-chip">PAG61879R7</span>
+        </div>
+        <div class="do-meta">Express Line &bull; CO-Transportation &bull; JAVIER ROMERO</div>
+      </div>
+
+      <!-- DO Card 2 -->
+      <div class="do-card" onclick="openEdit('DO-0000109')">
+        <div class="do-header">
+          <span class="do-number">DO-0000109</span>
+          <span class="do-status draft">Draft</span>
+        </div>
+        <div class="do-awbs">
+          <span>045-22209854</span>
+        </div>
+        <div class="do-ulds">
+          <span class="uld-chip">PAG63020R7</span>
+        </div>
+        <div class="do-meta">Express Line &bull; — &bull; —</div>
+      </div>
+
+      <!-- DO Card 3 -->
+      <div class="do-card" onclick="openEdit('DO-0000106')">
+        <div class="do-header">
+          <span class="do-number">DO-0000106</span>
+          <span class="do-status pending">Pending</span>
+        </div>
+        <div class="do-awbs">
+          <span>045-22209865</span>, <span>045-22209806</span>, <span>045-22209482</span>, <span>045-22209854</span>
+        </div>
+        <div class="do-ulds">
+          <span class="uld-chip">PAG69570R7</span>
+          <span class="uld-chip">PAG66890R7</span>
+          <span class="uld-chip">PAG71794R7</span>
+          <span class="uld-chip">PAG63020R7</span>
+          <span class="uld-chip">PAG61879R7</span>
+        </div>
+        <div class="do-meta">Express Line &bull; CO-Transportation &bull; JAVIER ROMERO</div>
+      </div>
+    </div>
+
+    <!-- Search for other dates -->
+    <button class="search-toggle" id="searchToggle" onclick="toggleSearch()">
+      <span class="icon">&#128269;</span> Buscar DO de otra fecha
+    </button>
+    <div class="search-bar" id="searchBar">
+      <input type="text" placeholder="DO#, AWB, cliente..." id="searchInput" oninput="filterDOs()">
+      <button class="close-search" onclick="closeSearch()">&times;</button>
+    </div>
+
+    <div class="empty" id="emptyState">
+      <div class="icon">&#128196;</div>
+      <div class="msg">No se encontraron DOs</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- VIEW 2: Edit DO                              -->
+<!-- ============================================ -->
+<div id="view-edit" style="display:none;">
+  <div class="header">
+    <button class="back-btn" onclick="goBack()">&larr;</button>
+    <h1 id="edit-do-number">DO-0000108</h1>
+    <div class="sub">Editar ULDs</div>
+  </div>
+  <div class="content">
+
+    <!-- AWBs (read-only) -->
+    <div class="section-label">AWBs en esta DO</div>
+    <div class="awb-list" id="edit-awb-list">
+      <div class="awb-item">
+        <span class="badge c">C</span>
+        <div>
+          <div class="awb-num">045-22209865</div>
+          <div class="awb-client">Express Line &bull; EZE</div>
+        </div>
+      </div>
+      <div class="awb-item">
+        <span class="badge c">C</span>
+        <div>
+          <div class="awb-num">045-22209806</div>
+          <div class="awb-client">Express Line &bull; EZE</div>
+        </div>
+      </div>
+      <div class="awb-item">
+        <span class="badge c">C</span>
+        <div>
+          <div class="awb-num">045-22209482</div>
+          <div class="awb-client">Express Line &bull; EZE</div>
+        </div>
+      </div>
+      <div class="awb-item">
+        <span class="badge p">P</span>
+        <div>
+          <div class="awb-num">045-22209854</div>
+          <div class="awb-client">Express Line &bull; EZE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ULDs (editable) -->
+    <div class="section-label">ULDs Loaded</div>
+    <div class="uld-edit-list" id="uld-edit-list">
+      <div class="uld-edit-row">
+        <input type="text" value="PAG69570R7" placeholder="ULD number">
+        <button class="remove-btn" onclick="removeUld(this)">&times;</button>
+      </div>
+      <div class="uld-edit-row">
+        <input type="text" value="PAG66890R7" placeholder="ULD number">
+        <button class="remove-btn" onclick="removeUld(this)">&times;</button>
+      </div>
+      <div class="uld-edit-row">
+        <input type="text" value="PAG71794R7" placeholder="ULD number">
+        <button class="remove-btn" onclick="removeUld(this)">&times;</button>
+      </div>
+      <div class="uld-edit-row">
+        <input type="text" value="PAG63020R7" placeholder="ULD number">
+        <button class="remove-btn" onclick="removeUld(this)">&times;</button>
+      </div>
+      <div class="uld-edit-row">
+        <input type="text" value="PAG61879R7" placeholder="ULD number">
+        <button class="remove-btn" onclick="removeUld(this)">&times;</button>
+      </div>
+    </div>
+    <button class="add-uld-btn" onclick="addUld()">+ Agregar ULD</button>
+
+    <button class="save-btn" id="saveBtn" onclick="saveDo()">Guardar Cambios</button>
+    <button class="cancel-btn" onclick="goBack()">Cancelar</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">ULDs actualizados correctamente</div>
+
+<script>
+function openEdit(doNum) {
+  document.getElementById('view-list').style.display = 'none';
+  document.getElementById('view-edit').style.display = 'block';
+  document.getElementById('edit-do-number').textContent = doNum;
+}
+
+function goBack() {
+  document.getElementById('view-edit').style.display = 'none';
+  document.getElementById('view-list').style.display = 'block';
+}
+
+function removeUld(btn) {
+  const row = btn.parentElement;
+  row.style.opacity = '0';
+  row.style.transform = 'translateX(50px)';
+  row.style.transition = 'all 0.2s ease';
+  setTimeout(() => row.remove(), 200);
+}
+
+function addUld() {
+  const list = document.getElementById('uld-edit-list');
+  const row = document.createElement('div');
+  row.className = 'uld-edit-row';
+  row.innerHTML = '<input type="text" value="" placeholder="ULD number" autofocus><button class="remove-btn" onclick="removeUld(this)">&times;</button>';
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+
+function saveDo() {
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = 'Guardando...';
+  btn.classList.add('saving');
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = 'Guardar Cambios';
+    btn.classList.remove('saving');
+    btn.disabled = false;
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); goBack(); }, 1500);
+  }, 800);
+}
+
+function toggleSearch() {
+  document.getElementById('searchToggle').style.display = 'none';
+  document.getElementById('searchBar').classList.add('open');
+  document.getElementById('searchInput').focus();
+}
+
+function closeSearch() {
+  document.getElementById('searchBar').classList.remove('open');
+  document.getElementById('searchToggle').style.display = '';
+  document.getElementById('searchInput').value = '';
+  filterDOs();
+}
+
+function filterDOs() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let visible = 0;
+  document.querySelectorAll('.do-card').forEach(card => {
+    const show = !q || card.textContent.toLowerCase().includes(q);
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

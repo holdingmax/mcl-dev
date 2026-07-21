@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pallet Tag Scanner - Mobile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: { extend: { colors: { 'mcl-blue': '#1e40af', 'mcl-light': '#3b82f6', 'mcl-dark': '#0f172a' } } }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 min-h-screen max-w-md mx-auto">
+
+  <!-- Mobile Header -->
+  <header class="bg-mcl-blue text-white shadow-lg sticky top-0 z-50">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <a href="01-warehouse-dashboard.html" class="text-white/70">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <div>
+          <h1 class="text-sm font-bold">Escaneo de Pallets</h1>
+          <p class="text-xs text-white/70">Armar cola de DOs</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-white/70">Agente</p>
+        <p class="text-sm font-bold">JORODRIGUEZ</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="px-4 py-4 pb-32">
+
+    <!-- Active Truck Queue Selector -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4 shadow-sm">
+      <label class="block text-xs text-gray-500 mb-2 font-medium">Cola activa (Camion)</label>
+      <div class="flex gap-2">
+        <select class="flex-1 border-2 border-mcl-blue rounded-xl px-3 py-3 text-sm font-bold focus:outline-none bg-blue-50 text-mcl-blue">
+          <option>Camion 1 AV - EZE</option>
+          <option>Camion 2 AV - EZE</option>
+          <option>Camion 3 DHL - BOG</option>
+          <option>+ Nueva cola...</option>
+        </select>
+        <button class="px-4 py-3 bg-mcl-blue text-white rounded-xl text-sm font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scan / Photo Section -->
+    <div class="bg-white rounded-xl border-2 border-dashed border-mcl-blue p-6 mb-4 text-center shadow-sm">
+      <div class="mb-4">
+        <svg class="w-16 h-16 mx-auto text-mcl-blue/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+        </svg>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <button class="bg-mcl-blue text-white py-4 rounded-xl font-bold text-sm flex flex-col items-center gap-2 active:scale-95">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+          </svg>
+          Escanear Barcode
+        </button>
+        <button class="bg-amber-600 text-white py-4 rounded-xl font-bold text-sm flex flex-col items-center gap-2 active:scale-95">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Tomar Foto
+        </button>
+      </div>
+      <p class="text-xs text-gray-400 mt-3">Escanee el barcode del Pallet Tag o tome una foto para lectura automatica</p>
+
+      <!-- Manual input fallback -->
+      <div class="mt-3 pt-3 border-t border-gray-100">
+        <div class="flex gap-2">
+          <input type="text" placeholder="Ingresar ULD manual..." class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-center focus:outline-none focus:border-mcl-blue">
+          <button class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-bold">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Last Scanned - Success State -->
+    <div class="bg-green-50 border-2 border-green-300 rounded-xl p-4 mb-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-3">
+        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span class="text-sm font-bold text-green-800">Pallet escaneado</span>
+        <span class="ml-auto text-xs text-green-600">hace 30s</span>
+      </div>
+
+      <!-- Pallet tag data extracted -->
+      <div class="bg-white rounded-lg p-3 mb-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl font-black text-gray-800 font-mono">PMC58347R7</span>
+          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold">LD</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-xs">
+          <div>
+            <p class="text-gray-400">Destino</p>
+            <p class="font-bold text-gray-800 text-lg">EZE</p>
+          </div>
+          <div>
+            <p class="text-gray-400">Vuelo</p>
+            <p class="font-bold text-gray-800">LA0543</p>
+          </div>
+          <div>
+            <p class="text-gray-400">Peso Neto</p>
+            <p class="font-mono font-bold text-gray-800">1,511 kg</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWBs inside this pallet (from system data) -->
+      <div class="mb-3">
+        <p class="text-xs text-green-700 font-medium mb-2">AWBs en este pallet (del sistema):</p>
+        <div class="space-y-1.5">
+          <div class="bg-white rounded-lg px-3 py-2 flex items-center justify-between">
+            <span class="font-mono text-sm font-medium">729-93889364</span>
+            <div class="flex items-center gap-3 text-xs text-gray-500">
+              <span>Express Line</span>
+              <span class="font-mono font-bold">48 pzas</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg px-3 py-2 flex items-center justify-between">
+            <span class="font-mono text-sm font-medium">729-93889375</span>
+            <div class="flex items-center gap-3 text-xs text-gray-500">
+              <span>Express Line</span>
+              <span class="font-mono font-bold">38 pzas</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg px-3 py-2 flex items-center justify-between">
+            <span class="font-mono text-sm font-medium">729-93889386</span>
+            <div class="flex items-center gap-3 text-xs text-gray-500">
+              <span>Express Line</span>
+              <span class="font-mono font-bold">6 pzas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-xs text-green-700 font-medium text-center">Agregado a: <span class="font-bold">Camion 1 AV - EZE</span></p>
+    </div>
+
+    <!-- Current Queue Summary -->
+    <div class="mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-sm font-bold text-gray-700">Cola: Camion 1 AV - EZE</h3>
+        <span class="text-xs bg-mcl-blue text-white px-2 py-0.5 rounded-full font-bold">3 pallets</span>
+      </div>
+
+      <div class="space-y-2">
+        <!-- Pallet 1 -->
+        <div class="bg-white rounded-lg border border-gray-200 px-3 py-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold">MD</span>
+              <span class="font-mono font-bold text-sm text-gray-800">PAG61389R7</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">4 AWBs / 92 pzas</span>
+              <button class="p-1 text-red-400 hover:text-red-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mt-1 text-xs text-gray-400">
+            <span>EZE</span>
+            <span>LA0543</span>
+            <span class="font-mono">2,270 kg</span>
+            <span class="ml-auto">08:41</span>
+          </div>
+        </div>
+
+        <!-- Pallet 2 -->
+        <div class="bg-white rounded-lg border border-gray-200 px-3 py-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold">MD</span>
+              <span class="font-mono font-bold text-sm text-gray-800">PAG72557R7</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">3 AWBs / 78 pzas</span>
+              <button class="p-1 text-red-400 hover:text-red-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mt-1 text-xs text-gray-400">
+            <span>EZE</span>
+            <span>LA0543</span>
+            <span class="font-mono">2,118 kg</span>
+            <span class="ml-auto">08:43</span>
+          </div>
+        </div>
+
+        <!-- Pallet 3 (just scanned) -->
+        <div class="bg-white rounded-lg border-2 border-green-300 px-3 py-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">LD</span>
+              <span class="font-mono font-bold text-sm text-gray-800">PMC58347R7</span>
+              <span class="text-[10px] text-green-600 font-medium">NUEVO</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">3 AWBs / 92 pzas</span>
+              <button class="p-1 text-red-400 hover:text-red-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mt-1 text-xs text-gray-400">
+            <span>EZE</span>
+            <span>LA0543</span>
+            <span class="font-mono">1,511 kg</span>
+            <span class="ml-auto">08:45</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Queue totals -->
+      <div class="mt-3 bg-gray-100 rounded-lg px-3 py-2 flex items-center justify-between text-xs">
+        <span class="text-gray-500">Total cola:</span>
+        <div class="flex items-center gap-4 font-bold text-gray-700">
+          <span>3 ULDs</span>
+          <span>10 AWBs</span>
+          <span>262 pzas</span>
+          <span class="font-mono">5,899 kg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Active Queues -->
+    <div>
+      <h3 class="text-sm font-bold text-gray-700 mb-2">Todas las colas activas</h3>
+      <div class="space-y-2">
+        <div class="bg-mcl-blue/5 border border-mcl-blue/20 rounded-lg px-3 py-2.5 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-bold text-mcl-blue">Camion 1 AV - EZE</p>
+            <p class="text-xs text-gray-500">3 pallets / 10 AWBs / 262 pzas</p>
+          </div>
+          <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">En progreso</span>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-lg px-3 py-2.5 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-bold text-gray-700">Camion 2 AV - EZE</p>
+            <p class="text-xs text-gray-500">5 pallets / 16 AWBs / 430 pzas</p>
+          </div>
+          <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Lista para DO</span>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-lg px-3 py-2.5 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-bold text-gray-700">Camion 3 DHL - BOG</p>
+            <p class="text-xs text-gray-500">2 pallets / 8 AWBs / 180 pzas</p>
+          </div>
+          <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Lista para DO</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Fixed bottom: Quick scan again -->
+  <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 p-4 shadow-lg">
+    <div class="flex gap-3">
+      <button class="flex-1 bg-mcl-blue text-white py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 active:scale-95">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+        </svg>
+        Escanear Siguiente
+      </button>
+      <button class="bg-green-600 text-white px-5 py-4 rounded-xl font-bold text-sm active:scale-95">
+        Cerrar Cola
+      </button>
+    </div>
+  </div>
+</body>
+</html>

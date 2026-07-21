@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>LB Format Preview — Corrected</title>
+<style>
+  @page { margin: 0.4in 0.5in; size: letter; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 10pt; color: #000; padding: 30px 40px; background: #fff; max-width: 800px; margin: 0 auto; }
+  .title-bar { background: #e0e0e0; padding: 4px 8px; font-weight: bold; font-size: 9pt; margin: 8px 0 4px; border: 1px solid #999; }
+  .sub-note { font-size: 8.5pt; font-style: italic; padding-left: 4px; }
+  .info-line { font-size: 9pt; padding: 1px 0; border-bottom: 1px solid #ccc; }
+  .pi-box {
+    display: inline-block; width: 56px; height: 40px;
+    border: 1.5px solid #000;
+    text-align: center; font-size: 9pt; font-weight: bold;
+    line-height: 1.2; padding-top: 6px; margin: 0 6px;
+    vertical-align: middle;
+  }
+  .yes-no-row { display: flex; border-bottom: 1px solid #ccc; padding: 3px 0; }
+  .item-text { flex: 1; font-size: 8.5pt; }
+  .num { font-weight: bold; margin-right: 4px; }
+  .cols { width: 90px; display: flex; }
+  .cols span { width: 30px; height: 14px; border: 1px solid #999; margin: 0 1px; }
+  .cb { display: inline-block; width: 12px; height: 12px; border: 1px solid #000; vertical-align: middle; }
+  .item-row { font-size: 8.5pt; padding: 2px 0; }
+  .sig-line { border-top: 1px solid #000; margin-top: 30px; padding-top: 3px; font-size: 7.5pt; }
+
+  .highlight { background: #ffffa0; border: 2px solid #f0c000; padding: 8px; margin: 4px 0; border-radius: 4px; }
+  .label { color: #c00; font-weight: bold; font-size: 8pt; margin-bottom: 4px; }
+</style>
+</head><body>
+
+<h2 style="text-align:center; margin-bottom: 20px; color: #1a3a6b;">LB Format — CORRECTED VERSION</h2>
+
+<!-- AWB Information + Status boxes -->
+<div style="display:flex; gap: 20px; margin-bottom: 8px;">
+  <div style="flex:1; border: 1px solid #000; padding: 6px 10px;">
+    <div style="text-align:center; font-weight:bold; border-bottom:1px solid #000; padding-bottom:2px; margin-bottom:4px;">AWB Information</div>
+    <div class="info-line"><b>Date (MM / DD / YYYY):</b> 05/06/2026</div>
+    <div class="info-line"><b>Master AWB #:</b> 045-22209250</div>
+    <div class="info-line"><b>Destination:</b> EZE PAX</div>
+    <div class="info-line"><b>Qty of Pieces:</b> (ELI) <b>108</b> &nbsp;&nbsp; (ELM) ______</div>
+    <div class="info-line"><b>Total AWB Weight:</b> 3060 kg</div>
+  </div>
+  <div style="width:150px; font-size:10pt;">
+    <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-bottom:6px;">
+      <span style="font-weight:bold;">Accepted</span>
+      <span class="cb" style="width:16px; height:16px;"></span>
+    </div>
+    <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-bottom:6px;">
+      <span style="font-weight:bold;">Rejected</span>
+      <span class="cb" style="width:16px; height:16px;"></span>
+    </div>
+    <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-bottom:10px;">
+      <span style="font-weight:bold;">Hold</span>
+      <span class="cb" style="width:16px; height:16px;"></span>
+    </div>
+    <div style="text-align:right; font-weight:bold; margin-bottom:4px;">Accepted for:</div>
+    <div style="display:flex; justify-content:flex-end; gap:20px;">
+      <div style="text-align:center;"><span style="font-weight:bold;">CAO</span><br><span class="cb" style="width:16px; height:16px; margin-top:4px;"></span></div>
+      <div style="text-align:center;"><span style="font-weight:bold;">PAX</span><br><span class="cb" style="width:16px; height:16px; margin-top:4px;"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CORRECTED TITLE -->
+<div class="highlight">
+  <div class="label">CORRECTED:</div>
+  <div class="title-bar">ACCEPTANCE CHECKLIST FOR LITHIUM ION / METAL BATTERIES - SECTION II</div>
+</div>
+
+<div class="sub-note">Is the following information correct for each entry?</div>
+<div class="sub-note">Delete the non-applicable type unless both are carried.</div>
+
+<!-- Bordered checklist box -->
+<div style="border:1.5px solid #000; padding:6px 8px; margin-top:4px;">
+
+<!-- Air Waybill section -->
+<div style="display:flex; border-bottom:1px solid #000; padding-bottom:2px;">
+  <div style="flex:1; font-weight:bold;">Air Waybill</div>
+  <div style="width:90px; display:flex; font-weight:bold; font-size:8pt;">
+    <span style="width:30px; text-align:center;">YES</span>
+    <span style="width:30px; text-align:center;">NO*</span>
+    <span style="width:30px; text-align:center;">N/A</span>
+  </div>
+</div>
+
+<div class="yes-no-row">
+  <div class="item-text">
+    <span class="num">1.</span> The current text is included on the AWB, in the "Nature and Quantity of Goods" box [applicable PI, Section II].
+    <div style="padding-left:18px; margin-top:2px;">- Batteries of ION / METAL lithium, according to section II of the Packing Instruction 966 / 967 / 969 / 970.</div>
+  </div>
+  <div class="cols"><span></span><span></span><span></span></div>
+</div>
+
+<div class="item-row" style="padding-left:18px;">- The packing instruction (circle the applicable one):</div>
+
+<div style="display:flex; margin:6px 0;">
+  <div style="flex:1; text-align:center;">
+    <span class="pi-box">"PI:<br>966"</span>
+    <span class="pi-box">"PI:<br>967"</span>
+    <span style="display:inline-block; width:30px;"></span>
+    <span class="pi-box">"PI:<br>969"</span>
+    <span class="pi-box">"PI:<br>970"</span>
+  </div>
+  <div class="cols" style="align-self:center;"><span></span><span></span><span></span></div>
+</div>
+<div style="display:flex;">
+  <div style="flex:1; text-align:center; font-size:9pt; margin-bottom:6px;">
+    <span style="display:inline-block; width:140px; text-align:center;">ION</span>
+    <span style="display:inline-block; width:30px;"></span>
+    <span style="display:inline-block; width:140px; text-align:center;">METAL</span>
+  </div>
+  <div style="width:90px;"></div>
+</div>
+
+<!-- Packages and Overpacks -->
+<div style="border-bottom:1px solid #000; margin-top:4px; padding-bottom:2px; font-weight:bold;">Packages and Overpacks</div>
+<div class="yes-no-row">
+  <div class="item-text"><span class="num">2.</span> Packaging conforms with packing instructions and is free from damage, impacts or leakage [9.1.3.1.i].</div>
+  <div class="cols"><span></span><span></span></div>
+</div>
+<div class="yes-no-row">
+  <div class="item-text"><span class="num">3.</span> Each package must be marked with a lithium battery handling mark and duly completed with the corresponding data [Figure 7.1.c].</div>
+  <div class="cols"><span></span><span></span></div>
+</div>
+<div class="yes-no-row">
+  <div class="item-text"><span class="num">4.</span> The overpack must be marked with the word "Overpack" with a minimum height of 12 mm, and marked with the battery mark [Figure 7.1.c], unless the mark(s) on the package(s) inside the overpack are visible [7.1.7].</div>
+  <div class="cols"><span></span><span></span><span></span></div>
+</div>
+
+<!-- General -->
+<div style="border-bottom:1px solid #000; margin-top:4px; padding-bottom:2px; font-weight:bold;">General</div>
+<div class="yes-no-row">
+  <div class="item-text"><span class="num">5.</span> State and Operator variations complied with [2.8].</div>
+  <div class="cols"><span></span><span></span><span></span></div>
+</div>
+<div class="yes-no-row">
+  <div class="item-text"><span class="num">6.</span> The PI 969 - 970, will only be transported in CAO ("Cargo Only"), in PAX prohibited except for exceptions according to the current MOC 6.25.5.1.1 / Bol-CGO-LC 039.(Medical equipment for humanitarian purposes / Temperature control devices "data loggers" / Material from the LATAM group "COMAT")</div>
+  <div class="cols"><span></span><span></span><span></span></div>
+</div>
+
+<!-- Bottom -->
+<div style="border-top:1px solid #000; margin-top:8px; padding:6px 4px;">
+  <b>Observations:</b>
+  <div style="height: 60px;"></div>
+</div>
+
+<div style="display:flex; margin-top:20px; gap: 20px; align-items:flex-end;">
+  <div style="flex:0 0 auto;">
+    <b>Checked by</b>
+  </div>
+  <div style="flex:1;">
+    <div style="border-bottom:1px solid #000; height:25px;"></div>
+    <div style="text-align:center; font-size:8pt; margin-top:2px;">Legible Name and Signature</div>
+  </div>
+  <div style="flex:0 0 auto;">
+    <b>Place:</b>
+  </div>
+  <div style="flex:0.6;">
+    <div style="border-bottom:1px solid #000; height:25px;"></div>
+  </div>
+  <div style="flex:0 0 auto;">
+    <b>Date /<br>Time</b>
+  </div>
+  <div style="flex:0.6;">
+    <div style="border-bottom:1px solid #000; height:25px;"></div>
+  </div>
+</div>
+
+</div><!-- end bordered checklist box -->
+
+<hr style="margin-top: 30px;">
+<h3 style="color: #c00; margin-top: 15px;">Changes vs current system:</h3>
+<ol style="font-size: 10pt; margin: 10px 20px;">
+  <li><b>Title:</b> "LITHIUM, ION, SODIUM / METAL" &rarr; "LITHIUM ION / METAL"</li>
+  <li><b>Item 1 text:</b> "ION, SODIUM / METAL LITHIUM...966 / 967 / 977 / 978 / 969 / 970" &rarr; "ION / METAL lithium...966 / 967 / 969 / 970"</li>
+  <li><b>PI boxes:</b> 6 boxes (966, 977, 978, 967, 969, 970) &rarr; 4 boxes (966, 967, 969, 970)</li>
+  <li><b>PI grouping:</b> ION = 966, 967 | METAL = 969, 970 (with visual gap between groups)</li>
+</ol>
+
+</body></html>

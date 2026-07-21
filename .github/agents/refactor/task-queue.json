@@ -1,0 +1,8 @@
+{
+  "description": "AREF task queue — executed automatically one per night",
+  "tasks": [
+    { "id": "F1", "status": "done", "completed_at": "2026-05-21" },
+    { "id": "F6", "status": "pending" },
+    { "id": "F2", "status": "pending" }
+  ]
+}

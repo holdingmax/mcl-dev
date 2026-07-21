@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+/* Print styles for WR document */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #wr-print-area,
+  #wr-print-area * {
+    visibility: visible;
+  }
+  #wr-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  @page {
+    size: letter portrait;
+    margin: 10mm;
+  }
+}

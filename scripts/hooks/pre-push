@@ -1,0 +1,21 @@
+#!/bin/sh
+# Protect master: block force-push and branch deletion
+
+remote="$1"
+
+while read local_ref local_sha remote_ref remote_sha; do
+  # Block force-push to master
+  if echo "$remote_ref" | grep -q "refs/heads/master"; then
+    # Check if this is a force push (non-fast-forward)
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+      merge_base=$(git merge-base "$remote_sha" "$local_sha" 2>/dev/null)
+      if [ "$merge_base" != "$remote_sha" ]; then
+        echo "ERROR: Force-push to master is blocked."
+        echo "Use a normal push or create a PR."
+        exit 1
+      fi
+    fi
+  fi
+done
+
+exit 0

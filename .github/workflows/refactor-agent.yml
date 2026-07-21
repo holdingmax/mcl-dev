@@ -1,0 +1,76 @@
+name: "AREF — Agente de Refactoring Arquitectonico"
+
+on:
+  schedule:
+    # 10:00 AM UTC (6:00 AM EST) — after monitoring agents
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: 'Task to execute (empty = auto from queue)'
+        required: false
+        type: choice
+        options: ['', 'F1', 'F2', 'F6']
+      dry_run:
+        description: 'Dry run — analyze only, no PR'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  refactor-agent:
+    name: AREF Refactor Agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install agent dependencies
+        working-directory: .github/agents
+        run: npm ci
+
+      - name: Run AREF agent
+        id: aref
+        working-directory: .github/agents
+        run: node refactor/index.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TASK_ID: ${{ github.event.inputs.task_id }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create PR from changes
+        if: ${{ (github.event.inputs.dry_run || 'false') != 'true' }}
+        working-directory: .github/agents
+        run: node refactor/create-pr.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TASK_ID: ${{ github.event.inputs.task_id }}
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aref-report-${{ github.run_number }}
+          path: .github/agents/reports/
+          retention-days: 30

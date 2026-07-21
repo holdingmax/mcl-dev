@@ -1,0 +1,49 @@
+name: "ADMP — Agente Diario de Monitoreo de Performance"
+
+on:
+  schedule:
+    # 2:00 AM EST = 6:00 AM UTC (madrugada monitoring)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  monitor-agent:
+    name: ADMP Monitor Agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install agent dependencies
+        working-directory: .github/agents
+        run: npm ci
+
+      - name: Run ADMP agent
+        working-directory: .github/agents
+        run: node monitor/index.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admp-report-${{ github.run_number }}
+          path: .github/agents/reports/
+          retention-days: 30

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pallet Tag — MCL WMS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    background: #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 40px;
+  }
+
+  h2 {
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .section-desc {
+    font-size: 12px;
+    color: #888;
+    max-width: 420px;
+    text-align: center;
+    margin-top: -28px;
+    margin-bottom: 8px;
+  }
+
+  /* ── Tag container ── */
+  .tag {
+    width: 420px;
+    background: #fff;
+    border: 2px solid #111;
+    font-family: 'Inter', Arial, sans-serif;
+  }
+
+  /* ── Header ── */
+  .tag-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px 8px;
+    border-bottom: 2px solid #111;
+  }
+  .tag-header .airline-block {
+    display: flex;
+    flex-direction: column;
+  }
+  .tag-header .airline-code {
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #111;
+    line-height: 1;
+  }
+  .tag-header .airline-name {
+    font-size: 8px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .tag-header .mcl-logo img {
+    height: 67px;
+    width: auto;
+  }
+
+  /* ── ULD Number ── */
+  .uld-number {
+    text-align: center;
+    padding: 10px 16px 8px;
+    border-bottom: 2px solid #111;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #111;
+  }
+
+  /* ── Grid rows ── */
+  .row {
+    display: flex;
+    border-bottom: 1.5px solid #111;
+  }
+  .cell {
+    padding: 4px 10px 6px;
+    flex: 1;
+    border-right: 1.5px solid #111;
+  }
+  .cell:last-child {
+    border-right: none;
+  }
+  .cell-label {
+    font-size: 7px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #555;
+    letter-spacing: 0.5px;
+    margin-bottom: 1px;
+  }
+  .cell-value {
+    font-size: 20px;
+    font-weight: 900;
+    color: #111;
+    line-height: 1.2;
+  }
+  .cell-value.medium {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .cell-value.small {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .cell-value.dest {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 2px;
+  }
+  .cell-value.position {
+    font-size: 36px;
+    font-weight: 900;
+  }
+
+  /* Weight block */
+  .weight-row {
+    display: flex;
+    border-bottom: 1.5px solid #111;
+  }
+  .weight-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .weight-left .cell {
+    border-bottom: 1.5px solid #111;
+    border-right: 1.5px solid #111;
+  }
+  .weight-left .cell:last-child {
+    border-bottom: none;
+  }
+  .weight-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .weight-right .cell {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .weight-right .cell-value {
+    font-size: 28px;
+    text-align: center;
+  }
+
+  /* 3-col row */
+  .row-3 .cell:nth-child(1) { flex: 0.7; }
+  .row-3 .cell:nth-child(2) { flex: 1.3; }
+  .row-3 .cell:nth-child(3) { flex: 1; }
+
+  /* Special handling */
+  .shc-row {
+    padding: 4px 10px 6px;
+    border-bottom: 1.5px solid #111;
+    min-height: 32px;
+  }
+
+  /* Note */
+  .note-row {
+    padding: 4px 10px 8px;
+    border-bottom: 1.5px solid #111;
+    min-height: 50px;
+  }
+  .note-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #111;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* Barcode */
+  .barcode-row {
+    display: flex;
+    justify-content: center;
+    padding: 10px 16px 6px;
+    border-bottom: 1.5px solid #111;
+  }
+  .barcode-placeholder {
+    height: 50px;
+    width: 320px;
+    background: repeating-linear-gradient(
+      90deg,
+      #000 0px, #000 2px,
+      #fff 2px, #fff 4px,
+      #000 4px, #000 5px,
+      #fff 5px, #fff 8px,
+      #000 8px, #000 11px,
+      #fff 11px, #fff 13px,
+      #000 13px, #000 14px,
+      #fff 14px, #fff 16px
+    );
+  }
+  .barcode-text {
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 3px;
+    letter-spacing: 1px;
+  }
+
+  /* Footer */
+  .tag-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    font-size: 8px;
+    color: #666;
+  }
+  .tag-footer .prepared {
+    font-weight: 700;
+    color: #333;
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .tag { border: 1.5px solid #000; page-break-inside: avoid; }
+    h2, .section-desc { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>Ejemplo 1 — AWBs directas (sin MAWB)</h2>
+<p class="section-desc">Note muestra AWBs individuales con piezas y comment</p>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div class="tag">
+  <div class="tag-header">
+    <div class="airline-block">
+      <div class="airline-code">XL</div>
+      <div class="airline-name">XL Airways</div>
+    </div>
+    <div class="mcl-logo">
+      <img src="../public/logo.png" alt="MinCurl Logistics">
+    </div>
+  </div>
+
+  <div class="uld-number">PAG67029R7</div>
+
+  <div class="row">
+    <div class="cell" style="flex: 1.3;">
+      <div class="cell-label">Destination:</div>
+      <div class="cell-value dest">SDQ</div>
+    </div>
+    <div class="cell" style="flex: 0.7;">
+      <div class="cell-label">Position:</div>
+      <div class="cell-value position">MD</div>
+    </div>
+  </div>
+
+  <div class="weight-row">
+    <div class="weight-left">
+      <div class="cell">
+        <div class="cell-label">Net Weight KG:</div>
+        <div class="cell-value medium">1,721.54</div>
+      </div>
+      <div class="cell">
+        <div class="cell-label">Tare Weight KG:</div>
+        <div class="cell-value medium">120.00</div>
+      </div>
+    </div>
+    <div class="weight-right">
+      <div class="cell">
+        <div class="cell-label">Total KG:</div>
+        <div class="cell-value">1,841.54</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-3">
+    <div class="cell">
+      <div class="cell-label">Loaded At:</div>
+      <div class="cell-value medium">MIA</div>
+    </div>
+    <div class="cell">
+      <div class="cell-label">Flight:</div>
+      <div class="cell-value">XL0515</div>
+    </div>
+    <div class="cell">
+      <div class="cell-label">Date:</div>
+      <div class="cell-value small">05/15/2026</div>
+    </div>
+  </div>
+
+  <div class="shc-row">
+    <div class="cell-label">Special Handling Code:</div>
+    <div class="note-value" style="min-height: 14px;"></div>
+  </div>
+
+  <div class="note-row">
+    <div class="cell-label">Note:</div>
+    <div class="note-value">
+      045-21859596 (14 pcs) - eli<br>
+      045-33447788 (6 pcs)
+    </div>
+  </div>
+
+  <div class="barcode-row">
+    <div>
+      <div class="barcode-placeholder"></div>
+      <div class="barcode-text">PAG67029R7-XL0515-20260515</div>
+    </div>
+  </div>
+
+  <div class="tag-footer">
+    <span>Print Date: 05/15/2026 04:49:04 PM</span>
+    <span class="prepared">AGARCIA</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>Ejemplo 2 — Con MAWB — Note muestra MAWB</h2>
+<p class="section-desc">Cuando hay MAWB, Note muestra la MAWB (no AWBs individuales)</p>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div class="tag">
+  <div class="tag-header">
+    <div class="airline-block">
+      <div class="airline-code">AA</div>
+      <div class="airline-name">American Airlines</div>
+    </div>
+    <div class="mcl-logo">
+      <img src="../public/logo.png" alt="MinCurl Logistics">
+    </div>
+  </div>
+
+  <div class="uld-number">AKE45210AA</div>
+
+  <div class="row">
+    <div class="cell" style="flex: 1.3;">
+      <div class="cell-label">Destination:</div>
+      <div class="cell-value dest">AEP</div>
+    </div>
+    <div class="cell" style="flex: 0.7;">
+      <div class="cell-label">Position:</div>
+      <div class="cell-value position">LD</div>
+    </div>
+  </div>
+
+  <div class="weight-row">
+    <div class="weight-left">
+      <div class="cell">
+        <div class="cell-label">Net Weight KG:</div>
+        <div class="cell-value medium">845.30</div>
+      </div>
+      <div class="cell">
+        <div class="cell-label">Tare Weight KG:</div>
+        <div class="cell-value medium">75.00</div>
+      </div>
+    </div>
+    <div class="weight-right">
+      <div class="cell">
+        <div class="cell-label">Total KG:</div>
+        <div class="cell-value">920.30</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-3">
+    <div class="cell">
+      <div class="cell-label">Loaded At:</div>
+      <div class="cell-value medium">MIA</div>
+    </div>
+    <div class="cell">
+      <div class="cell-label">Flight:</div>
+      <div class="cell-value">AA TEST3</div>
+    </div>
+    <div class="cell">
+      <div class="cell-label">Date:</div>
+      <div class="cell-value small">05/18/2026</div>
+    </div>
+  </div>
+
+  <div class="shc-row">
+    <div class="cell-label">Special Handling Code:</div>
+    <div class="note-value" style="min-height: 14px;">ICE</div>
+  </div>
+
+  <div class="note-row">
+    <div class="cell-label">Note:</div>
+    <div class="note-value">
+      131-12345678 (23 pcs)
+    </div>
+  </div>
+
+  <div class="barcode-row">
+    <div>
+      <div class="barcode-placeholder"></div>
+      <div class="barcode-text">AKE45210AA-AATEST3-20260518</div>
+    </div>
+  </div>
+
+  <div class="tag-footer">
+    <span>Print Date: 05/18/2026 02:15:30 PM</span>
+    <span class="prepared">DGARCIA</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>Ejemplo 3 — Mix: MAWBs + AWB directa en mismo ULD</h2>
+<p class="section-desc">Note lista MAWBs y AWBs directas, mismo formato</p>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div class="tag">
+  <div class="tag-header">
+    <div class="airline-block">
+      <div class="airline-code">L7</div>
+      <div class="airline-name">LATAM Cargo</div>
+    </div>
+    <div class="mcl-logo">
+      <img src="../public/logo.png" alt="MinCurl Logistics">
+    </div>
+  </div>
+
+  <div class="uld-number">PMC99001LA</div>
+
+  <div class="row">
+    <div class="cell" style="flex: 1.3;">
+      <div class="cell-label">Destination:</div>
+      <div class="cell-value dest">GRU</div>
+    </div>
+    <div class="cell" style="flex: 0.7;">
+      <div class="cell-label">Position:</div>
+      <div class="cell-value position">ESP</div>
+    </div>
+  </div>
+
+  <div class="weight-row">
+    <div class="weight-left">
+      <div class="cell">
+        <div class="cell-label">Net Weight KG:</div>
+        <div class="cell-value medium">2,340.00</div>
+      </div>
+      <div class="cell">
+        <div class="cell-label">Tare Weight KG:</div>
+        <div class="cell-value medium">200.00</div>
+      </div>
+    </div>
+    <div class="weight-right">
+      <div class="cell">
+        <div class="cell-label">Total KG:</div>
+        <div class="cell-value">2,540.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-3">
+    <div class="cell">
+      <div class="cell-label">Loaded At:</div>
+      <div class="cell-value medium">MIA</div>
+    </div>
+    <div class="cell">
+      <div class="cell-label">Flight:</div>
+      <div class="cell-value">LA8070</div>
+    </div>
+    <div class="cell">
+      <div class="cell-label">Date:</div>
+      <div class="cell-value small">05/20/2026</div>
+    </div>
+  </div>
+
+  <div class="shc-row">
+    <div class="cell-label">Special Handling Code:</div>
+    <div class="note-value" style="min-height: 14px;">DGR / PER</div>
+  </div>
+
+  <div class="note-row">
+    <div class="cell-label">Note:</div>
+    <div class="note-value">
+      957-44556677 (20 pcs)<br>
+      957-88990011 (15 pcs)<br>
+      045-99001122 (5 pcs) - FRAGILE
+    </div>
+  </div>
+
+  <div class="barcode-row">
+    <div>
+      <div class="barcode-placeholder"></div>
+      <div class="barcode-text">PMC99001LA-LA8070-20260520</div>
+    </div>
+  </div>
+
+  <div class="tag-footer">
+    <span>Print Date: 05/20/2026 10:30:00 AM</span>
+    <span class="prepared">JDURAN</span>
+  </div>
+</div>
+
+</body>
+</html>

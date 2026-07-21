@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assign Pieces v2 — Desktop + Mobile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: { extend: { colors: { 'mcl-blue': '#1e40af', 'mcl-dark': '#0f172a' } } }
+    }
+  </script>
+  <style>
+    .phone { width: 390px; height: 844px; overflow: hidden; border-radius: 2rem; border: 8px solid #1a1a2e; }
+  </style>
+</head>
+<body class="bg-gray-200 py-8">
+
+  <div class="max-w-7xl mx-auto px-4">
+    <h2 class="text-2xl font-black text-gray-800 mb-2">Assign Pieces v2</h2>
+    <p class="text-gray-500 mb-8">Desktop modal + Mobile redesign — comments field, bigger touch targets, no -/+ buttons</p>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 flex flex-wrap gap-12 items-start">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- PART 1: DESKTOP MODAL                  -->
+    <!-- ═══════════════════════════════════════ -->
+    <div>
+      <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Part 1 — Desktop Modal</h3>
+
+      <!-- Backdrop -->
+      <div class="relative w-[640px] h-[520px] bg-gray-900/30 rounded-2xl flex items-center justify-center">
+
+        <!-- Modal -->
+        <div class="bg-white rounded-2xl shadow-2xl w-[480px] p-6">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-xl font-bold text-mcl-dark">Assign pieces to 5345</h3>
+            <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Tabs -->
+          <div class="flex border-b border-gray-200 mb-5">
+            <button class="px-4 py-2 text-sm font-semibold text-mcl-dark border-b-2 border-mcl-dark">By Quantity</button>
+            <button class="px-4 py-2 text-sm font-semibold text-gray-400">By Barcode</button>
+          </div>
+
+          <!-- AWB Select -->
+          <label class="block text-xs font-medium text-gray-500 mb-1">AWB</label>
+          <select class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm font-mono mb-4 focus:ring-2 focus:ring-mcl-blue focus:border-mcl-blue">
+            <option>666-78555555 — 50 available</option>
+            <option>045-11111111 — 15 available</option>
+          </select>
+
+          <!-- Quantity -->
+          <label class="block text-xs font-medium text-gray-500 mb-1">Pieces</label>
+          <input type="number" value="50" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm font-mono mb-1 focus:ring-2 focus:ring-mcl-blue focus:border-mcl-blue">
+          <p class="text-xs text-gray-400 mb-4">Available: 50</p>
+
+          <!-- Comments (optional) -->
+          <label class="block text-xs font-medium text-gray-500 mb-1">Comments <span class="text-gray-300">(optional)</span></label>
+          <input type="text" placeholder="e.g. Fragile - top load only" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm mb-5 focus:ring-2 focus:ring-mcl-blue focus:border-mcl-blue">
+
+          <!-- Assign button -->
+          <button class="w-full bg-mcl-dark text-white font-bold py-3 rounded-xl text-sm hover:bg-mcl-dark/90 transition">
+            Assign 50
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- PART 2: MOBILE — ULD DETAIL REDESIGN   -->
+    <!-- ═══════════════════════════════════════ -->
+    <div>
+      <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Part 2 — Mobile ULD Detail (bigger text, comment)</h3>
+
+      <div class="phone bg-white relative flex flex-col">
+
+        <!-- Header bar -->
+        <div class="bg-mcl-dark text-white px-4 pt-3 pb-3 flex-shrink-0">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M15 19l-7-7 7-7"/></svg>
+              <span class="bg-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded">LD</span>
+              <span class="text-lg font-black">DQF 5345</span>
+            </div>
+            <button class="text-xs text-white/60 border border-white/20 px-2 py-1 rounded">Edit</button>
+          </div>
+          <p class="text-xs text-white/50 ml-7">AEP | AA TEST3 MAWB</p>
+          <p class="text-xl font-black mt-1 ml-7">50 pcs | 815 kg</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 flex-shrink-0">
+          <button class="flex-1 py-3 text-sm font-bold text-mcl-dark border-b-2 border-mcl-dark text-center">By Piece</button>
+          <button class="flex-1 py-3 text-sm font-bold text-gray-400 text-center">By Barcode</button>
+          <button class="flex-1 py-3 text-sm font-bold text-gray-400 text-center">By WR#</button>
+        </div>
+
+        <!-- Scrollable content -->
+        <div class="flex-1 overflow-y-auto">
+
+          <!-- Column headers -->
+          <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
+            <span class="text-xs font-bold text-gray-400 uppercase">AWB</span>
+            <div class="flex items-center gap-6">
+              <span class="w-14 text-center text-xs font-bold text-gray-400 uppercase">In ULD</span>
+              <span class="w-16 text-center text-xs font-bold text-gray-400 uppercase">Total</span>
+            </div>
+          </div>
+
+          <!-- AWB Row (expanded) -->
+          <details open class="border-b border-gray-100">
+            <summary class="flex items-center justify-between px-4 py-3 cursor-pointer list-none">
+              <div class="flex items-center gap-2 min-w-0">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                <span class="font-mono font-bold text-base text-mcl-dark">666-78555555</span>
+                <span class="text-xs text-gray-400">Merflex</span>
+              </div>
+              <div class="flex items-center gap-6 flex-shrink-0">
+                <span class="w-14 text-center text-base font-bold text-mcl-dark">50</span>
+                <span class="w-16 text-center text-sm text-green-600 font-medium">100/150</span>
+              </div>
+            </summary>
+
+            <div class="px-4 pb-4 bg-white">
+
+              <!-- AVAILABLE section -->
+              <div class="text-xs font-bold text-gray-400 uppercase mb-2 mt-1">Available (50)</div>
+
+              <!-- Piece group card — BIGGER -->
+              <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-3">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-14 h-14 bg-white border-2 border-gray-300 rounded-xl flex flex-col items-center justify-center">
+                    <span class="text-xs font-bold text-gray-600">Crate</span>
+                    <span class="text-base font-black text-mcl-dark">50</span>
+                  </div>
+                  <div>
+                    <p class="text-base font-bold text-gray-800">50 Crate available</p>
+                    <p class="text-sm text-gray-500">10.8 kg ea | 150x120x100</p>
+                  </div>
+                </div>
+
+                <!-- Assign row: just number input + assign button -->
+                <div class="flex items-center gap-3">
+                  <input type="number" value="50" class="w-20 h-12 text-center text-lg font-bold font-mono border-2 border-gray-300 rounded-xl focus:border-mcl-blue focus:ring-2 focus:ring-mcl-blue/20">
+                  <button class="flex-1 h-12 bg-mcl-dark text-white font-bold rounded-xl text-base">
+                    Assign 50
+                  </button>
+                </div>
+
+                <!-- Comment toggle button -->
+                <button class="flex items-center gap-1.5 mt-2.5 text-sm text-gray-400" onclick="this.nextElementSibling.classList.toggle('hidden'); this.classList.toggle('hidden')">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                  Add comment
+                </button>
+                <!-- Comment textarea (hidden by default) -->
+                <div class="hidden mt-2">
+                  <textarea rows="2" placeholder="Write a comment..." class="w-full border-2 border-gray-300 rounded-xl px-3 py-2.5 text-base focus:border-mcl-blue focus:ring-2 focus:ring-mcl-blue/20 resize-none"></textarea>
+                </div>
+              </div>
+
+              <!-- IN THIS ULD section -->
+              <div class="text-xs font-bold text-green-700 uppercase mb-2">In this ULD (50)</div>
+
+              <div class="bg-green-50 border border-green-200 rounded-xl overflow-hidden">
+                <!-- Group row — tappable to expand comment -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-green-100">
+                  <div class="flex items-center gap-3">
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-lg">Crate</span>
+                    <span class="text-base font-bold text-gray-800">29</span>
+                    <span class="text-sm text-gray-500">| 10.8 kg ea</span>
+                  </div>
+                  <!-- Comment indicator (shows if has comment) -->
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3 border-b border-green-100">
+                  <div class="flex items-center gap-3">
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-lg">SKID</span>
+                    <span class="text-base font-bold text-gray-800">20</span>
+                    <span class="text-sm text-gray-500">| 25.0 kg ea</span>
+                  </div>
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-lg">Bag</span>
+                    <span class="text-base font-bold text-gray-800">1</span>
+                    <span class="text-sm text-gray-500">| 1.0 kg</span>
+                  </div>
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                </div>
+                <!-- Summary -->
+                <div class="px-4 py-2 bg-green-100/50 border-t border-green-200">
+                  <span class="text-sm font-bold text-green-700">50 pcs | 815.4 kg</span>
+                </div>
+              </div>
+
+            </div>
+          </details>
+
+          <!-- AWB Row (collapsed) -->
+          <details class="border-b border-gray-100">
+            <summary class="flex items-center justify-between px-4 py-3 cursor-pointer list-none">
+              <div class="flex items-center gap-2 min-w-0">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                <span class="font-mono font-bold text-base text-mcl-dark">045-11111111</span>
+                <span class="text-xs text-gray-400">Express Li.</span>
+              </div>
+              <div class="flex items-center gap-6 flex-shrink-0">
+                <span class="w-14 text-center text-base font-bold text-gray-300">0</span>
+                <span class="w-16 text-center text-sm text-gray-500">0/15</span>
+              </div>
+            </summary>
+          </details>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
+          <button class="w-full bg-green-600 text-white font-bold py-4 rounded-xl text-base">
+            Close ULD
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- PART 3: MOBILE — COMMENT EXPANDED VIEW -->
+    <!-- ═══════════════════════════════════════ -->
+    <div>
+      <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Part 3 — Comment expanded on assigned group</h3>
+
+      <div class="phone bg-white relative flex flex-col">
+
+        <!-- Header bar -->
+        <div class="bg-mcl-dark text-white px-4 pt-3 pb-3 flex-shrink-0">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M15 19l-7-7 7-7"/></svg>
+              <span class="bg-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded">LD</span>
+              <span class="text-lg font-black">DQF 5345</span>
+            </div>
+            <button class="text-xs text-white/60 border border-white/20 px-2 py-1 rounded">Edit</button>
+          </div>
+          <p class="text-xs text-white/50 ml-7">AEP | AA TEST3 MAWB</p>
+          <p class="text-xl font-black mt-1 ml-7">50 pcs | 815 kg</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 flex-shrink-0">
+          <button class="flex-1 py-3 text-sm font-bold text-mcl-dark border-b-2 border-mcl-dark text-center">By Piece</button>
+          <button class="flex-1 py-3 text-sm font-bold text-gray-400 text-center">By Barcode</button>
+          <button class="flex-1 py-3 text-sm font-bold text-gray-400 text-center">By WR#</button>
+        </div>
+
+        <!-- Scrollable content -->
+        <div class="flex-1 overflow-y-auto">
+
+          <!-- Column headers -->
+          <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
+            <span class="text-xs font-bold text-gray-400 uppercase">AWB</span>
+            <div class="flex items-center gap-6">
+              <span class="w-14 text-center text-xs font-bold text-gray-400 uppercase">In ULD</span>
+              <span class="w-16 text-center text-xs font-bold text-gray-400 uppercase">Total</span>
+            </div>
+          </div>
+
+          <!-- AWB Row expanded — showing comment on tapped group -->
+          <details open class="border-b border-gray-100">
+            <summary class="flex items-center justify-between px-4 py-3 cursor-pointer list-none">
+              <div class="flex items-center gap-2 min-w-0">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                <span class="font-mono font-bold text-base text-mcl-dark">666-78555555</span>
+                <span class="text-xs text-gray-400">Merflex</span>
+              </div>
+              <div class="flex items-center gap-6 flex-shrink-0">
+                <span class="w-14 text-center text-base font-bold text-mcl-dark">50</span>
+                <span class="w-16 text-center text-sm text-green-600 font-medium">100/150</span>
+              </div>
+            </summary>
+
+            <div class="px-4 pb-4 bg-white">
+
+              <!-- IN THIS ULD section only (no available) -->
+              <div class="text-xs font-bold text-green-700 uppercase mb-2 mt-1">In this ULD (50)</div>
+
+              <div class="bg-green-50 border border-green-200 rounded-xl overflow-hidden">
+                <!-- Group row EXPANDED — shows comment + reduce -->
+                <div class="bg-green-100/60 border-b border-green-200">
+                  <div class="flex items-center justify-between px-4 py-3">
+                    <div class="flex items-center gap-3">
+                      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-lg">Crate</span>
+                      <span class="text-base font-bold text-gray-800">29</span>
+                      <span class="text-sm text-gray-500">| 10.8 kg ea</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 rotate-90" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                  </div>
+                  <!-- Comment area -->
+                  <div class="px-4 pb-3">
+                    <div class="bg-white border border-green-300 rounded-xl p-3">
+                      <label class="text-xs font-medium text-gray-400 block mb-1">Comment</label>
+                      <textarea rows="2" class="w-full text-base border-0 p-0 focus:ring-0 resize-none text-gray-800" placeholder="Write a comment...">Fragile - top load only</textarea>
+                    </div>
+                    <!-- Reduce button -->
+                    <div class="flex items-center justify-between mt-3">
+                      <button class="text-sm text-red-500 font-medium flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M20 12H4"/></svg>
+                        Reduce pieces
+                      </button>
+                      <button class="bg-mcl-dark text-white text-sm font-bold px-4 py-2 rounded-lg">Save</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Other groups collapsed -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-green-100">
+                  <div class="flex items-center gap-3">
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-lg">SKID</span>
+                    <span class="text-base font-bold text-gray-800">20</span>
+                    <span class="text-sm text-gray-500">| 25.0 kg ea</span>
+                  </div>
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-lg">Bag</span>
+                    <span class="text-base font-bold text-gray-800">1</span>
+                    <span class="text-sm text-gray-500">| 1.0 kg</span>
+                  </div>
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+                </div>
+                <!-- Summary -->
+                <div class="px-4 py-2 bg-green-100/50 border-t border-green-200">
+                  <span class="text-sm font-bold text-green-700">50 pcs | 815.4 kg</span>
+                </div>
+              </div>
+
+            </div>
+          </details>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
+          <button class="w-full bg-green-600 text-white font-bold py-4 rounded-xl text-base">
+            Close ULD
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PART 4: MOBILE — COMMENT OPEN ON ASSIGN    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="max-w-7xl mx-auto px-4 mt-12">
+    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Part 4 — Mobile: Comment field open while assigning</h3>
+
+    <div class="phone bg-white relative flex flex-col mx-auto">
+
+      <!-- Header bar -->
+      <div class="bg-mcl-dark text-white px-4 pt-3 pb-3 flex-shrink-0">
+        <div class="flex items-center justify-between mb-1">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M15 19l-7-7 7-7"/></svg>
+            <span class="bg-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded">LD</span>
+            <span class="text-lg font-black">DQF 5345</span>
+          </div>
+        </div>
+        <p class="text-xs text-white/50 ml-7">AEP | AA TEST3 MAWB</p>
+        <p class="text-xl font-black mt-1 ml-7">50 pcs | 815 kg</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-200 flex-shrink-0">
+        <button class="flex-1 py-3 text-sm font-bold text-mcl-dark border-b-2 border-mcl-dark text-center">By Piece</button>
+        <button class="flex-1 py-3 text-sm font-bold text-gray-400 text-center">By Barcode</button>
+        <button class="flex-1 py-3 text-sm font-bold text-gray-400 text-center">By WR#</button>
+      </div>
+
+      <!-- Scrollable content -->
+      <div class="flex-1 overflow-y-auto">
+
+        <!-- Column headers -->
+        <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
+          <span class="text-xs font-bold text-gray-400 uppercase">AWB</span>
+          <div class="flex items-center gap-6">
+            <span class="w-14 text-center text-xs font-bold text-gray-400 uppercase">In ULD</span>
+            <span class="w-16 text-center text-xs font-bold text-gray-400 uppercase">Total</span>
+          </div>
+        </div>
+
+        <!-- AWB expanded -->
+        <details open class="border-b border-gray-100">
+          <summary class="flex items-center justify-between px-4 py-3 cursor-pointer list-none">
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-4 h-4 text-gray-400 flex-shrink-0 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+              <span class="font-mono font-bold text-base text-mcl-dark">666-78555555</span>
+              <span class="text-xs text-gray-400">Merflex</span>
+            </div>
+            <div class="flex items-center gap-6 flex-shrink-0">
+              <span class="w-14 text-center text-base font-bold text-gray-300">0</span>
+              <span class="w-16 text-center text-sm text-gray-500">50/150</span>
+            </div>
+          </summary>
+
+          <div class="px-4 pb-4 bg-white">
+
+            <div class="text-xs font-bold text-gray-400 uppercase mb-2 mt-1">Available (50)</div>
+
+            <!-- Piece group card with comment open -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-3">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-14 h-14 bg-white border-2 border-gray-300 rounded-xl flex flex-col items-center justify-center">
+                  <span class="text-xs font-bold text-gray-600">Crate</span>
+                  <span class="text-base font-black text-mcl-dark">50</span>
+                </div>
+                <div>
+                  <p class="text-base font-bold text-gray-800">50 Crate available</p>
+                  <p class="text-sm text-gray-500">10.8 kg ea | 150x120x100</p>
+                </div>
+              </div>
+
+              <!-- Assign row -->
+              <div class="flex items-center gap-3 mb-3">
+                <input type="number" value="50" class="w-20 h-12 text-center text-lg font-bold font-mono border-2 border-gray-300 rounded-xl">
+                <button class="flex-1 h-12 bg-mcl-dark text-white font-bold rounded-xl text-base">
+                  Assign 50
+                </button>
+              </div>
+
+              <!-- Comment area OPEN -->
+              <div class="bg-white border border-gray-300 rounded-xl p-3">
+                <label class="text-xs font-medium text-gray-400 block mb-1">Comment</label>
+                <textarea rows="2" class="w-full text-base border-0 p-0 focus:ring-0 resize-none text-gray-800" placeholder="Write a comment...">DGR class 9 - lithium batteries</textarea>
+              </div>
+            </div>
+
+          </div>
+        </details>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
+        <button class="w-full bg-green-600 text-white font-bold py-4 rounded-xl text-base">
+          Close ULD
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="h-16"></div>
+
+</body>
+</html>

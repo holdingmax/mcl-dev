@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mobile Build-up - Pantalla 2: Asignar a ULD</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{'mcl-blue':'#1e3a5f','mcl-gold':'#c9a84c'}}}}</script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; max-width: 430px; margin: 0 auto; min-height: 100vh; }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
+  .tab-active { border-bottom: 2px solid #1e3a5f; color: #1e3a5f; font-weight: 700; }
+  .tab-inactive { border-bottom: 2px solid transparent; color: #9ca3af; }
+</style>
+</head>
+<body class="bg-gray-100">
+
+<!-- ============================================================ -->
+<!-- PANTALLA 2-A: ASIGNAR A ULD - TAB "POR PIEZA"               -->
+<!-- Vista principal: el operador lee la etiqueta y asigna        -->
+<!-- ============================================================ -->
+
+<section id="screen-pieza" class="min-h-screen flex flex-col">
+
+  <!-- Header sticky: ULD info -->
+  <div class="bg-mcl-blue text-white px-4 py-3 sticky top-0 z-20">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <button onclick="window.history.back()" class="p-1 -ml-1 opacity-60">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-300 text-purple-900">MD</span>
+            <span class="text-sm font-bold font-mono">PMC 1234LA</span>
+          </div>
+          <p class="text-[10px] opacity-60">BOG | LA601</p>
+        </div>
+      </div>
+      <!-- Edit ULD button -->
+      <button class="text-[10px] opacity-60 border border-white/30 rounded px-2 py-1">Editar</button>
+    </div>
+    <!-- Capacity bar -->
+    <div class="flex items-center justify-between text-[10px] mt-2 opacity-70">
+      <span>8 pzas | 320 kg</span>
+      <span>320 / 2,000 kg (16%)</span>
+    </div>
+    <div class="h-1.5 bg-white/20 rounded-full mt-1 overflow-hidden">
+      <div class="h-full bg-mcl-gold rounded-full" style="width: 16%"></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="bg-white flex border-b border-gray-200 sticky top-[88px] z-10">
+    <button class="flex-1 py-3 text-xs text-center tab-active">Por Pieza</button>
+    <button onclick="document.getElementById('screen-pieza').style.display='none'; document.getElementById('screen-barcode').style.display='flex';"
+      class="flex-1 py-3 text-xs text-center tab-inactive">Por Barcode</button>
+    <button onclick="document.getElementById('screen-pieza').style.display='none'; document.getElementById('screen-wr').style.display='flex';"
+      class="flex-1 py-3 text-xs text-center tab-inactive">Por WR#</button>
+  </div>
+
+  <!-- Content: lista de AWBs expandible con piezas -->
+  <div class="flex-1 overflow-y-auto pb-28">
+
+    <!-- AWB 1: expandida, con piezas variadas -->
+    <details open class="border-b border-gray-200 bg-white">
+      <summary class="px-4 py-3 flex items-center justify-between cursor-pointer">
+        <div>
+          <span class="font-mono font-bold text-sm text-mcl-blue">057-12345678</span>
+          <span class="text-[10px] text-gray-400 ml-1">Merflex | BOG</span>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-gray-500">5/24 asignadas</span>
+          <div class="w-16 h-1 bg-gray-100 rounded-full overflow-hidden mt-0.5">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 20%"></div>
+          </div>
+        </div>
+      </summary>
+
+      <div class="px-4 pb-3">
+        <!-- Piezas disponibles (no asignadas) -->
+        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1.5">Disponibles (19)</p>
+
+        <!-- SKID - peso grande, facilmente identificable -->
+        <div class="flex items-center justify-between py-2 border-b border-gray-50">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-amber-50 border border-amber-200 rounded-lg flex flex-col items-center justify-center">
+              <span class="text-[9px] font-bold text-amber-700">SKID</span>
+              <span class="text-[8px] text-amber-500">#01</span>
+            </div>
+            <div>
+              <p class="text-sm font-mono font-bold text-gray-800">...00142</p>
+              <p class="text-[11px] text-gray-500">30.0 kg | 120x100x80</p>
+            </div>
+          </div>
+          <button class="w-10 h-10 rounded-xl bg-mcl-blue text-white font-bold text-lg active:bg-blue-900 shadow">+</button>
+        </div>
+
+        <div class="flex items-center justify-between py-2 border-b border-gray-50">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-amber-50 border border-amber-200 rounded-lg flex flex-col items-center justify-center">
+              <span class="text-[9px] font-bold text-amber-700">SKID</span>
+              <span class="text-[8px] text-amber-500">#02</span>
+            </div>
+            <div>
+              <p class="text-sm font-mono font-bold text-gray-800">...00143</p>
+              <p class="text-[11px] text-gray-500">30.0 kg | 120x100x80</p>
+            </div>
+          </div>
+          <button class="w-10 h-10 rounded-xl bg-mcl-blue text-white font-bold text-lg active:bg-blue-900 shadow">+</button>
+        </div>
+
+        <!-- CRATE -->
+        <div class="flex items-center justify-between py-2 border-b border-gray-50">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-orange-50 border border-orange-200 rounded-lg flex flex-col items-center justify-center">
+              <span class="text-[9px] font-bold text-orange-700">CRATE</span>
+              <span class="text-[8px] text-orange-500">#03</span>
+            </div>
+            <div>
+              <p class="text-sm font-mono font-bold text-gray-800">...00144</p>
+              <p class="text-[11px] text-gray-500">15.5 kg | 60x40x40</p>
+            </div>
+          </div>
+          <button class="w-10 h-10 rounded-xl bg-mcl-blue text-white font-bold text-lg active:bg-blue-900 shadow">+</button>
+        </div>
+
+        <!-- BOLSA group - muchas identicas, con campo cantidad -->
+        <div class="py-2 border-b border-gray-50">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-sky-50 border border-sky-200 rounded-lg flex flex-col items-center justify-center">
+                <span class="text-[9px] font-bold text-sky-700">BOLSA</span>
+                <span class="text-[8px] text-sky-500">x16</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-gray-800">16 Bolsas disponibles</p>
+                <p class="text-[11px] text-gray-500">2.5 kg c/u | 30x20x15</p>
+              </div>
+            </div>
+          </div>
+          <!-- Quantity input + button -->
+          <div class="ml-15 mt-2 flex items-center gap-2 pl-14">
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 font-bold active:bg-gray-100" onclick="let i=document.getElementById('qty-bolsa'); i.value=Math.max(1,parseInt(i.value)-1)">-</button>
+            <input id="qty-bolsa" type="number" value="1" min="1" max="16"
+              class="w-14 h-8 border border-gray-200 rounded-lg text-center font-mono font-bold text-sm focus:outline-none focus:border-mcl-blue" />
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 font-bold active:bg-gray-100" onclick="let i=document.getElementById('qty-bolsa'); i.value=Math.min(16,parseInt(i.value)+1)">+</button>
+            <button class="flex-1 h-8 rounded-lg bg-mcl-blue text-white text-xs font-bold active:bg-blue-900 shadow">
+              Asignar
+            </button>
+          </div>
+        </div>
+
+        <!-- Ya asignadas a ESTE ULD -->
+        <p class="text-[10px] font-bold text-green-600 uppercase mt-3 mb-1.5">En este ULD (5)</p>
+
+        <div class="bg-green-50 rounded-lg px-3 py-2 space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-bold text-green-700 bg-green-100 px-1 rounded">SKID</span>
+              <span class="font-mono text-gray-700">...00140</span>
+              <span class="text-gray-400">30.0 kg</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-bold text-green-700 bg-green-100 px-1 rounded">SKID</span>
+              <span class="font-mono text-gray-700">...00141</span>
+              <span class="text-gray-400">30.0 kg</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-bold text-green-700 bg-green-100 px-1 rounded">BOLSA</span>
+              <span class="text-gray-600">x3</span>
+              <span class="text-gray-400">2.5 kg c/u</span>
+            </div>
+          </div>
+          <!-- Reducir cantidad -->
+          <div class="pt-1 border-t border-green-200 flex items-center justify-between">
+            <span class="text-[10px] text-green-700 font-medium">5 pzas | 67.5 kg en este ULD</span>
+            <button class="text-[10px] text-red-400 font-medium">Quitar piezas...</button>
+          </div>
+        </div>
+
+        <!-- Asignadas a OTRO ULD (grises) -->
+        <p class="text-[10px] font-bold text-gray-400 uppercase mt-3 mb-1">En otros ULDs</p>
+        <div class="opacity-50">
+          <div class="flex items-center justify-between text-[11px] py-0.5">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-bold text-gray-500 bg-gray-100 px-1 rounded">BOLSA</span>
+              <span class="text-gray-400">x2 → AKE 5678LA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- AWB 2: colapsada -->
+    <details class="border-b border-gray-200 bg-white">
+      <summary class="px-4 py-3 flex items-center justify-between cursor-pointer">
+        <div>
+          <span class="font-mono font-bold text-sm text-mcl-blue">057-87654321</span>
+          <span class="text-[10px] text-gray-400 ml-1">Cargo Int'l | BOG</span>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-green-600 font-medium">10/10</span>
+          <div class="w-16 h-1 bg-gray-100 rounded-full overflow-hidden mt-0.5">
+            <div class="h-full bg-green-500 rounded-full" style="width: 100%"></div>
+          </div>
+        </div>
+      </summary>
+      <div class="px-4 pb-3">
+        <p class="text-xs text-green-600">Todas las piezas distribuidas</p>
+      </div>
+    </details>
+
+    <!-- AWB 3: colapsada, sin asignar -->
+    <details class="border-b border-gray-200 bg-white">
+      <summary class="px-4 py-3 flex items-center justify-between cursor-pointer">
+        <div>
+          <span class="font-mono font-bold text-sm text-mcl-blue">057-11223344</span>
+          <span class="text-[10px] text-gray-400 ml-1">Express Co. | BOG</span>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-gray-500">0/6</span>
+          <div class="w-16 h-1 bg-gray-100 rounded-full overflow-hidden mt-0.5">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+      </summary>
+      <div class="px-4 pb-3">
+        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1.5">Disponibles (6)</p>
+        <!-- Todas DContainer identicas -->
+        <div class="py-2">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-violet-50 border border-violet-200 rounded-lg flex flex-col items-center justify-center">
+              <span class="text-[8px] font-bold text-violet-700">DCONT</span>
+              <span class="text-[8px] text-violet-500">x6</span>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-800">6 DContainer disponibles</p>
+              <p class="text-[11px] text-gray-500">8.2 kg c/u | 40x30x30</p>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center gap-2 pl-14">
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 font-bold active:bg-gray-100">-</button>
+            <input type="number" value="3" min="1" max="6"
+              class="w-14 h-8 border border-gray-200 rounded-lg text-center font-mono font-bold text-sm focus:outline-none focus:border-mcl-blue" />
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 font-bold active:bg-gray-100">+</button>
+            <button class="flex-1 h-8 rounded-lg bg-mcl-blue text-white text-xs font-bold active:bg-blue-900 shadow">
+              Asignar 3
+            </button>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- AWB 4: cierre forzado -->
+    <details class="border-b border-gray-200 bg-amber-50/50">
+      <summary class="px-4 py-3 flex items-center justify-between cursor-pointer">
+        <div>
+          <span class="font-mono font-bold text-sm text-amber-700">057-99887766</span>
+          <span class="text-[10px] text-amber-500 ml-1">Cierre forzado</span>
+        </div>
+        <span class="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-medium">3/5 FC</span>
+      </summary>
+    </details>
+  </div>
+
+  <!-- Fixed bottom: resumen + cerrar ULD -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-bottom" style="max-width:430px; margin:0 auto;">
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+      <span class="font-bold text-gray-700">8 pzas | 3 AWBs | 320 kg</span>
+      <span>16% capacidad</span>
+    </div>
+    <button class="w-full py-3 bg-green-600 text-white text-sm font-bold rounded-xl active:bg-green-700">
+      Cerrar ULD
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- PANTALLA 2-B: TAB "POR BARCODE"                              -->
+<!-- ============================================================ -->
+
+<section id="screen-barcode" class="min-h-screen flex flex-col" style="display:none">
+
+  <!-- Header (mismo) -->
+  <div class="bg-mcl-blue text-white px-4 py-3 sticky top-0 z-20">
+    <div class="flex items-center gap-2">
+      <button onclick="document.getElementById('screen-barcode').style.display='none'; document.getElementById('screen-pieza').style.display='flex';"
+        class="p-1 -ml-1 opacity-60">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-300 text-purple-900">MD</span>
+          <span class="text-sm font-bold font-mono">PMC 1234LA</span>
+        </div>
+        <p class="text-[10px] opacity-60">BOG | LA601</p>
+      </div>
+    </div>
+    <div class="flex items-center justify-between text-[10px] mt-2 opacity-70">
+      <span>8 pzas | 320 kg</span>
+      <span>320 / 2,000 kg (16%)</span>
+    </div>
+    <div class="h-1.5 bg-white/20 rounded-full mt-1 overflow-hidden">
+      <div class="h-full bg-mcl-gold rounded-full" style="width: 16%"></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="bg-white flex border-b border-gray-200 sticky top-[88px] z-10">
+    <button onclick="document.getElementById('screen-barcode').style.display='none'; document.getElementById('screen-pieza').style.display='flex';"
+      class="flex-1 py-3 text-xs text-center tab-inactive">Por Pieza</button>
+    <button class="flex-1 py-3 text-xs text-center tab-active">Por Barcode</button>
+    <button onclick="document.getElementById('screen-barcode').style.display='none'; document.getElementById('screen-wr').style.display='flex';"
+      class="flex-1 py-3 text-xs text-center tab-inactive">Por WR#</button>
+  </div>
+
+  <!-- Barcode input area -->
+  <div class="bg-white px-4 py-4 border-b border-gray-200">
+    <label class="block text-xs font-semibold text-gray-500 mb-2">Escanear o digitar barcode</label>
+    <div class="flex gap-2">
+      <input type="text" placeholder="Escanear barcode..." autofocus
+        class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-lg font-mono focus:outline-none focus:border-mcl-blue" />
+      <button class="px-4 py-3 bg-mcl-blue text-white font-bold rounded-xl active:bg-blue-900 shadow text-sm">
+        OK
+      </button>
+    </div>
+  </div>
+
+  <!-- Feedback: ultima pieza escaneada (success) -->
+  <div class="mx-4 mt-3 bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-3">
+    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+      <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <p class="text-sm font-bold text-green-800">Pieza asignada</p>
+      <p class="text-[11px] text-green-600">BOLSA | ...00150 | 2.5 kg | 057-12345678</p>
+    </div>
+  </div>
+
+  <!-- Feedback example: pieza de otro ULD (warning) -->
+  <div class="mx-4 mt-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-sm font-bold text-amber-800">Ya en AKE 5678LA</p>
+        <p class="text-[11px] text-amber-600">SKID | ...00155 | 30 kg</p>
+      </div>
+    </div>
+    <div class="flex gap-2 mt-2 pl-12">
+      <button class="flex-1 py-2 bg-amber-600 text-white text-xs font-bold rounded-lg active:bg-amber-700">Mover aqui</button>
+      <button class="flex-1 py-2 border border-gray-200 text-gray-500 text-xs rounded-lg">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Lista de piezas escaneadas en este ULD -->
+  <div class="px-4 mt-4">
+    <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Piezas en este ULD (8)</p>
+    <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      <div class="flex items-center justify-between px-3 py-2">
+        <div class="text-xs">
+          <span class="font-bold text-gray-700 font-mono">...00150</span>
+          <span class="text-gray-400 ml-1">BOLSA | 2.5 kg</span>
+        </div>
+        <button class="text-[10px] text-red-400 font-medium active:text-red-600">Quitar</button>
+      </div>
+      <div class="flex items-center justify-between px-3 py-2">
+        <div class="text-xs">
+          <span class="font-bold text-gray-700 font-mono">...00149</span>
+          <span class="text-gray-400 ml-1">BOLSA | 2.5 kg</span>
+        </div>
+        <button class="text-[10px] text-red-400 font-medium active:text-red-600">Quitar</button>
+      </div>
+      <div class="flex items-center justify-between px-3 py-2">
+        <div class="text-xs">
+          <span class="font-bold text-gray-700 font-mono">...00140</span>
+          <span class="text-gray-400 ml-1">SKID | 30.0 kg</span>
+        </div>
+        <button class="text-[10px] text-red-400 font-medium active:text-red-600">Quitar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed bottom -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-bottom" style="max-width:430px; margin:0 auto;">
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+      <span class="font-bold text-gray-700">8 pzas | 3 AWBs | 320 kg</span>
+      <span>16% capacidad</span>
+    </div>
+    <button class="w-full py-3 bg-green-600 text-white text-sm font-bold rounded-xl active:bg-green-700">
+      Cerrar ULD
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- PANTALLA 2-C: TAB "POR WR#"                                  -->
+<!-- Ultimos 5 digitos del Warehouse Receipt                      -->
+<!-- ============================================================ -->
+
+<section id="screen-wr" class="min-h-screen flex flex-col" style="display:none">
+
+  <!-- Header (mismo) -->
+  <div class="bg-mcl-blue text-white px-4 py-3 sticky top-0 z-20">
+    <div class="flex items-center gap-2">
+      <button onclick="document.getElementById('screen-wr').style.display='none'; document.getElementById('screen-pieza').style.display='flex';"
+        class="p-1 -ml-1 opacity-60">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-300 text-purple-900">MD</span>
+          <span class="text-sm font-bold font-mono">PMC 1234LA</span>
+        </div>
+        <p class="text-[10px] opacity-60">BOG | LA601</p>
+      </div>
+    </div>
+    <div class="flex items-center justify-between text-[10px] mt-2 opacity-70">
+      <span>8 pzas | 320 kg</span>
+      <span>320 / 2,000 kg (16%)</span>
+    </div>
+    <div class="h-1.5 bg-white/20 rounded-full mt-1 overflow-hidden">
+      <div class="h-full bg-mcl-gold rounded-full" style="width: 16%"></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="bg-white flex border-b border-gray-200 sticky top-[88px] z-10">
+    <button onclick="document.getElementById('screen-wr').style.display='none'; document.getElementById('screen-pieza').style.display='flex';"
+      class="flex-1 py-3 text-xs text-center tab-inactive">Por Pieza</button>
+    <button onclick="document.getElementById('screen-wr').style.display='none'; document.getElementById('screen-barcode').style.display='flex';"
+      class="flex-1 py-3 text-xs text-center tab-inactive">Por Barcode</button>
+    <button class="flex-1 py-3 text-xs text-center tab-active">Por WR#</button>
+  </div>
+
+  <!-- WR# input -->
+  <div class="bg-white px-4 py-4 border-b border-gray-200">
+    <label class="block text-xs font-semibold text-gray-500 mb-1">Ultimos 5 digitos del Warehouse No.</label>
+    <p class="text-[10px] text-gray-400 mb-2">Lee el numero en la etiqueta de la pieza (ej: 0000000142 → digita 00142)</p>
+    <div class="flex gap-2">
+      <input type="text" maxlength="5" placeholder="00142" value="00142"
+        class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-2xl font-mono font-bold text-center tracking-[0.3em] focus:outline-none focus:border-mcl-blue" />
+      <button class="px-5 py-3 bg-mcl-blue text-white font-bold rounded-xl active:bg-blue-900 shadow text-sm">
+        OK
+      </button>
+    </div>
+  </div>
+
+  <!-- Match result: pieza encontrada -->
+  <div class="mx-4 mt-3 bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div class="px-4 py-3 bg-blue-50 border-b border-blue-100">
+      <p class="text-xs font-bold text-mcl-blue">Pieza encontrada</p>
+    </div>
+    <div class="px-4 py-3">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p class="font-mono font-bold text-lg text-gray-800">0000000142</p>
+          <p class="text-xs text-gray-500">057-12345678 | Merflex</p>
+        </div>
+        <div class="w-14 h-14 bg-amber-50 border border-amber-200 rounded-lg flex flex-col items-center justify-center">
+          <span class="text-[10px] font-bold text-amber-700">SKID</span>
+          <span class="text-[9px] text-amber-500">#01</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-gray-500 mb-3">
+        <span>Peso: <b class="text-gray-800">30.0 kg</b></span>
+        <span>Dim: <b class="text-gray-800">120x100x80</b></span>
+        <span>Pieza: <b class="text-gray-800">#1/24</b></span>
+      </div>
+      <button class="w-full py-3 bg-mcl-blue text-white text-sm font-bold rounded-xl active:bg-blue-900 shadow">
+        Asignar a PMC 1234LA
+      </button>
+    </div>
+  </div>
+
+  <!-- Match result: ambiguedad (2 piezas similares) -->
+  <div class="mx-4 mt-3 bg-white rounded-xl border border-amber-200 overflow-hidden">
+    <div class="px-4 py-3 bg-amber-50 border-b border-amber-100">
+      <p class="text-xs font-bold text-amber-700">2 coincidencias para "00152"</p>
+    </div>
+    <div class="divide-y divide-gray-100">
+      <button class="w-full px-4 py-3 text-left active:bg-blue-50 flex items-center justify-between">
+        <div>
+          <p class="font-mono font-bold text-sm text-gray-800">0000<b class="text-mcl-blue">00152</b></p>
+          <p class="text-[11px] text-gray-500">057-12345678 | BOLSA | 2.5 kg</p>
+        </div>
+        <span class="text-xs text-mcl-blue font-bold">Asignar</span>
+      </button>
+      <button class="w-full px-4 py-3 text-left active:bg-blue-50 flex items-center justify-between">
+        <div>
+          <p class="font-mono font-bold text-sm text-gray-800">0000<b class="text-mcl-blue">00152</b></p>
+          <p class="text-[11px] text-gray-500">057-11223344 | DCONT | 8.2 kg</p>
+        </div>
+        <span class="text-xs text-mcl-blue font-bold">Asignar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Already assigned warning -->
+  <div class="mx-4 mt-3 bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3">
+    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+      <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </div>
+    <div>
+      <p class="text-sm font-bold text-red-800">Ya asignada</p>
+      <p class="text-[11px] text-red-600">Esta pieza ya esta en PMC 1234LA</p>
+    </div>
+  </div>
+
+  <!-- Fixed bottom -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-bottom" style="max-width:430px; margin:0 auto;">
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+      <span class="font-bold text-gray-700">8 pzas | 3 AWBs | 320 kg</span>
+      <span>16% capacidad</span>
+    </div>
+    <button class="w-full py-3 bg-green-600 text-white text-sm font-bold rounded-xl active:bg-green-700">
+      Cerrar ULD
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- PANTALLA 2-D: QUITAR PIEZAS (desde "Quitar piezas..." link)  -->
+<!-- Modal/overlay para reducir cantidades                         -->
+<!-- ============================================================ -->
+
+<section id="screen-quitar" class="min-h-screen flex flex-col bg-white" style="display:none">
+
+  <!-- Header -->
+  <div class="bg-red-600 text-white px-4 py-3 flex items-center gap-3">
+    <button onclick="document.getElementById('screen-quitar').style.display='none'; document.getElementById('screen-pieza').style.display='flex';"
+      class="p-1 -ml-1 opacity-60">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div>
+      <p class="text-sm font-bold">Quitar piezas de PMC 1234LA</p>
+      <p class="text-[10px] opacity-60">057-12345678 | Merflex</p>
+    </div>
+  </div>
+
+  <div class="flex-1 px-4 py-4 space-y-4">
+    <p class="text-xs text-gray-500">Reduce la cantidad para liberar piezas y poder moverlas a otro ULD.</p>
+
+    <!-- SKID: 2 asignadas -->
+    <div class="bg-gray-50 rounded-xl p-4">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">SKID</span>
+          <span class="text-sm text-gray-700">30.0 kg c/u</span>
+        </div>
+        <span class="text-xs text-gray-400">Actual: 2</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-lg active:bg-gray-100">-</button>
+        <input type="number" value="2" min="0" max="2"
+          class="flex-1 h-10 border-2 border-gray-200 rounded-xl text-center font-mono font-bold text-xl focus:outline-none focus:border-red-400" />
+        <button class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-lg active:bg-gray-100">+</button>
+      </div>
+    </div>
+
+    <!-- BOLSA: 3 asignadas, reduciendo a 1 -->
+    <div class="bg-red-50 rounded-xl p-4 border border-red-200">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded">BOLSA</span>
+          <span class="text-sm text-gray-700">2.5 kg c/u</span>
+        </div>
+        <span class="text-xs text-red-500 font-medium">Actual: 3 → 1 (quitando 2)</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-lg active:bg-gray-100">-</button>
+        <input type="number" value="1" min="0" max="3"
+          class="flex-1 h-10 border-2 border-red-300 rounded-xl text-center font-mono font-bold text-xl text-red-600 focus:outline-none" />
+        <button class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-lg active:bg-gray-100">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed bottom -->
+  <div class="border-t border-gray-200 px-4 py-3 safe-bottom">
+    <p class="text-xs text-red-500 text-center mb-2 font-medium">Se quitaran 2 piezas (BOLSA) de este ULD</p>
+    <button class="w-full py-3.5 bg-red-600 text-white text-sm font-bold rounded-xl active:bg-red-700">
+      Confirmar
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- PANTALLA 2-E: EDITAR ULD (CONF + TYPE + Numero)              -->
+<!-- ============================================================ -->
+
+<section id="screen-edit-uld" class="min-h-screen flex flex-col bg-white" style="display:none">
+
+  <!-- Header -->
+  <div class="bg-mcl-blue text-white px-4 py-3 flex items-center gap-3">
+    <button class="p-1 -ml-1 opacity-60">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <p class="text-sm font-bold">Editar ULD</p>
+  </div>
+
+  <div class="flex-1 px-4 py-6 space-y-6">
+    <!-- Mismos campos que Crear ULD, pre-llenados -->
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Configuracion</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="py-4 rounded-xl border-2 border-purple-400 bg-purple-50 text-purple-700 font-bold text-sm text-center">Main<br>Deck</button>
+        <button class="py-4 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center">Lower<br>Deck</button>
+        <button class="py-4 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm text-center">Especial</button>
+      </div>
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Tipo</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="py-3 rounded-xl border-2 border-mcl-blue bg-blue-50 text-mcl-blue font-bold text-sm">PMC</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm">PAG</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm">PLA</button>
+      </div>
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Numero de ULD</label>
+      <input type="text" value="1234LA"
+        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 text-xl font-mono font-bold text-center tracking-wider focus:outline-none focus:border-mcl-blue" />
+      <p class="text-center text-sm font-mono font-bold text-mcl-blue mt-2">PMC 1234LA</p>
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Destino</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="py-3 rounded-xl border-2 border-mcl-blue bg-blue-50 text-mcl-blue font-bold text-sm">BOG</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm">UIO</button>
+        <button class="py-3 rounded-xl border-2 border-gray-200 text-gray-400 font-bold text-sm">GYE</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-gray-200 px-4 py-3 safe-bottom flex gap-2">
+    <button class="flex-1 py-3.5 bg-mcl-blue text-white text-sm font-bold rounded-xl">Guardar</button>
+    <button class="px-6 py-3.5 border border-gray-200 text-gray-600 text-sm rounded-xl">Cancelar</button>
+  </div>
+</section>
+
+</body>
+</html>

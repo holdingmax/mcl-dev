@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCL WMS — Transport-Only SO Flow v4 (Driver PIN + Unified /driver)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #f3f4f6; color: #1f2937; }
+
+  .nav { background: #0a1929; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+  .nav a { color: #93c5fd; text-decoration: none; font-size: 12px; padding: 4px 8px; border-radius: 6px; }
+  .nav a:hover { background: rgba(255,255,255,0.1); }
+  .nav .title { font-weight: 800; font-size: 14px; letter-spacing: 1px; margin-right: 12px; }
+  .nav .divider { color: #475569; }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 30px 20px 60px; }
+  .page-title { font-size: 22px; font-weight: 800; color: #0a1929; margin-bottom: 6px; }
+  .page-sub { font-size: 13px; color: #6b7280; margin-bottom: 24px; }
+
+  .separator { background: #0a1929; color: #fff; text-align: center; padding: 18px; font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+  .separator small { display: block; font-size: 11px; font-weight: 400; color: #93c5fd; margin-top: 4px; }
+  .separator.green { background: #166534; }
+  .separator.blue { background: #1d4ed8; }
+  .separator.purple { background: #6d28d9; }
+
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .card-sub { font-size: 12px; color: #9ca3af; margin-bottom: 16px; }
+
+  label { display: block; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  input, select, textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 9px 12px; font-size: 13px; color: #374151; }
+  input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+  textarea { resize: vertical; min-height: 60px; }
+  .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
+  .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.15s; }
+  .btn-primary { background: #0a1929; color: #fff; }
+  .btn-primary:hover { background: #1e3a5f; }
+  .btn-green { background: #16a34a; color: #fff; }
+  .btn-green:hover { background: #15803d; }
+  .btn-blue { background: #2563eb; color: #fff; }
+  .btn-outline { background: #fff; color: #374151; border: 1px solid #d1d5db; }
+  .btn-outline:hover { background: #f9fafb; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-blue { background: #dbeafe; color: #1d4ed8; }
+  .badge-green { background: #dcfce7; color: #16a34a; }
+  .badge-orange { background: #ffedd5; color: #ea580c; }
+  .badge-yellow { background: #fef9c3; color: #a16207; }
+  .badge-purple { background: #f3e8ff; color: #7c3aed; }
+  .badge-gray { background: #f3f4f6; color: #6b7280; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; border-bottom: 2px solid #e5e7eb; }
+  td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; }
+  .mono { font-family: 'Courier New', monospace; }
+
+  .svc-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .svc-chip { padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 2px solid #e5e7eb; color: #6b7280; cursor: pointer; }
+  .svc-chip.active { border-color: #0a1929; background: #0a1929; color: #fff; }
+  .svc-label { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; margin-bottom: 6px; }
+
+  .section-title { font-size: 13px; font-weight: 700; color: #0a1929; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+  .route-box { display: flex; align-items: center; gap: 8px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; flex-wrap: wrap; }
+  .route-point { text-align: center; flex: 1; min-width: 80px; }
+  .route-point .label { font-size: 10px; font-weight: 700; color: #0369a1; text-transform: uppercase; }
+  .route-point .value { font-size: 13px; font-weight: 700; color: #0a1929; margin-top: 2px; }
+  .route-arrow { font-size: 20px; color: #0284c7; }
+
+  .cargo-lines th { background: #f9fafb; }
+  .cargo-lines td input { border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 8px; font-size: 12px; width: 100%; }
+  .remove-btn { color: #dc2626; cursor: pointer; font-size: 16px; font-weight: 700; border: none; background: none; }
+  .add-line-btn { margin-top: 8px; font-size: 12px; color: #2563eb; font-weight: 600; background: none; border: 1px dashed #93c5fd; padding: 6px 16px; border-radius: 8px; cursor: pointer; }
+
+  .annotation { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; font-size: 12px; color: #92400e; border-radius: 0 8px 8px 0; margin-bottom: 16px; }
+  .annotation strong { color: #78350f; }
+  .alt-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px 14px; font-size: 12px; color: #1e40af; border-radius: 0 8px 8px 0; margin-bottom: 16px; }
+
+  .do-card { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+  .info-cell { padding: 10px 14px; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; }
+  .info-cell:nth-child(even) { border-right: none; }
+  .info-cell .lbl { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; }
+  .info-cell .val { font-size: 13px; font-weight: 600; color: #1f2937; margin-top: 2px; }
+
+  .upload-zone { border: 2px dashed #d1d5db; border-radius: 10px; padding: 24px; text-align: center; color: #6b7280; font-size: 12px; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+  .upload-zone:hover { border-color: #3b82f6; background: #f0f9ff; }
+  .upload-zone.green { border-color: #86efac; color: #16a34a; }
+  .uploaded-file { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 6px; font-size: 12px; }
+  .uploaded-file .file-icon { color: #2563eb; font-weight: 700; margin-right: 8px; }
+
+  .big-stat { text-align: center; padding: 12px; }
+  .big-stat .number { font-size: 28px; font-weight: 800; color: #0a1929; }
+  .big-stat .unit { font-size: 12px; font-weight: 600; color: #6b7280; }
+
+  .extra-stop-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; padding: 8px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; }
+  .extra-stop-row input { flex: 1; }
+
+  .pin-display { background: #0a1929; color: #fff; border-radius: 12px; padding: 20px; text-align: center; margin: 16px 0; }
+  .pin-display .pin-number { font-size: 48px; font-weight: 900; letter-spacing: 12px; font-family: 'Courier New', monospace; margin: 8px 0; }
+  .pin-display .pin-label { font-size: 11px; color: #93c5fd; text-transform: uppercase; letter-spacing: 1px; }
+
+  .timeline { display: flex; align-items: center; gap: 0; margin-bottom: 24px; }
+  .timeline-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .timeline-dot.done { background: #16a34a; color: #fff; }
+  .timeline-dot.current { background: #2563eb; color: #fff; }
+  .timeline-dot.pending { background: #e5e7eb; color: #9ca3af; }
+  .timeline-label { font-size: 10px; font-weight: 600; margin-top: 4px; text-align: center; }
+  .timeline-line { width: 60px; height: 2px; background: #e5e7eb; }
+  .timeline-line.done { background: #16a34a; }
+
+  /* ─── MOBILE DRIVER STYLES ─── */
+  .mobile-frame { max-width: 400px; margin: 0 auto; background: #fff; border-radius: 24px; border: 3px solid #1f2937; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+  .mobile-statusbar { background: #0a1929; color: #fff; padding: 6px 16px; font-size: 10px; display: flex; justify-content: space-between; }
+  .mobile-header { background: #0a1929; color: #fff; padding: 14px 16px; }
+  .mobile-header .mh-title { font-size: 16px; font-weight: 800; }
+  .mobile-header .mh-sub { font-size: 11px; color: #93c5fd; margin-top: 2px; }
+  .mobile-body { padding: 16px; background: #f3f4f6; min-height: 500px; }
+  .mobile-card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+  .driver-step { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; margin-bottom: 8px; }
+  .driver-step.done { background: #f0fdf4; }
+  .driver-step.current { background: #dbeafe; border: 2px solid #3b82f6; }
+  .driver-step.pending { background: #f9fafb; opacity: 0.6; }
+  .driver-step .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .driver-step .step-dot.done { background: #16a34a; color: #fff; }
+  .driver-step .step-dot.current { background: #2563eb; color: #fff; }
+  .driver-step .step-dot.pending { background: #e5e7eb; color: #9ca3af; }
+  .driver-step .step-info { flex: 1; }
+  .driver-step .step-title { font-size: 13px; font-weight: 700; }
+  .driver-step .step-detail { font-size: 11px; color: #6b7280; margin-top: 1px; }
+  .driver-step .step-time { font-size: 10px; color: #16a34a; font-weight: 600; }
+
+  .driver-big-btn { width: 100%; padding: 18px; border-radius: 14px; font-size: 18px; font-weight: 800; border: none; cursor: pointer; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+  .driver-big-btn.blue { background: #2563eb; }
+  .driver-big-btn.green { background: #16a34a; }
+  .driver-big-btn.orange { background: #ea580c; }
+
+  .driver-address-card { background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  .driver-address-card .dac-label { font-size: 10px; font-weight: 700; color: #2563eb; text-transform: uppercase; }
+  .driver-address-card .dac-address { font-size: 15px; font-weight: 700; color: #0a1929; margin-top: 4px; }
+
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .photo-thumb { background: #e5e7eb; border-radius: 8px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #6b7280; cursor: pointer; }
+  .photo-thumb.has-photo { background: #dbeafe; border: 2px solid #3b82f6; color: #2563eb; font-weight: 600; }
+
+  /* Print styles */
+  .print-page { background: #fff; border: 1px solid #d1d5db; border-radius: 4px; padding: 0.5in 0.6in; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); font-size: 11px; }
+  .print-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #0f1d3a; padding-bottom: 14px; margin-bottom: 16px; }
+  .print-logo { width: 48px; height: 48px; background: #0f1d3a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 13px; }
+  .print-company { font-size: 17px; font-weight: 800; color: #0f1d3a; }
+  .print-section { font-size: 10px; font-weight: 800; color: #0f1d3a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1.5px solid #e5e7eb; }
+  .print-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 16px; }
+  .print-table th { background: #0f1d3a; color: #fff; padding: 6px 10px; text-align: left; font-weight: 700; font-size: 9px; text-transform: uppercase; }
+  .print-table td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; }
+  .print-footer { text-align: center; font-size: 8px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 20px; }
+  .print-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #d1d5db; border-radius: 4px; overflow: hidden; margin-bottom: 14px; font-size: 10px; }
+  .print-info-cell { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; }
+  .print-info-cell:nth-child(even) { border-right: none; }
+  .print-info-cell .plbl { font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; }
+  .print-info-cell .pval { font-weight: 600; color: #1f2937; margin-top: 1px; }
+
+  /* Type selector tabs */
+  .do-type-tabs { display: flex; gap: 0; margin-bottom: 16px; border-radius: 10px; overflow: hidden; border: 2px solid #e5e7eb; }
+  .do-type-tab { flex: 1; padding: 12px; text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .do-type-tab.active-air { background: #0a1929; color: #fff; }
+  .do-type-tab.active-ws { background: #6d28d9; color: #fff; }
+  .do-type-tab.inactive { background: #f9fafb; color: #9ca3af; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <span class="title">MCL WMS — Transport v4</span>
+  <span class="divider">|</span>
+  <a href="#step1">1.SO</a>
+  <a href="#step2">2.DO+PIN</a>
+  <a href="#step2b">2b.Tracking</a>
+  <span class="divider">|</span>
+  <a href="#drv-login">Driver: Login</a>
+  <a href="#drv-accept">Accept</a>
+  <a href="#drv-pickup">Pickup</a>
+  <a href="#drv-loaded">Loaded</a>
+  <a href="#drv-stop1">Stop</a>
+  <a href="#drv-deliver">Deliver</a>
+  <a href="#drv-done">Done</a>
+  <span class="divider">|</span>
+  <a href="#step3b">3b.Completed</a>
+  <a href="#step4">4.Billing</a>
+  <span class="divider">|</span>
+  <a href="#pdf-do">PDF:DO</a>
+  <a href="#pdf-pod">PDF:POD</a>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     STEP 1: CREAR SO
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator" id="step1">
+  PASO 1: CREAR SERVICE ORDER (Admin)
+  <small>Igual que v3: cliente + BUP/Loose + cargo lines</small>
+</div>
+
+<div class="page">
+  <div class="page-title">New Service Order</div>
+  <div class="page-sub">Create a new warehouse service order</div>
+
+  <div class="card">
+    <div class="form-group" style="margin-bottom:20px;">
+      <label>Client *</label>
+      <div style="display:flex; gap:8px;">
+        <select style="flex:1;"><option>Bringer Air Cargo LLC</option></select>
+        <button class="btn btn-outline btn-sm">+ New</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label>Services</label>
+      <div class="svc-label">Transport</div>
+      <div class="svc-grid">
+        <span class="svc-chip active">Transport</span>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Transport Only detected.</strong> Select BUP or Loose, add cargo lines.
+    </div>
+
+    <div class="form-row cols-3" style="margin-bottom:16px;">
+      <div class="form-group">
+        <label>Cargo Type</label>
+        <select><option>General</option><option selected>Special Cargo</option></select>
+      </div>
+      <div class="form-group">
+        <label>Mode</label>
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <span class="svc-chip active" style="padding:6px 14px;">Local</span>
+          <span class="svc-chip" style="padding:6px 14px;">Bonded</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Cargo Description</label>
+        <input value="Electronic parts" />
+      </div>
+    </div>
+
+    <!-- BUP/Loose -->
+    <div style="margin-bottom:20px; padding:16px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px;">
+      <label style="color:#0369a1;">Transport Type *</label>
+      <div style="display:flex; gap:12px; margin-top:6px;">
+        <span class="svc-chip active" style="padding:8px 20px; font-size:13px;">BUP / ULD</span>
+        <span class="svc-chip" style="padding:8px 20px; font-size:13px;">Loose</span>
+      </div>
+      <div style="margin-top:12px; display:flex; align-items:center; gap:16px;">
+        <div class="form-group" style="width:140px;">
+          <label style="color:#0369a1;">Number of BUPs *</label>
+          <input type="number" value="3" style="font-size:16px; font-weight:700; text-align:center;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Cargo Lines -->
+    <div class="section-title">Cargo Lines</div>
+    <table class="cargo-lines">
+      <thead>
+        <tr><th>AWB</th><th>Reference / PO</th><th style="width:80px;">Pieces</th><th style="width:90px;">Weight (kg)</th><th>Note</th><th style="width:30px;"></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input value="417-12788252" /></td><td><input value="PO-99821" /></td>
+          <td><input value="50" style="text-align:right;" /></td><td><input value="820.0" style="text-align:right;" /></td>
+          <td><input value="Fragile" /></td><td><button class="remove-btn">&times;</button></td>
+        </tr>
+        <tr>
+          <td><input value="417-12788253" /></td><td><input value="PO-99822" /></td>
+          <td><input value="30" style="text-align:right;" /></td><td><input value="450.5" style="text-align:right;" /></td>
+          <td><input value="" placeholder="Optional" /></td><td><button class="remove-btn">&times;</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="add-line-btn">+ Add Line</button>
+
+    <div style="margin-top:12px; display:flex; gap:24px; font-size:13px;">
+      <span style="color:#6b7280;">Total Pieces: <strong style="color:#0a1929;">80</strong></span>
+      <span style="color:#6b7280;">Total Weight: <strong style="color:#0a1929;">1,270.5 kg</strong></span>
+      <span style="padding:4px 12px; background:#dbeafe; border-radius:12px; color:#1d4ed8; font-weight:700;">BUP: 3 units</span>
+    </div>
+
+    <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+      <button class="btn btn-outline">Cancel</button>
+      <button class="btn btn-primary">Create Service Order</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     STEP 2: SO DETAIL + CREAR DO + PIN
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator" id="step2">
+  PASO 2: SO DETAIL + CREAR DO + ASIGNAR DRIVER (Admin)
+  <small>Crear DO con ruta, asignar driver, generar PIN. Counter entrega PIN al driver.</small>
+</div>
+
+<div class="page">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+    <div class="page-title" style="margin-bottom:0;">SO-260515-0003</div>
+    <span class="badge badge-purple">Transport Only</span>
+    <span class="badge badge-blue">BUP</span>
+    <span class="badge badge-gray">Requested</span>
+  </div>
+  <div class="page-sub">Bringer Air Cargo LLC &mdash; Special Cargo, Local</div>
+
+  <!-- Cargo Summary -->
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Cargo Summary</div>
+    <div style="display:flex; gap:24px;">
+      <div class="big-stat" style="flex:1; background:#dbeafe; border-radius:10px;">
+        <div class="number">3</div><div class="unit">BUP Units</div>
+      </div>
+      <div class="big-stat" style="flex:1; background:#f3f4f6; border-radius:10px;">
+        <div class="number">80</div><div class="unit">Pieces</div>
+      </div>
+      <div class="big-stat" style="flex:1; background:#f3f4f6; border-radius:10px;">
+        <div class="number">1,270.5</div><div class="unit">kg</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE DO FORM -->
+  <div class="card" style="border: 2px solid #3b82f6; background: #f8faff;">
+    <div class="card-title" style="color:#1d4ed8;">Create Delivery Order</div>
+    <div class="card-sub">Pickup + Delivery for SO-260515-0003</div>
+
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label>Pickup From *</label>
+        <input value="MIA Airport - Cargo Building 263" />
+      </div>
+      <div class="form-group">
+        <label>Deliver To *</label>
+        <input value="8351 NW 21st St, Doral, FL 33122" />
+      </div>
+    </div>
+
+    <!-- BUP info + ULD numbers -->
+    <div style="margin-bottom:16px; padding:14px; background:#dbeafe; border:1px solid #93c5fd; border-radius:10px;">
+      <div style="display:flex; align-items:center; gap:20px;">
+        <div>
+          <label style="color:#1d4ed8; margin-bottom:2px;">Transport</label>
+          <div style="font-size:16px; font-weight:800; color:#1d4ed8;">BUP &mdash; 3 Units</div>
+        </div>
+        <div style="flex:1;">
+          <label style="color:#1d4ed8;">ULD Numbers (optional)</label>
+          <input value="PMC-12345-AA, PMC-12346-AA, PMC-12347-AA" style="border-color:#93c5fd;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Extra Stops -->
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label>Extra Stops</label>
+        <select><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option></select>
+      </div>
+      <div class="form-group" style="grid-column: span 2;">
+        <label>Extra Stop 1 Address *</label>
+        <input value="2100 NW 42nd Ave, Miami, FL 33142" />
+      </div>
+    </div>
+
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label>Trucking Company *</label>
+        <select><option selected>CO-Transportation</option><option>GEO Transport</option></select>
+      </div>
+      <div class="form-group">
+        <label>Driver *</label>
+        <div style="display:flex; gap:8px;">
+          <select style="flex:1;"><option selected>Carlos Mendez</option><option>Juan Rivera</option></select>
+          <button class="btn btn-outline btn-sm">+ New</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label>Custody Method</label>
+        <select><option value="" selected>— None —</option><option>Seal</option><option>Escort</option></select>
+      </div>
+      <div class="form-group">
+        <label>Seal #</label>
+        <input value="" placeholder="Optional" />
+      </div>
+      <div class="form-group">
+        <label>MCL Agent</label>
+        <input value="diego.garcia@mincurllogistics.com" disabled style="background:#f3f4f6; font-size:11px;" />
+      </div>
+    </div>
+
+    <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:12px;">
+      <button class="btn btn-outline">Cancel</button>
+      <button class="btn btn-blue">Create DO &amp; Assign Driver</button>
+    </div>
+  </div>
+
+  <!-- PIN Generated -->
+  <div class="card" style="border:2px solid #16a34a;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+      <span style="font-size:18px;">&#9989;</span>
+      <span style="font-size:16px; font-weight:700; color:#166534;">DO Created &mdash; Driver Assigned</span>
+    </div>
+
+    <div class="pin-display">
+      <div class="pin-label">Driver PIN</div>
+      <div class="pin-number">8 4 7 2</div>
+      <div style="font-size:12px; color:#93c5fd; margin-top:4px;">
+        DO: <strong>WS-DO-00012</strong> &mdash; Driver: <strong>Carlos Mendez</strong>
+      </div>
+    </div>
+
+    <div class="annotation" style="margin-top:12px;">
+      <strong>Mismo portal del driver:</strong> El driver accede a <strong style="color:#2563eb;">wms-mcl.web.app/driver</strong> (la misma ruta que usa para Airfreight). Se registra en la cola, y cuando Counter le da el DO# + PIN, lo ingresa. El sistema detecta el prefijo <code>WS-DO-</code> y carga automaticamente el flujo de Transport con sus milestones.
+    </div>
+
+    <div style="display:flex; justify-content:center; gap:12px; margin-top:16px;">
+      <button class="btn btn-outline btn-sm">Print DO PDF</button>
+      <button class="btn btn-outline btn-sm">Copy PIN</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     STEP 2b: ADMIN TRACKING VIEW
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator" id="step2b">
+  PASO 2b: ADMIN VE TRACKING EN TIEMPO REAL
+  <small>El admin ve el progreso del driver en la SO detail. Timestamps se actualizan en real-time.</small>
+</div>
+
+<div class="page">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+    <div class="page-title" style="margin-bottom:0;">SO-260515-0003</div>
+    <span class="badge badge-purple">Transport Only</span>
+    <span class="badge badge-blue">BUP</span>
+    <span class="badge badge-orange">In Progress</span>
+  </div>
+  <div class="page-sub">Bringer Air Cargo LLC &mdash; Driver is in transit</div>
+
+  <div class="timeline">
+    <div style="text-align:center;"><div class="timeline-dot done">&#10003;</div><div class="timeline-label">SO</div></div>
+    <div class="timeline-line done"></div>
+    <div style="text-align:center;"><div class="timeline-dot done">&#10003;</div><div class="timeline-label">DO</div></div>
+    <div class="timeline-line done"></div>
+    <div style="text-align:center;"><div class="timeline-dot current">&#9679;</div><div class="timeline-label">In Transit</div></div>
+    <div class="timeline-line"></div>
+    <div style="text-align:center;"><div class="timeline-dot pending">4</div><div class="timeline-label">Delivered</div></div>
+    <div class="timeline-line"></div>
+    <div style="text-align:center;"><div class="timeline-dot pending">5</div><div class="timeline-label">Billed</div></div>
+  </div>
+
+  <!-- Driver Progress Card (real-time) -->
+  <div class="card" style="border:2px solid #3b82f6;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+      <div>
+        <div class="section-title" style="margin:0; color:#1d4ed8;">Driver Progress</div>
+        <div style="font-size:11px; color:#6b7280;">WS-DO-00012 &mdash; Carlos Mendez &mdash; PIN: 8472</div>
+      </div>
+      <span class="badge badge-orange">Loaded &mdash; En route to Stop 1</span>
+    </div>
+
+    <div class="driver-step done">
+      <div class="step-dot done">&#10003;</div>
+      <div class="step-info">
+        <div class="step-title">Order Accepted</div>
+        <div class="step-detail">Driver took the order</div>
+      </div>
+      <div class="step-time">09:15</div>
+    </div>
+    <div class="driver-step done">
+      <div class="step-dot done">&#10003;</div>
+      <div class="step-info">
+        <div class="step-title">At Pickup &mdash; MIA Airport Bldg 263</div>
+        <div class="step-detail">Arrived at pickup point</div>
+      </div>
+      <div class="step-time">09:42</div>
+    </div>
+    <div class="driver-step done">
+      <div class="step-dot done">&#10003;</div>
+      <div class="step-info">
+        <div class="step-title">Cargo Loaded</div>
+        <div class="step-detail">3 BUP loaded &mdash; 1 photo</div>
+      </div>
+      <div class="step-time">10:08</div>
+    </div>
+    <div class="driver-step current">
+      <div class="step-dot current">4</div>
+      <div class="step-info">
+        <div class="step-title">En Route &rarr; Stop 1: 2100 NW 42nd Ave</div>
+        <div class="step-detail">Extra stop delivery</div>
+      </div>
+    </div>
+    <div class="driver-step pending">
+      <div class="step-dot pending">5</div>
+      <div class="step-info">
+        <div class="step-title">Deliver &rarr; 8351 NW 21st St, Doral</div>
+        <div class="step-detail">Final destination</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DO info -->
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Delivery Order</div>
+    <div class="do-card">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <span class="mono" style="font-weight:700;">WS-DO-00012</span>
+          <span class="badge badge-orange" style="margin-left:8px;">In Transit</span>
+        </div>
+        <button class="btn btn-outline btn-sm">Print DO</button>
+      </div>
+      <div class="route-box" style="margin:10px 0 0; padding:10px 14px;">
+        <div class="route-point">
+          <div class="label" style="font-size:9px;">Pickup</div>
+          <div class="value" style="font-size:11px;">MIA Airport</div>
+          <div style="font-size:9px; color:#16a34a; font-weight:600;">&#10003; 09:42</div>
+        </div>
+        <div class="route-arrow">&#8594;</div>
+        <div class="route-point">
+          <div class="label" style="font-size:9px;">Stop 1</div>
+          <div class="value" style="font-size:11px; color:#a16207;">2100 NW 42nd</div>
+          <div style="font-size:9px; color:#2563eb; font-weight:600;">&#9679; En route</div>
+        </div>
+        <div class="route-arrow">&#8594;</div>
+        <div class="route-point">
+          <div class="label" style="font-size:9px;">Deliver To</div>
+          <div class="value" style="font-size:11px;">8351 NW 21st St</div>
+          <div style="font-size:9px; color:#9ca3af;">Pending</div>
+        </div>
+      </div>
+      <div style="font-size:11px; color:#6b7280; margin-top:8px;">
+        CO-Transportation &mdash; Carlos Mendez &mdash; BUP, 3 units
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents -->
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Documents</div>
+    <div class="upload-zone">
+      <div style="font-size:24px; margin-bottom:6px;">&#128206;</div>
+      Drop files here or click to upload<br/>
+      <span style="font-size:11px; color:#9ca3af;">PDF, JPG, PNG &mdash; Multiple files</span>
+    </div>
+    <div class="uploaded-file">
+      <div><span class="file-icon">PDF</span> AWB-417-12788252.pdf</div>
+      <div><button class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;">View</button></div>
+    </div>
+    <div class="uploaded-file">
+      <div><span class="file-icon">JPG</span> cargo-loaded.jpg <span style="font-size:10px; color:#6d28d9;">(from driver)</span></div>
+      <div><button class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;">View</button></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIVER: LOGIN / PIN ENTRY — UNIFIED /driver
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator purple" id="drv-login">
+  DRIVER: PORTAL UNIFICADO — /driver
+  <small>Misma ruta wms-mcl.web.app/driver. Register + Queue + PIN. Detecta DO- vs WS-DO- para rutear al flujo correcto.</small>
+</div>
+
+<div class="page">
+  <div class="alt-box" style="margin-bottom:24px;">
+    <strong>Misma pantalla actual de /driver:</strong> El driver se registra en la cola (nombre, trucking, placa) — esto es igual para Airfreight y WS Transport. Luego Counter le da el DO# y PIN. Al ingresarlo, el sistema detecta el prefijo:<br/><br/>
+    &bull; <code>DO-0000012</code> &rarr; busca en <code>delivery_tracking</code> &rarr; flujo <strong>Airfreight</strong> (milestones actuales)<br/>
+    &bull; <code>WS-DO-00012</code> &rarr; busca en <code>ws_delivery_tracking</code> &rarr; flujo <strong>WS Transport</strong> (milestones nuevos)
+  </div>
+
+  <!-- REGISTER (same as current) -->
+  <div style="display:flex; gap:24px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:300px;">
+      <div class="mobile-frame">
+        <div class="mobile-statusbar"><span>9:10 AM</span><span>MCL WMS</span></div>
+        <div class="mobile-header" style="text-align:center; padding:24px 16px;">
+          <div style="font-size:32px; font-weight:900; letter-spacing:2px;">MCL</div>
+          <div style="font-size:11px; color:#93c5fd; margin-top:4px;">Driver Check-In</div>
+        </div>
+        <div class="mobile-body" style="min-height:400px;">
+          <div class="mobile-card">
+            <div style="font-size:14px; font-weight:700; margin-bottom:12px; text-align:center;">Register</div>
+            <div style="margin-bottom:10px;">
+              <label>Driver Name *</label>
+              <input value="Carlos Mendez" />
+            </div>
+            <div style="margin-bottom:10px;">
+              <label>Trucking Company</label>
+              <select><option selected>CO-Transportation</option></select>
+            </div>
+            <div style="margin-bottom:10px;">
+              <label>Plate (optional)</label>
+              <input value="ABC-1234" />
+            </div>
+            <button class="driver-big-btn blue" style="font-size:14px; padding:14px;">Register in Queue</button>
+          </div>
+          <div style="text-align:center; font-size:11px; color:#9ca3af; margin-top:8px;">
+            Same registration for Airfreight &amp; WS Transport
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WAITING + PIN ENTRY (updated to accept both formats) -->
+    <div style="flex:1; min-width:300px;">
+      <div class="mobile-frame">
+        <div class="mobile-statusbar"><span>9:11 AM</span><span>MCL WMS</span></div>
+        <div class="mobile-header" style="text-align:center; padding:16px;">
+          <div style="font-size:16px; font-weight:800;">In Queue</div>
+          <div style="font-size:11px; color:#93c5fd;">Waiting for DO assignment</div>
+        </div>
+        <div class="mobile-body" style="min-height:400px;">
+          <div class="mobile-card" style="text-align:center; border:2px solid #16a34a;">
+            <div style="font-size:13px; font-weight:700; color:#166534;">You're in the queue</div>
+            <div style="font-size:11px; color:#6b7280; margin-top:4px;">Wait for Counter to assign a DO and give you a PIN</div>
+          </div>
+
+          <div class="mobile-card">
+            <div style="font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:10px;">Enter DO# + PIN</div>
+
+            <!-- DO Number — accepts both formats -->
+            <div style="margin-bottom:10px;">
+              <label>Delivery Order #</label>
+              <input value="WS-DO-00012" placeholder="DO-0000012 or WS-DO-00012" style="font-family:monospace; font-size:14px; font-weight:700; text-align:center;" />
+              <div style="font-size:10px; color:#9ca3af; margin-top:4px; text-align:center;">
+                Airfreight: DO-XXXXXXX &nbsp;|&nbsp; WS Transport: WS-DO-XXXXX
+              </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <label>PIN</label>
+              <div style="display:flex; gap:8px; justify-content:center;">
+                <input value="8" maxlength="1" style="width:48px; height:48px; font-size:22px; font-weight:800; text-align:center; border-radius:12px;" />
+                <input value="4" maxlength="1" style="width:48px; height:48px; font-size:22px; font-weight:800; text-align:center; border-radius:12px;" />
+                <input value="7" maxlength="1" style="width:48px; height:48px; font-size:22px; font-weight:800; text-align:center; border-radius:12px;" />
+                <input value="2" maxlength="1" style="width:48px; height:48px; font-size:22px; font-weight:800; text-align:center; border-radius:12px;" />
+              </div>
+            </div>
+
+            <button class="driver-big-btn blue" style="font-size:14px; padding:14px;">Start Tracking</button>
+          </div>
+
+          <div class="annotation" style="font-size:11px;">
+            <strong>Auto-detect:</strong> If DO# starts with <code>WS-DO-</code> the system searches <code>ws_delivery_tracking</code> and loads the WS Transport milestones. Otherwise searches <code>delivery_tracking</code> for Airfreight milestones.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIVER STEP 1: ACCEPT ORDER (WS Transport flow)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator purple" id="drv-accept">
+  DRIVER: WS TRANSPORT — ACCEPT ORDER
+  <small>Flujo WS Transport detectado. Ve ruta completa, cargo, boton "Accept Order".</small>
+</div>
+
+<div class="page">
+  <div class="mobile-frame">
+    <div class="mobile-statusbar"><span>9:12 AM</span><span>MCL Driver</span></div>
+    <div class="mobile-header">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div class="mh-title">WS-DO-00012</div>
+          <div class="mh-sub">Bringer Air Cargo LLC</div>
+        </div>
+        <span class="badge badge-purple" style="font-size:10px;">WS Transport</span>
+      </div>
+    </div>
+    <div class="mobile-body">
+      <!-- Route card -->
+      <div class="mobile-card">
+        <div style="font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:8px;">Route</div>
+        <div class="driver-address-card" style="border-color:#16a34a; background:#f0fdf4;">
+          <div class="dac-label" style="color:#16a34a;">Pickup</div>
+          <div class="dac-address">MIA Airport - Cargo Building 263</div>
+        </div>
+        <div style="text-align:center; font-size:16px; color:#d1d5db; margin:-4px 0;">&#9660;</div>
+        <div class="driver-address-card" style="border-color:#f59e0b; background:#fffbeb;">
+          <div class="dac-label" style="color:#a16207;">Stop 1</div>
+          <div class="dac-address">2100 NW 42nd Ave, Miami</div>
+        </div>
+        <div style="text-align:center; font-size:16px; color:#d1d5db; margin:-4px 0;">&#9660;</div>
+        <div class="driver-address-card">
+          <div class="dac-label">Deliver To</div>
+          <div class="dac-address">8351 NW 21st St, Doral, FL 33122</div>
+        </div>
+      </div>
+
+      <!-- Cargo -->
+      <div class="mobile-card">
+        <div style="font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:8px;">Cargo</div>
+        <div style="display:flex; gap:12px; text-align:center;">
+          <div style="flex:1; background:#dbeafe; border-radius:10px; padding:10px;">
+            <div style="font-size:22px; font-weight:800; color:#1d4ed8;">3</div>
+            <div style="font-size:10px; font-weight:600; color:#6b7280;">BUP</div>
+          </div>
+          <div style="flex:1; background:#f3f4f6; border-radius:10px; padding:10px;">
+            <div style="font-size:22px; font-weight:800;">80</div>
+            <div style="font-size:10px; font-weight:600; color:#6b7280;">Pieces</div>
+          </div>
+          <div style="flex:1; background:#f3f4f6; border-radius:10px; padding:10px;">
+            <div style="font-size:22px; font-weight:800;">1,270</div>
+            <div style="font-size:10px; font-weight:600; color:#6b7280;">kg</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="driver-big-btn blue">Accept Order</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIVER STEP 2: AT PICKUP
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator purple" id="drv-pickup">
+  DRIVER: ARRIVED AT PICKUP
+  <small>Driver llega al punto de pickup. Boton "Arrived at Pickup".</small>
+</div>
+
+<div class="page">
+  <div class="mobile-frame">
+    <div class="mobile-statusbar"><span>9:40 AM</span><span>MCL Driver</span></div>
+    <div class="mobile-header">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div><div class="mh-title">WS-DO-00012</div><div class="mh-sub">In transit to pickup</div></div>
+        <span class="badge badge-purple" style="font-size:10px;">WS Transport</span>
+      </div>
+    </div>
+    <div class="mobile-body">
+      <div class="mobile-card">
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">Order Accepted</div></div>
+          <div class="step-time">9:15</div>
+        </div>
+        <div class="driver-step current">
+          <div class="step-dot current">2</div>
+          <div class="step-info"><div class="step-title">Go to Pickup</div><div class="step-detail">MIA Airport - Bldg 263</div></div>
+        </div>
+        <div class="driver-step pending">
+          <div class="step-dot pending">3</div>
+          <div class="step-info"><div class="step-title">Load Cargo</div></div>
+        </div>
+        <div class="driver-step pending">
+          <div class="step-dot pending">4</div>
+          <div class="step-info"><div class="step-title">Stop 1: 2100 NW 42nd Ave</div></div>
+        </div>
+        <div class="driver-step pending">
+          <div class="step-dot pending">5</div>
+          <div class="step-info"><div class="step-title">Deliver: 8351 NW 21st St</div></div>
+        </div>
+      </div>
+
+      <div class="driver-address-card">
+        <div class="dac-label">Go To</div>
+        <div class="dac-address">MIA Airport - Cargo Building 263</div>
+      </div>
+
+      <button class="driver-big-btn orange">Arrived at Pickup</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIVER STEP 3: LOADED
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator purple" id="drv-loaded">
+  DRIVER: CARGO LOADED
+  <small>Driver confirma que cargo. Puede tomar foto de la carga.</small>
+</div>
+
+<div class="page">
+  <div class="mobile-frame">
+    <div class="mobile-statusbar"><span>10:05 AM</span><span>MCL Driver</span></div>
+    <div class="mobile-header">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div><div class="mh-title">WS-DO-00012</div><div class="mh-sub">At pickup &mdash; Loading</div></div>
+        <span class="badge badge-purple" style="font-size:10px;">WS Transport</span>
+      </div>
+    </div>
+    <div class="mobile-body">
+      <div class="mobile-card">
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">Order Accepted</div></div>
+          <div class="step-time">9:15</div>
+        </div>
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">At Pickup &mdash; MIA Airport</div></div>
+          <div class="step-time">9:42</div>
+        </div>
+        <div class="driver-step current">
+          <div class="step-dot current">3</div>
+          <div class="step-info"><div class="step-title">Load Cargo</div><div class="step-detail">Confirm when loaded</div></div>
+        </div>
+        <div class="driver-step pending">
+          <div class="step-dot pending">4</div>
+          <div class="step-info"><div class="step-title">Stop 1: 2100 NW 42nd Ave</div></div>
+        </div>
+        <div class="driver-step pending">
+          <div class="step-dot pending">5</div>
+          <div class="step-info"><div class="step-title">Deliver: 8351 NW 21st St</div></div>
+        </div>
+      </div>
+
+      <div class="mobile-card">
+        <div style="display:flex; gap:12px; text-align:center; margin-bottom:12px;">
+          <div style="flex:1; background:#dbeafe; border-radius:10px; padding:8px;">
+            <div style="font-size:20px; font-weight:800; color:#1d4ed8;">3 BUP</div>
+          </div>
+          <div style="flex:1; background:#f3f4f6; border-radius:10px; padding:8px;">
+            <div style="font-size:20px; font-weight:800;">1,270 kg</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:6px;">Take Photo (optional)</div>
+        <div class="photo-grid">
+          <div class="photo-thumb has-photo">&#128247; Photo 1</div>
+          <div class="photo-thumb">+ Add Photo</div>
+        </div>
+      </div>
+
+      <button class="driver-big-btn green">Cargo Loaded</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIVER STEP 4: EXTRA STOP
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator purple" id="drv-stop1">
+  DRIVER: EXTRA STOP DELIVERY
+  <small>Si hay extra stops, aparece un paso por cada uno.</small>
+</div>
+
+<div class="page">
+  <div class="mobile-frame">
+    <div class="mobile-statusbar"><span>10:45 AM</span><span>MCL Driver</span></div>
+    <div class="mobile-header">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div><div class="mh-title">WS-DO-00012</div><div class="mh-sub">En route to Stop 1</div></div>
+        <span class="badge badge-purple" style="font-size:10px;">WS Transport</span>
+      </div>
+    </div>
+    <div class="mobile-body">
+      <div class="mobile-card">
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">Order Accepted</div></div>
+          <div class="step-time">9:15</div>
+        </div>
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">At Pickup</div></div>
+          <div class="step-time">9:42</div>
+        </div>
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">Cargo Loaded</div><div class="step-detail">1 photo</div></div>
+          <div class="step-time">10:08</div>
+        </div>
+        <div class="driver-step current">
+          <div class="step-dot current">4</div>
+          <div class="step-info"><div class="step-title">Stop 1</div><div class="step-detail">2100 NW 42nd Ave, Miami</div></div>
+        </div>
+        <div class="driver-step pending">
+          <div class="step-dot pending">5</div>
+          <div class="step-info"><div class="step-title">Final: 8351 NW 21st St</div></div>
+        </div>
+      </div>
+
+      <div class="driver-address-card" style="border-color:#f59e0b; background:#fffbeb;">
+        <div class="dac-label" style="color:#a16207;">Stop 1</div>
+        <div class="dac-address">2100 NW 42nd Ave, Miami, FL 33142</div>
+      </div>
+
+      <button class="driver-big-btn orange">Arrived at Stop 1</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIVER STEP 5: DELIVER (FINAL)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator purple" id="drv-deliver">
+  DRIVER: FINAL DELIVERY
+  <small>Ultimo punto. Confirma entrega, fotos, receptor. Genera POD + billing charge automaticamente.</small>
+</div>
+
+<div class="page">
+  <div class="mobile-frame">
+    <div class="mobile-statusbar"><span>11:20 AM</span><span>MCL Driver</span></div>
+    <div class="mobile-header">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div><div class="mh-title">WS-DO-00012</div><div class="mh-sub">At final destination</div></div>
+        <span class="badge badge-purple" style="font-size:10px;">WS Transport</span>
+      </div>
+    </div>
+    <div class="mobile-body">
+      <div class="mobile-card">
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">Order Accepted</div></div>
+          <div class="step-time">9:15</div>
+        </div>
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">At Pickup</div></div>
+          <div class="step-time">9:42</div>
+        </div>
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">Cargo Loaded</div></div>
+          <div class="step-time">10:08</div>
+        </div>
+        <div class="driver-step done">
+          <div class="step-dot done">&#10003;</div>
+          <div class="step-info"><div class="step-title">Stop 1 Completed</div></div>
+          <div class="step-time">10:52</div>
+        </div>
+        <div class="driver-step current">
+          <div class="step-dot current">5</div>
+          <div class="step-info"><div class="step-title">Final Delivery</div><div class="step-detail">8351 NW 21st St, Doral</div></div>
+        </div>
+      </div>
+
+      <div class="driver-address-card" style="border-color:#16a34a; background:#f0fdf4;">
+        <div class="dac-label" style="color:#16a34a;">Deliver To</div>
+        <div class="dac-address">8351 NW 21st St, Doral, FL 33122</div>
+      </div>
+
+      <div class="mobile-card">
+        <div style="font-size:13px; font-weight:700; margin-bottom:12px;">Delivery Confirmation</div>
+
+        <div style="margin-bottom:12px;">
+          <label>Receiver Name</label>
+          <input value="Maria Rodriguez" placeholder="Optional" />
+        </div>
+
+        <div style="font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:6px;">Take Photos (optional)</div>
+        <div class="photo-grid" style="margin-bottom:12px;">
+          <div class="photo-thumb has-photo">&#128247; Dock B</div>
+          <div class="photo-thumb has-photo">&#128247; Signature</div>
+          <div class="photo-thumb">+ Add</div>
+        </div>
+
+        <div style="margin-bottom:8px;">
+          <label>Notes</label>
+          <textarea placeholder="Optional..." style="min-height:40px;">Delivered at loading dock B.</textarea>
+        </div>
+      </div>
+
+      <button class="driver-big-btn green" style="font-size:20px; padding:20px;">Confirm Delivery</button>
+      <div style="text-align:center; font-size:11px; color:#6b7280; margin-top:8px;">
+        This will close the order and generate the POD
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIVER: DONE
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator purple" id="drv-done">
+  DRIVER: ORDER COMPLETED
+  <small>Confirmacion de entrega. Resumen del trip. PIN desactivado.</small>
+</div>
+
+<div class="page">
+  <div class="mobile-frame">
+    <div class="mobile-statusbar"><span>11:22 AM</span><span>MCL Driver</span></div>
+    <div class="mobile-header" style="background:#166534;">
+      <div class="mh-title">Delivery Completed!</div>
+      <div class="mh-sub" style="color:#86efac;">WS-DO-00012</div>
+    </div>
+    <div class="mobile-body">
+      <div class="mobile-card" style="text-align:center; border: 2px solid #16a34a;">
+        <div style="font-size:48px; margin-bottom:8px;">&#10003;</div>
+        <div style="font-size:18px; font-weight:800; color:#166534;">Delivered Successfully</div>
+        <div style="font-size:13px; color:#6b7280; margin-top:4px;">05/15/2026 &mdash; 11:22 AM</div>
+      </div>
+
+      <div class="mobile-card">
+        <div style="font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:10px;">Trip Summary</div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f3f4f6; font-size:12px;">
+          <span style="color:#6b7280;">Order Accepted</span><span style="font-weight:600;">9:15 AM</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f3f4f6; font-size:12px;">
+          <span style="color:#6b7280;">At Pickup</span><span style="font-weight:600;">9:42 AM</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f3f4f6; font-size:12px;">
+          <span style="color:#6b7280;">Cargo Loaded</span><span style="font-weight:600;">10:08 AM</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f3f4f6; font-size:12px;">
+          <span style="color:#6b7280;">Stop 1 Completed</span><span style="font-weight:600;">10:52 AM</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:12px; color:#166534; font-weight:700;">
+          <span>Delivered</span><span>11:22 AM</span>
+        </div>
+      </div>
+
+      <div class="mobile-card">
+        <div style="font-size:12px; color:#6b7280; text-align:center;">
+          Receiver: <strong style="color:#1f2937;">Maria Rodriguez</strong><br/>
+          Photos: <strong style="color:#1f2937;">3 uploaded</strong><br/>
+          <div style="margin-top:8px; font-size:11px; color:#9ca3af;">Your PIN is no longer active. Thank you!</div>
+        </div>
+      </div>
+
+      <button class="driver-big-btn blue" style="font-size:14px; padding:14px;">New Trip</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     COMPARISON: AIRFREIGHT vs WS TRANSPORT MILESTONES
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator" style="background:#475569;">
+  COMPARACION: MILESTONES AIRFREIGHT vs WS TRANSPORT
+  <small>Mismo /driver, misma cola, mismo PIN. Diferentes milestones segun el tipo de DO.</small>
+</div>
+
+<div class="page">
+  <div class="card">
+    <table style="font-size:12px;">
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th>Airfreight (DO-XXXXXXX)</th>
+          <th>WS Transport (WS-DO-XXXXX)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;">1</td>
+          <td>Arrival at MCL</td>
+          <td>Accept Order</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">2</td>
+          <td>Truck Loaded (+ foto)</td>
+          <td>Arrived at Pickup (address)</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">3</td>
+          <td>Arrival at Airline</td>
+          <td>Cargo Loaded (+ foto optional)</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">4</td>
+          <td>Gate Assigned</td>
+          <td style="color:#a16207;">Stop 1 (if extra stops) &mdash; dynamic</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">5</td>
+          <td>Unload Start</td>
+          <td style="color:#a16207;">Stop 2, 3... (dynamic per DO)</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">6</td>
+          <td>Unload End</td>
+          <td style="color:#16a34a; font-weight:700;">Delivered (+ foto, receiver, notes) &rarr; POD + billing</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alt-box" style="margin-top:16px;">
+      <strong>Key difference:</strong> Airfreight has 6 fixed milestones. WS Transport has 3 fixed (accept, pickup, loaded) + N dynamic stops + 1 final delivery. The milestones are built dynamically from the DO's route (extra stops).
+    </div>
+
+    <div class="annotation" style="margin-top:12px;">
+      <strong>Implementation:</strong> The <code>DriverMobile.tsx</code> component checks the DO prefix. If <code>WS-DO-</code>, it loads from <code>ws_delivery_tracking</code> and renders WS milestones with dynamic stops. If <code>DO-</code>, it uses the current <code>delivery_tracking</code> with the 6 fixed airfreight milestones. Same register, same queue, same PIN flow.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     STEP 3b: SO COMPLETED (Admin)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator green" id="step3b">
+  PASO 3b: SO COMPLETADA (Admin)
+  <small>El driver confirmo entrega. SO completada automaticamente. Charge generado. PDFs disponibles.</small>
+</div>
+
+<div class="page">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+    <div class="page-title" style="margin-bottom:0;">SO-260515-0003</div>
+    <span class="badge badge-purple">Transport Only</span>
+    <span class="badge badge-blue">BUP</span>
+    <span class="badge badge-green">Completed</span>
+  </div>
+  <div class="page-sub">Bringer Air Cargo LLC &mdash; Delivered 05/15/2026 11:22</div>
+
+  <div class="timeline">
+    <div style="text-align:center;"><div class="timeline-dot done">&#10003;</div><div class="timeline-label">SO</div></div>
+    <div class="timeline-line done"></div>
+    <div style="text-align:center;"><div class="timeline-dot done">&#10003;</div><div class="timeline-label">DO</div></div>
+    <div class="timeline-line done"></div>
+    <div style="text-align:center;"><div class="timeline-dot done">&#10003;</div><div class="timeline-label">Delivered</div></div>
+    <div class="timeline-line"></div>
+    <div style="text-align:center;"><div class="timeline-dot pending">4</div><div class="timeline-label">Billed</div></div>
+  </div>
+
+  <!-- POD info -->
+  <div class="card" style="border-color:#bbf7d0; background:#f0fdf4;">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="section-title" style="margin-top:0; color:#166534;">Proof of Delivery</div>
+      <button class="btn btn-green btn-sm">Download POD Certificate</button>
+    </div>
+    <div class="info-grid" style="border-color:#bbf7d0;">
+      <div class="info-cell" style="border-color:#d1fae5;">
+        <div class="lbl">Delivered</div>
+        <div class="val">05/15/2026 &mdash; 11:22</div>
+      </div>
+      <div class="info-cell" style="border-color:#d1fae5;">
+        <div class="lbl">Receiver</div>
+        <div class="val">Maria Rodriguez</div>
+      </div>
+      <div class="info-cell" style="border-color:#d1fae5;">
+        <div class="lbl">Driver</div>
+        <div class="val">Carlos Mendez (CO-Transportation)</div>
+      </div>
+      <div class="info-cell" style="border-color:#d1fae5;">
+        <div class="lbl">Photos</div>
+        <div class="val" style="font-size:12px;">3 photos from driver</div>
+      </div>
+    </div>
+
+    <!-- Driver timestamps -->
+    <div class="section-title" style="color:#166534; font-size:11px;">Driver Trip Log</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-size:11px;">
+      <div style="background:#dcfce7; border-radius:8px; padding:8px; text-align:center;">
+        <div style="font-weight:700;">Accepted</div><div style="color:#166534;">9:15</div>
+      </div>
+      <div style="background:#dcfce7; border-radius:8px; padding:8px; text-align:center;">
+        <div style="font-weight:700;">At Pickup</div><div style="color:#166534;">9:42</div>
+      </div>
+      <div style="background:#dcfce7; border-radius:8px; padding:8px; text-align:center;">
+        <div style="font-weight:700;">Loaded</div><div style="color:#166534;">10:08</div>
+      </div>
+      <div style="background:#dcfce7; border-radius:8px; padding:8px; text-align:center;">
+        <div style="font-weight:700;">Stop 1</div><div style="color:#166534;">10:52</div>
+      </div>
+      <div style="background:#166534; color:#fff; border-radius:8px; padding:8px; text-align:center;">
+        <div style="font-weight:700;">Delivered</div><div>11:22</div>
+      </div>
+      <div style="background:#f3f4f6; border-radius:8px; padding:8px; text-align:center;">
+        <div style="font-weight:700;">Total</div><div style="color:#0a1929; font-weight:700;">2h 07m</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DO summary -->
+  <div class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="section-title" style="margin-top:0;">Delivery Order</div>
+      <button class="btn btn-outline btn-sm">Print DO</button>
+    </div>
+    <div class="do-card">
+      <span class="mono" style="font-weight:700;">WS-DO-00012</span>
+      <span class="badge badge-green" style="margin-left:8px;">Delivered</span>
+      <div class="route-box" style="margin:10px 0 0; padding:10px 14px;">
+        <div class="route-point">
+          <div class="label" style="font-size:9px;">Pickup</div>
+          <div class="value" style="font-size:11px;">MIA Airport</div>
+          <div style="font-size:9px; color:#16a34a;">&#10003; 9:42</div>
+        </div>
+        <div class="route-arrow">&#8594;</div>
+        <div class="route-point">
+          <div class="label" style="font-size:9px;">Stop 1</div>
+          <div class="value" style="font-size:11px;">2100 NW 42nd</div>
+          <div style="font-size:9px; color:#16a34a;">&#10003; 10:52</div>
+        </div>
+        <div class="route-arrow">&#8594;</div>
+        <div class="route-point">
+          <div class="label" style="font-size:9px;">Delivered</div>
+          <div class="value" style="font-size:11px;">8351 NW 21st St</div>
+          <div style="font-size:9px; color:#16a34a;">&#10003; 11:22</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents -->
+  <div class="card">
+    <div class="section-title" style="margin-top:0;">Documents</div>
+    <div class="upload-zone">
+      <div style="font-size:24px; margin-bottom:6px;">&#128206;</div>
+      Drop more files or click to upload
+    </div>
+    <div class="uploaded-file">
+      <div><span class="file-icon">JPG</span> cargo-loaded.jpg <span style="font-size:10px; color:#6d28d9;">(driver)</span></div>
+      <div><button class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;">View</button></div>
+    </div>
+    <div class="uploaded-file">
+      <div><span class="file-icon">JPG</span> delivery-dock-B.jpg <span style="font-size:10px; color:#6d28d9;">(driver)</span></div>
+      <div><button class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;">View</button></div>
+    </div>
+    <div class="uploaded-file">
+      <div><span class="file-icon">JPG</span> signature.jpg <span style="font-size:10px; color:#6d28d9;">(driver)</span></div>
+      <div><button class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;">View</button></div>
+    </div>
+    <div class="uploaded-file">
+      <div><span class="file-icon">PDF</span> AWB-417-12788252.pdf</div>
+      <div><button class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;">View</button></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     STEP 4: BILLING
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator" id="step4">
+  PASO 4: BILLING (Admin)
+  <small>Charge generado automaticamente al delivery. Flujo normal de facturacion.</small>
+</div>
+
+<div class="page">
+  <div class="page-title">WS Billing Charges</div>
+  <div class="page-sub">Transport charge generated at driver delivery confirmation</div>
+
+  <div class="card" style="padding:0; overflow:hidden;">
+    <div style="padding:14px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e5e7eb;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <strong>Bringer Air Cargo LLC</strong>
+        <span class="badge badge-yellow">PENDING</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="btn btn-green btn-sm">Facturar (1)</button>
+        <span style="font-size:18px; font-weight:700; color:#16a34a;">$120.00</span>
+      </div>
+    </div>
+
+    <div style="padding:10px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <input type="checkbox" checked style="width:16px; height:16px;" />
+        <span class="mono" style="font-weight:700; color:#2563eb;">SO-260515-0003</span>
+        <span class="badge badge-purple" style="font-size:10px;">Transport Only</span>
+        <span class="badge badge-blue" style="font-size:10px;">BUP</span>
+      </div>
+      <span style="font-weight:600;">$120.00</span>
+    </div>
+
+    <div style="padding:8px 40px 16px; background:#f9fafb;">
+      <table style="font-size:12px;">
+        <thead>
+          <tr style="font-size:10px; color:#9ca3af; text-transform:uppercase;">
+            <th style="padding:4px 8px;">Service</th>
+            <th style="padding:4px 8px;">Description</th>
+            <th style="text-align:right; padding:4px 8px;">Amount</th>
+            <th style="text-align:center; padding:4px 8px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:6px 8px; font-weight:600;">Transport</td>
+            <td style="padding:6px 8px; color:#6b7280; font-size:11px;">BUP &mdash; 3 units &mdash; CO-Transportation &mdash; +1 stop (minimum charge)</td>
+            <td style="padding:6px 8px; text-align:right; font-family:'Courier New',monospace; font-weight:600;">$120.00</td>
+            <td style="padding:6px 8px; text-align:center;"><span class="badge badge-yellow" style="font-size:10px;">pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PDF: DELIVERY ORDER
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator blue" id="pdf-do">
+  PDF: DELIVERY ORDER
+  <small>Documento imprimible. El driver lleva este documento.</small>
+</div>
+
+<div class="page">
+  <div class="print-page">
+    <div class="print-header">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="print-logo">MCL</div>
+        <div>
+          <div class="print-company">MinCurl Logistics Corp.</div>
+          <div style="font-size: 9px; color: #6b7280;">7500 NW 25th St, Suite 100, Miami, FL 33122</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:18px; font-weight:800; color:#0f1d3a;">DELIVERY ORDER</div>
+        <div style="font-size:14px; font-weight:700; color:#2563eb; margin-top:2px;">WS-DO-00012</div>
+        <div style="font-size:9px; color:#6b7280; margin-top:4px;">Date: 05/15/2026</div>
+      </div>
+    </div>
+
+    <div class="print-section">Service Order</div>
+    <div class="print-info-grid">
+      <div class="print-info-cell"><div class="plbl">SO</div><div class="pval">SO-260515-0003</div></div>
+      <div class="print-info-cell"><div class="plbl">Client</div><div class="pval">Bringer Air Cargo LLC</div></div>
+      <div class="print-info-cell"><div class="plbl">Cargo</div><div class="pval">Special Cargo &mdash; Local</div></div>
+      <div class="print-info-cell"><div class="plbl">Transport</div><div class="pval" style="color:#1d4ed8;">BUP / ULD &mdash; 3 Units</div></div>
+    </div>
+
+    <div class="print-section">Route</div>
+    <div class="print-info-grid">
+      <div class="print-info-cell"><div class="plbl">Pickup From</div><div class="pval">MIA Airport - Cargo Building 263</div></div>
+      <div class="print-info-cell"><div class="plbl">Deliver To</div><div class="pval">8351 NW 21st St, Doral, FL 33122</div></div>
+      <div class="print-info-cell" style="border-bottom:none;"><div class="plbl">Extra Stop 1</div><div class="pval" style="color:#a16207;">2100 NW 42nd Ave, Miami, FL 33142</div></div>
+      <div class="print-info-cell" style="border-bottom:none;"><div class="plbl">&nbsp;</div><div class="pval">&nbsp;</div></div>
+    </div>
+
+    <div class="print-section">Transport</div>
+    <div class="print-info-grid">
+      <div class="print-info-cell"><div class="plbl">Trucking Company</div><div class="pval">CO-Transportation</div></div>
+      <div class="print-info-cell"><div class="plbl">Driver</div><div class="pval">Carlos Mendez</div></div>
+      <div class="print-info-cell"><div class="plbl">Driver PIN</div><div class="pval" style="font-size:16px; font-weight:800; letter-spacing:4px;">8472</div></div>
+      <div class="print-info-cell"><div class="plbl">MCL Agent</div><div class="pval">diego.garcia@mincurllogistics.com</div></div>
+    </div>
+
+    <div class="print-section">ULD Numbers</div>
+    <table class="print-table">
+      <thead><tr><th style="width:40px;">#</th><th>ULD Number</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>PMC-12345-AA</td></tr>
+        <tr><td>2</td><td>PMC-12346-AA</td></tr>
+        <tr><td>3</td><td>PMC-12347-AA</td></tr>
+      </tbody>
+    </table>
+
+    <div class="print-section">Cargo Lines</div>
+    <table class="print-table">
+      <thead><tr><th style="width:30px;">#</th><th>AWB</th><th>Reference</th><th style="text-align:right;">Pcs</th><th style="text-align:right;">Kg</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td style="font-family:monospace;">417-12788252</td><td>PO-99821</td><td style="text-align:right;">50</td><td style="text-align:right;">820.0</td><td>Fragile</td></tr>
+        <tr><td>2</td><td style="font-family:monospace;">417-12788253</td><td>PO-99822</td><td style="text-align:right;">30</td><td style="text-align:right;">450.5</td><td>&mdash;</td></tr>
+        <tr style="font-weight:700; background:#f9fafb;"><td colspan="3" style="text-align:right;">TOTAL</td><td style="text-align:right;">80</td><td style="text-align:right;">1,270.5</td><td></td></tr>
+      </tbody>
+    </table>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:30px;">
+      <div>
+        <div style="border-bottom:1px solid #374151; margin-bottom:4px; height:40px;"></div>
+        <div style="font-size:9px; font-weight:700; color:#6b7280; text-transform:uppercase;">Driver Signature</div>
+        <div style="font-size:8px; color:#9ca3af;">Name: Carlos Mendez</div>
+      </div>
+      <div>
+        <div style="border-bottom:1px solid #374151; margin-bottom:4px; height:40px;"></div>
+        <div style="font-size:9px; font-weight:700; color:#6b7280; text-transform:uppercase;">Receiver Signature</div>
+        <div style="font-size:8px; color:#9ca3af;">Name: _________________ &nbsp; ID: _________________</div>
+      </div>
+    </div>
+    <div style="margin-top:12px; font-size:9px; color:#6b7280;">
+      Date &amp; Time of Delivery: _____ / _____ / __________ &nbsp;&nbsp; _____ : _____
+    </div>
+
+    <div class="print-footer">
+      MinCurl Logistics Corp. &mdash; 7500 NW 25th St, Suite 100, Miami, FL 33122 &mdash; admin@mincurllogistics.com
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PDF: POD CERTIFICATE
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="separator green" id="pdf-pod">
+  PDF: POD CERTIFICATE
+  <small>Generado automaticamente cuando el driver confirma entrega. Incluye timestamps de todo el trip.</small>
+</div>
+
+<div class="page" style="padding-bottom:100px;">
+  <div class="print-page">
+    <div class="print-header">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="print-logo">MCL</div>
+        <div>
+          <div class="print-company">MinCurl Logistics Corp.</div>
+          <div style="font-size: 9px; color: #6b7280;">7500 NW 25th St, Suite 100, Miami, FL 33122</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:18px; font-weight:800; color:#166534;">PROOF OF DELIVERY</div>
+        <div style="font-size:12px; font-weight:700; color:#166534;">POD Certificate</div>
+        <div style="font-size:9px; color:#6b7280; margin-top:4px;">Issued: 05/15/2026 11:22</div>
+      </div>
+    </div>
+
+    <div style="background:#f0fdf4; border:2px solid #86efac; border-radius:6px; padding:14px; margin-bottom:16px; text-align:center;">
+      <div style="font-size:14px; font-weight:800; color:#166534;">DELIVERY CONFIRMED</div>
+      <div style="font-size:20px; font-weight:800; color:#0a1929; margin-top:4px;">05/15/2026 &mdash; 11:22 AM</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:2px;">Receiver: Maria Rodriguez</div>
+    </div>
+
+    <div class="print-section">Service Order</div>
+    <div class="print-info-grid">
+      <div class="print-info-cell"><div class="plbl">SO</div><div class="pval">SO-260515-0003</div></div>
+      <div class="print-info-cell"><div class="plbl">Client</div><div class="pval">Bringer Air Cargo LLC</div></div>
+      <div class="print-info-cell"><div class="plbl">Cargo</div><div class="pval">Special Cargo &mdash; Local</div></div>
+      <div class="print-info-cell"><div class="plbl">Transport</div><div class="pval" style="color:#1d4ed8;">BUP / ULD &mdash; 3 Units</div></div>
+    </div>
+
+    <div class="print-section">Route &amp; Delivery</div>
+    <div class="print-info-grid">
+      <div class="print-info-cell"><div class="plbl">Pickup From</div><div class="pval">MIA Airport - Cargo Building 263</div></div>
+      <div class="print-info-cell"><div class="plbl">Deliver To</div><div class="pval">8351 NW 21st St, Doral, FL 33122</div></div>
+      <div class="print-info-cell"><div class="plbl">Extra Stop 1</div><div class="pval" style="color:#a16207;">2100 NW 42nd Ave, Miami</div></div>
+      <div class="print-info-cell"><div class="plbl">DO Number</div><div class="pval">WS-DO-00012</div></div>
+    </div>
+
+    <div class="print-section">Transport</div>
+    <div class="print-info-grid">
+      <div class="print-info-cell"><div class="plbl">Trucking Company</div><div class="pval">CO-Transportation</div></div>
+      <div class="print-info-cell"><div class="plbl">Driver</div><div class="pval">Carlos Mendez</div></div>
+    </div>
+
+    <!-- Driver Trip Log -->
+    <div class="print-section">Driver Trip Log</div>
+    <table class="print-table">
+      <thead>
+        <tr><th>Event</th><th>Location</th><th style="text-align:right;">Time</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="font-weight:600;">Order Accepted</td><td>&mdash;</td><td style="text-align:right;">09:15 AM</td></tr>
+        <tr><td style="font-weight:600;">Arrived at Pickup</td><td>MIA Airport - Bldg 263</td><td style="text-align:right;">09:42 AM</td></tr>
+        <tr><td style="font-weight:600;">Cargo Loaded</td><td>MIA Airport - Bldg 263</td><td style="text-align:right;">10:08 AM</td></tr>
+        <tr><td style="font-weight:600;">Stop 1 Completed</td><td>2100 NW 42nd Ave, Miami</td><td style="text-align:right;">10:52 AM</td></tr>
+        <tr style="background:#f0fdf4; font-weight:700;">
+          <td style="color:#166534;">Delivered</td>
+          <td style="color:#166534;">8351 NW 21st St, Doral</td>
+          <td style="text-align:right; color:#166534;">11:22 AM</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="text-align:right; font-size:10px; font-weight:700; color:#0a1929; margin-top:-8px; margin-bottom:16px;">
+      Total Trip Time: 2h 07m
+    </div>
+
+    <div class="print-section">ULD Numbers</div>
+    <table class="print-table">
+      <thead><tr><th style="width:40px;">#</th><th>ULD Number</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>PMC-12345-AA</td></tr>
+        <tr><td>2</td><td>PMC-12346-AA</td></tr>
+        <tr><td>3</td><td>PMC-12347-AA</td></tr>
+      </tbody>
+    </table>
+
+    <div class="print-section">Cargo</div>
+    <table class="print-table">
+      <thead><tr><th style="width:30px;">#</th><th>AWB</th><th>Reference</th><th style="text-align:right;">Pcs</th><th style="text-align:right;">Kg</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td style="font-family:monospace;">417-12788252</td><td>PO-99821</td><td style="text-align:right;">50</td><td style="text-align:right;">820.0</td><td>Fragile</td></tr>
+        <tr><td>2</td><td style="font-family:monospace;">417-12788253</td><td>PO-99822</td><td style="text-align:right;">30</td><td style="text-align:right;">450.5</td><td>&mdash;</td></tr>
+        <tr style="font-weight:700; background:#f9fafb;"><td colspan="3" style="text-align:right;">TOTAL</td><td style="text-align:right;">80</td><td style="text-align:right;">1,270.5</td><td></td></tr>
+      </tbody>
+    </table>
+
+    <div class="print-section">Photos on File</div>
+    <div style="font-size:10px; line-height:1.8; margin-bottom:16px;">
+      <div>&bull; cargo-loaded.jpg <span style="color:#6b7280;">(at loading &mdash; 10:08 AM)</span></div>
+      <div>&bull; delivery-dock-B.jpg <span style="color:#6b7280;">(at delivery &mdash; 11:22 AM)</span></div>
+      <div>&bull; signature.jpg <span style="color:#6b7280;">(at delivery &mdash; 11:22 AM)</span></div>
+    </div>
+
+    <div style="font-size:10px; margin-bottom:12px;">
+      <strong>Notes:</strong> Delivered at loading dock B.
+    </div>
+
+    <div class="print-footer">
+      MinCurl Logistics Corp. &mdash; 7500 NW 25th St, Suite 100, Miami, FL 33122 &mdash; admin@mincurllogistics.com<br/>
+      This document serves as proof of delivery. Generated automatically by MCL WMS.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sheet Sync Agent — Report</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #1a1a2e; padding: 24px; }
+  .container { max-width: 1300px; margin: 0 auto; }
+  h1 { font-size: 20px; color: #1a3b5c; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
+  .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .card { background: white; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb; }
+  .card-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .card-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  .card-value.green { color: #059669; }
+  .card-value.orange { color: #d97706; }
+  .card-value.red { color: #dc2626; }
+  .card-value.blue { color: #2563eb; }
+  .card-value.gray { color: #6b7280; }
+  .section { background: white; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 16px; overflow: hidden; }
+  .section-header { padding: 12px 16px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; gap: 8px; }
+  .section-title { font-size: 13px; font-weight: 700; color: #374151; }
+  .badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-orange { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-gray { background: #f3f4f6; color: #4b5563; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 8px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; font-weight: 600; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+  td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+  tr:hover { background: #f0f4ff; }
+  .mono { font-family: 'SF Mono', 'Consolas', monospace; font-size: 11px; }
+  .diff-pill { display: inline-flex; align-items: center; gap: 4px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 2px 8px; margin: 2px; font-size: 11px; }
+  .diff-pill .field { font-weight: 700; color: #374151; }
+  .diff-pill .old { color: #dc2626; text-decoration: line-through; }
+  .diff-pill .arrow { color: #9ca3af; }
+  .diff-pill .new { color: #059669; font-weight: 600; }
+  .empty { padding: 24px; text-align: center; color: #9ca3af; font-size: 13px; }
+  .run-bar { font-size: 12px; color: #6b7280; padding: 12px 16px; background: #f0fdf4; border-radius: 8px; margin-bottom: 16px; border: 1px solid #bbf7d0; }
+  .run-bar b { color: #374151; }
+  .note-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #92400e; margin-bottom: 16px; }
+  .note-box b { color: #78350f; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Sheet Sync Agent — Primera Ejecucion</h1>
+  <p class="subtitle">Express Line &bull; 19 de mayo de 2026 &bull; Spreadsheet: EXPRESS LINE BOOKING</p>
+
+  
+  <div class="run-bar">
+    Ejecutado: <b>2026-05-19T05:38:06.037Z</b> &nbsp;|&nbsp;
+    Filas: <b>93</b> &nbsp;|&nbsp;
+    Cambios detectados: <b>93</b> &nbsp;|&nbsp;
+    Auto-aplicados (day+1): <b>29</b> &nbsp;|&nbsp;
+    Alertas generadas: <b>64</b> &nbsp;|&nbsp;
+    Duracion: <b>5.0s</b>
+  </div>
+
+  <div class="note-box">
+    <b>Nota:</b> Los 29 cambios auto-aplicados (day+1) fueron escritos directamente al sistema sin generar alerta individual.
+    En esta primera ejecucion el agente comparo <b>93 filas del Google Sheet</b> contra el sistema y detecto las diferencias.
+    A partir de ahora, solo se reportaran <b>cambios incrementales</b> (filas que cambien entre una ejecucion y otra).
+  </div>
+
+  <div class="summary-cards">
+    <div class="card">
+      <div class="card-label">Filas Revisadas</div>
+      <div class="card-value blue">93</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Auto-aplicados (Day+1)</div>
+      <div class="card-value green">29</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Alertas Generadas</div>
+      <div class="card-value orange">64</div>
+    </div>
+  </div>
+
+  
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">AWBs Nuevas Same-Day (no aplicadas, solo alerta)</span>
+      <span class="badge badge-orange">64</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:130px">AWB 1st Leg</th>
+          <th style="width:130px">AWB 2nd Leg</th>
+          <th style="width:80px">Vuelo</th>
+          <th style="width:90px">ETD</th>
+          
+          <th>Diferencias (Sistema → Sheet)</th>
+        </tr>
+      </thead>
+      <tbody>
+      
+        <tr>
+          <td class="mono">369-99782605</td>
+          <td class="mono">045-22209353</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-17</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99359201</td>
+          <td class="mono">045-22209670</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360741</td>
+          <td class="mono">729-93889412</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99359190</td>
+          <td class="mono">045-22209666</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92781010</td>
+          <td class="mono">045-22209600</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-19</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99781732</td>
+          <td class="mono">045-22209784</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-14</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782841</td>
+          <td class="mono">045-22209843</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-17</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782432</td>
+          <td class="mono">729-93888104</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99358943</td>
+          <td class="mono">045-22209751</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99774905</td>
+          <td class="mono">045-22209305</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99781990</td>
+          <td class="mono">045-22209471</td>
+          <td class="mono">UC-1105</td>
+          <td>2026-05-15</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99359271</td>
+          <td class="mono">045-22209681</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360822</td>
+          <td class="mono">729-93888056</td>
+          <td class="mono">QT-4091</td>
+          <td>2026-05-17</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99359455</td>
+          <td class="mono">785-10108910</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-13</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782852</td>
+          <td class="mono">045-22209854</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782616</td>
+          <td class="mono">045-22209482</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782900</td>
+          <td class="mono">045-22209913</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92210462</td>
+          <td class="mono">785-10108792</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-14</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99358571</td>
+          <td class="mono">045-22209460</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">023-99305371</td>
+          <td class="mono">785-10108770</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-14</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92781021</td>
+          <td class="mono">045-22209364</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-19</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99359444</td>
+          <td class="mono">045-22209331</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-14</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99358954</td>
+          <td class="mono">045-22209762</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99359186</td>
+          <td class="mono">045-22209563</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92781006</td>
+          <td class="mono">045-22209585</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-19</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99774916</td>
+          <td class="mono">045-22209283</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99775524</td>
+          <td class="mono">044-45304825</td>
+          <td class="mono">AR1305 PAX</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99775340</td>
+          <td class="mono">045-22209773</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-12</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92207474</td>
+          <td class="mono">045-22209692</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99358582</td>
+          <td class="mono">045-22209736</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99775336</td>
+          <td class="mono">045-22209320</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-98059172</td>
+          <td class="mono">729-93889342</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99781986</td>
+          <td class="mono">045-22209810</td>
+          <td class="mono">UC-1105</td>
+          <td>2026-05-15</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-98150920</td>
+          <td class="mono">729-93889375</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99781975</td>
+          <td class="mono">045-22209596</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92781032</td>
+          <td class="mono">045-22209821</td>
+          <td class="mono">LA-0543</td>
+          <td>2026-05-19</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782911</td>
+          <td class="mono">045-22209924</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">936-02652101</td>
+          <td class="mono">785-10108906</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-13</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360531</td>
+          <td class="mono">729-93889331</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360763</td>
+          <td class="mono">729-93889401</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">023-99306012</td>
+          <td class="mono">785-10108781</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-14</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-98152213</td>
+          <td class="mono">729-93888060</td>
+          <td class="mono">QT-4091</td>
+          <td>2026-05-17</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">023-99305802</td>
+          <td class="mono">785-10109072</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-14</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360752</td>
+          <td class="mono">729-93889390</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782443</td>
+          <td class="mono">729-93888115</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-98150916</td>
+          <td class="mono">729-93889364</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782211</td>
+          <td class="mono">045-22209880</td>
+          <td class="mono">UC-1617</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99358593</td>
+          <td class="mono">045-22209740</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360785</td>
+          <td class="mono">729-93888012</td>
+          <td class="mono">QT-4091</td>
+          <td>2026-05-17</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99359466</td>
+          <td class="mono">785-10108921</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-13</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360520</td>
+          <td class="mono">729-93889423</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99360516</td>
+          <td class="mono">729-93889386</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92207485</td>
+          <td class="mono">045-22209703</td>
+          <td class="mono">UC-1711</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92780623</td>
+          <td class="mono">785-10109120</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-15</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">936-02243043</td>
+          <td class="mono">729-93888001</td>
+          <td class="mono">QT-4091</td>
+          <td>2026-05-17</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99775513</td>
+          <td class="mono">044-45304792</td>
+          <td class="mono">AR1305 PAX</td>
+          <td>2026-05-11</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782830</td>
+          <td class="mono">045-22209865</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782933</td>
+          <td class="mono">045-22209806</td>
+          <td class="mono">UC-1527</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">160-09055745</td>
+          <td class="mono">785-10108851</td>
+          <td class="mono">K4865</td>
+          <td>2026-05-10</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99782185</td>
+          <td class="mono">045-22209876</td>
+          <td class="mono">UC-1617</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">023-99306001</td>
+          <td class="mono">785-10109083</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-14</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-98059205</td>
+          <td class="mono">729-93889353</td>
+          <td class="mono">QT-4093</td>
+          <td>2026-05-18</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">369-99775535</td>
+          <td class="mono">785-10108895</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-13</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+        <tr>
+          <td class="mono">999-92780612</td>
+          <td class="mono">785-10108943</td>
+          <td class="mono">GG4515</td>
+          <td>2026-05-15</td>
+          
+          <td><span style="color:#059669;font-weight:600">AWB nueva en sheet</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+
+  
+
+</div>
+</body>
+</html>

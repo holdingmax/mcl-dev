@@ -1,0 +1,103 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Helper functions ──────────────────────────────────────────────────────
+    function isMCL() {
+      return request.auth != null
+        && request.auth.token.email.matches('.*@mincurllogistics\\.com');
+    }
+
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    // Max file size: 10 MB
+    function withinSizeLimit() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // ── Driver tracking photos (public upload — unauthenticated drivers) ────
+    // Only images up to 10 MB, write-only for public, read for logged-in users.
+    match /airfreight/tracking-photos/{fileName} {
+      allow read: if true;
+      allow write: if withinSizeLimit()
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // ── Airfreight documents ────────────────────────────────────────────────
+    // Paths use date/flight/client structure:
+    //   airfreight/{YYYY-MM}/{date}_{flight}_{airline}/{client}_{MAWB}/...
+    //   airfreight/{YYYY-MM}/{date}_{flight}_{airline}/holds/{holdId}/...
+    //   airfreight/{YYYY-MM}/{date}_{flight}_{airline}/{filename}
+    // MCL: full read/write. Clients: read/write (permission gated in app layer).
+    match /airfreight/{allPaths=**} {
+      allow read: if isLoggedIn();
+      allow write: if isLoggedIn() && withinSizeLimit();
+    }
+
+    // ── ULD return proof PDFs (MCL only) ──────────────────────────────────────
+    match /uld_returns/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    // ── ULD return generated documents (MCL only) ─────────────────────────────
+    match /uld_return_documents/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    // ── Airfreight screening certificates (Cloud Functions + MCL manual corrections)
+    match /airfreight/screening-certs/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    // ── WS Transport driver photos (public upload — unauthenticated drivers) ─
+    match /ws-transport/driver-photos/{fileName} {
+      allow read: if true;
+      allow write: if withinSizeLimit()
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // ── Warehouse Services documents & screening reports ─────────────────────
+    match /ws_screening_reports/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    match /ws_documents/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    // ── Warehouse Services CCSF certificates ──────────────────────────────────
+    match /ws_ccsf/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    // ── Warehouse Services CCSF Final (signed by airline) ───────────────────
+    match /ws_ccsf_final/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    // ── Seafreight inventory documents ──────────────────────────────────────
+    // Path: seafreight/inventory-docs/{wr_number}/{filename}
+    match /seafreight/{allPaths=**} {
+      allow read: if isLoggedIn();
+      allow write: if isLoggedIn() && withinSizeLimit();
+    }
+
+    // ── Avianca Cargo documents (AWBs, pallet tags, screening certs, manifests)
+    match /avianca/{allPaths=**} {
+      allow read: if isMCL();
+      allow write: if isMCL() && withinSizeLimit();
+    }
+
+    // ── Deny everything else ──────────────────────────────────────────────────
+    // Any path not matched above is denied by default (Firebase implicit deny).
+  }
+}

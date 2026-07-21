@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pallet Tag Document</title>
+<style>
+  @page { size: letter; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; background: #f0f0f0; }
+
+  .page {
+    width: 8.5in; height: 11in; margin: 20px auto; background: #fff;
+    padding: 0.5in 0.6in; position: relative; box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    display: flex; flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding-bottom: 10px; border-bottom: 3px solid #000;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo { font-weight: 900; font-size: 22px; letter-spacing: 2px; font-style: italic; }
+  .logo-sub { font-size: 8px; color: #555; letter-spacing: 0.5px; margin-top: -2px; }
+  .title-block { text-align: right; }
+  .title { font-size: 28px; font-weight: 900; letter-spacing: 3px; }
+  .subtitle { font-size: 10px; color: #555; letter-spacing: 1px; margin-top: 2px; }
+
+  /* ── Top info grid ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 12px;
+  }
+
+  /* Left: Pallet / Flight / Date */
+  .info-left {
+    border: 2px solid #000;
+    border-right: 1px solid #000;
+  }
+  .info-left table { width: 100%; border-collapse: collapse; }
+  .info-left th {
+    background: #e8e8e8; font-size: 9px; font-weight: 700; text-transform: uppercase;
+    padding: 4px 8px; border-bottom: 1px solid #000; border-right: 1px solid #999;
+    text-align: left; letter-spacing: 0.5px;
+  }
+  .info-left th:last-child { border-right: none; }
+  .info-left td {
+    font-size: 13px; font-weight: 700; padding: 6px 8px;
+    border-right: 1px solid #999; font-family: 'Courier New', monospace;
+  }
+  .info-left td:last-child { border-right: none; }
+
+  /* Right: Position / Destination / Weight */
+  .info-right {
+    border: 2px solid #000;
+    border-left: 1px solid #000;
+    display: flex; flex-direction: column;
+  }
+  .pos-dest {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-bottom: 2px solid #000;
+  }
+  .pos-dest .cell {
+    text-align: center; padding: 4px 8px;
+  }
+  .pos-dest .cell:first-child { border-right: 1px solid #000; }
+  .pos-dest .cell-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    background: #e8e8e8; padding: 4px 8px; letter-spacing: 0.5px;
+    border-bottom: 1px solid #000;
+  }
+  .pos-dest .cell-label:first-child { border-right: 1px solid #000; }
+  .pos-value {
+    font-size: 18px; font-weight: 900; padding: 6px 8px; text-align: center;
+  }
+  .dest-value {
+    font-size: 48px; font-weight: 900; padding: 2px 8px; text-align: center;
+    letter-spacing: 4px; line-height: 1;
+  }
+  .weight-section { display: flex; flex-direction: column; flex: 1; justify-content: center; }
+  .weight-row {
+    display: flex; align-items: baseline; justify-content: flex-end;
+    padding: 2px 12px; gap: 6px;
+  }
+  .weight-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; color: #555;
+    text-align: left; width: 80px;
+  }
+  .weight-value {
+    font-size: 22px; font-weight: 900; font-family: 'Courier New', monospace;
+    text-align: right; min-width: 100px;
+  }
+  .weight-unit { font-size: 14px; font-weight: 700; }
+
+  /* ── AWB Table ── */
+  .awb-table-wrap { margin-top: 12px; }
+  .awb-table {
+    width: 100%; border-collapse: collapse;
+    border: 2px solid #000;
+  }
+  .awb-table thead th {
+    background: #e8e8e8; font-size: 9px; font-weight: 700; text-transform: uppercase;
+    padding: 5px 8px; border-bottom: 2px solid #000; border-right: 1px solid #999;
+    text-align: left; letter-spacing: 0.5px;
+  }
+  .awb-table thead th:last-child { border-right: none; }
+  .awb-table tbody td {
+    font-size: 12px; padding: 5px 8px; border-bottom: 1px solid #ddd;
+    border-right: 1px solid #eee; font-family: 'Courier New', monospace;
+  }
+  .awb-table tbody td:last-child { border-right: none; }
+  .awb-table tbody tr:last-child td { border-bottom: none; }
+
+  /* Empty rows: no borders at all */
+  .awb-table tbody tr.empty-row td {
+    border: none; padding: 4px 8px;
+  }
+
+  /* Total row */
+  .awb-table .total-row td {
+    font-weight: 900; border-top: 2px solid #000; border-bottom: none;
+    border-right: none;
+    padding-top: 6px; font-size: 12px; background: #e8e8e8;
+  }
+  .awb-table .weight-totals td {
+    border: none; padding-top: 2px; padding-bottom: 6px;
+    font-weight: 700; font-size: 11px; background: #e8e8e8;
+  }
+
+  /* Spacer between table and notes */
+  .table-notes-gap { height: 32px; }
+
+  /* ── Notes ── */
+  .notes-section {
+    margin-top: 0;
+    border: 2px solid #000;
+    min-height: 60px;
+  }
+  .notes-header {
+    background: #e8e8e8; font-size: 9px; font-weight: 700; text-transform: uppercase;
+    padding: 4px 8px; border-bottom: 1px solid #000; letter-spacing: 0.5px;
+  }
+  .notes-body {
+    padding: 6px 8px; font-size: 11px; font-family: 'Courier New', monospace;
+    line-height: 1.6; min-height: 40px;
+  }
+
+  /* ── Prepared By ── */
+  .prepared-by {
+    margin-top: 10px;
+    border: 2px solid #000;
+  }
+  .prepared-by-inner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  }
+  .prepared-by-value {
+    font-family: 'Courier New', monospace; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 4px; display: flex; justify-content: space-between;
+    font-size: 8px; color: #888; font-style: italic;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ EXAMPLE 1: Single AWB ═══════════════ -->
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div>
+        <div class="logo">MINCURL</div>
+        <div class="logo-sub">MIAMI, FLORIDA</div>
+      </div>
+    </div>
+    <div class="title-block">
+      <div class="title">PALLET TAG</div>
+      <div class="subtitle">CARGO TRANSFER DOCUMENT</div>
+    </div>
+  </div>
+
+  <!-- Info Grid -->
+  <div class="info-grid">
+    <!-- Left: Pallet / Flight / Date -->
+    <div class="info-left">
+      <table>
+        <tr>
+          <th>Pallet No.</th>
+          <th>Flight No.</th>
+          <th>Date</th>
+        </tr>
+        <tr>
+          <td>AKE 51391 LA</td>
+          <td>0543</td>
+          <td>04/28/2026</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Right: Position / Destination / Weight -->
+    <div class="info-right">
+      <div class="pos-dest">
+        <div class="cell-label">Position</div>
+        <div class="cell-label">Destination</div>
+      </div>
+      <div class="pos-dest">
+        <div class="cell"><div class="pos-value">LD</div></div>
+        <div class="cell"><div class="dest-value">EZE</div></div>
+      </div>
+      <div class="weight-section">
+        <div class="weight-row">
+          <span class="weight-label">Total Weight</span>
+          <span class="weight-value">1,045.5</span>
+          <span class="weight-unit">Kgs</span>
+        </div>
+        <div class="weight-row">
+          <span class="weight-label"></span>
+          <span class="weight-value" style="font-size:16px; color:#666;">2,305.3</span>
+          <span class="weight-unit" style="font-size:11px; color:#666;">Lbs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AWB Table -->
+  <div class="awb-table-wrap">
+    <table class="awb-table">
+      <thead>
+        <tr>
+          <th style="width:30%">Airwaybill No.</th>
+          <th style="width:12%">Pieces</th>
+          <th style="width:18%">Weight (Kg)</th>
+          <th style="width:40%">Remark</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>045-22209084</td>
+          <td>21</td>
+          <td>457.31</td>
+          <td></td>
+        </tr>
+
+        <!-- Empty rows — fill table body -->
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+
+        <!-- Total -->
+        <tr class="total-row">
+          <td>TOTAL</td>
+          <td>21</td>
+          <td>457.31 Kgs</td>
+          <td></td>
+        </tr>
+        <tr class="weight-totals">
+          <td></td>
+          <td></td>
+          <td>1,008.3 Lbs</td>
+          <td></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2 rows gap -->
+  <div class="table-notes-gap"></div>
+
+  <!-- Notes -->
+  <div class="notes-section">
+    <div class="notes-header">Notes</div>
+    <div class="notes-body">
+      045-22209084 - 21 EL1
+    </div>
+  </div>
+
+  <!-- Prepared By -->
+  <div class="prepared-by">
+    <div class="prepared-by-inner">
+      PREPARED BY: <span class="prepared-by-value">JDURAN</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>MCL WMS</span>
+    <span>04/28/2026 07:36:36 PM</span>
+    <span>PAGE 1</span>
+  </div>
+</div>
+
+<!-- ═══════════════ EXAMPLE 2: Multiple AWBs ═══════════════ -->
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div>
+        <div class="logo">MINCURL</div>
+        <div class="logo-sub">MIAMI, FLORIDA</div>
+      </div>
+    </div>
+    <div class="title-block">
+      <div class="title">PALLET TAG</div>
+      <div class="subtitle">CARGO TRANSFER DOCUMENT</div>
+    </div>
+  </div>
+
+  <!-- Info Grid -->
+  <div class="info-grid">
+    <div class="info-left">
+      <table>
+        <tr>
+          <th>Pallet No.</th>
+          <th>Flight No.</th>
+          <th>Date</th>
+        </tr>
+        <tr>
+          <td>PMC 43335 QT</td>
+          <td>QT-4093</td>
+          <td>05/18/2026</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="info-right">
+      <div class="pos-dest">
+        <div class="cell-label">Position</div>
+        <div class="cell-label">Destination</div>
+      </div>
+      <div class="pos-dest">
+        <div class="cell"><div class="pos-value">MD</div></div>
+        <div class="cell"><div class="dest-value">SCL</div></div>
+      </div>
+      <div class="weight-section">
+        <div class="weight-row">
+          <span class="weight-label">Total Weight</span>
+          <span class="weight-value">2,340.0</span>
+          <span class="weight-unit">Kgs</span>
+        </div>
+        <div class="weight-row">
+          <span class="weight-label"></span>
+          <span class="weight-value" style="font-size:16px; color:#666;">5,159.4</span>
+          <span class="weight-unit" style="font-size:11px; color:#666;">Lbs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AWB Table -->
+  <div class="awb-table-wrap">
+    <table class="awb-table">
+      <thead>
+        <tr>
+          <th style="width:30%">Airwaybill No.</th>
+          <th style="width:12%">Pieces</th>
+          <th style="width:18%">Weight (Kg)</th>
+          <th style="width:40%">Remark</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>729-93889412</td>
+          <td>28</td>
+          <td>620.5</td>
+          <td>Fragile - Handle with care</td>
+        </tr>
+        <tr>
+          <td>729-93889386</td>
+          <td>55</td>
+          <td>1,230.0</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>729-93889423</td>
+          <td>19</td>
+          <td>489.5</td>
+          <td>Partial shipment</td>
+        </tr>
+
+        <!-- Empty rows — fill table body -->
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td></tr>
+
+        <!-- Total -->
+        <tr class="total-row">
+          <td>TOTAL</td>
+          <td>102</td>
+          <td>2,340.0 Kgs</td>
+          <td></td>
+        </tr>
+        <tr class="weight-totals">
+          <td></td>
+          <td></td>
+          <td>5,159.4 Lbs</td>
+          <td></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2 rows gap -->
+  <div class="table-notes-gap"></div>
+
+  <!-- Notes -->
+  <div class="notes-section">
+    <div class="notes-header">Notes</div>
+    <div class="notes-body">
+      729-93889412 - 28 pcs EL<br>
+      729-93889386 - 55 pcs EL<br>
+      729-93889423 - 19 pcs EL
+    </div>
+  </div>
+
+  <!-- Prepared By -->
+  <div class="prepared-by">
+    <div class="prepared-by-inner">
+      PREPARED BY: <span class="prepared-by-value">DGARCIA</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>MCL WMS</span>
+    <span>05/18/2026 08:15:22 PM</span>
+    <span>PAGE 1</span>
+  </div>
+</div>
+
+</body>
+</html>

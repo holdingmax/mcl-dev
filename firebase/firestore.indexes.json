@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "av_flight_awbs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "flight_id", "order": "ASCENDING" },
+        { "fieldPath": "awb_number", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "av_pallet_tags",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "flight_id", "order": "ASCENDING" },
+        { "fieldPath": "pallet_number", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,423 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isMCL() {
+      return request.auth != null
+        && request.auth.token.email.matches('.*@mincurllogistics\\.com');
+    }
+
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function userRole() {
+      return get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.role;
+    }
+
+    function isClient() {
+      return isLoggedIn() && userRole() == 'client';
+    }
+
+    function isViewer() {
+      return isLoggedIn() && userRole() == 'viewer';
+    }
+
+    // Client-scoped read access (clients and viewers share the same scoping)
+    function isClientScoped() {
+      return isClient() || isViewer();
+    }
+
+    function clientId() {
+      return get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.client_id;
+    }
+
+    function isAdminOrAccounting() {
+      return isMCL() && (userRole() == 'admin' || userRole() == 'accounting');
+    }
+
+    function isVendorAdmin() {
+      return isLoggedIn() && userRole() == 'vendor_admin';
+    }
+
+    function isAvViewer() {
+      return isLoggedIn() && userRole() == 'av_viewer';
+    }
+
+    function vendorId() {
+      return get(/databases/$(database)/documents/vendor_users/$(request.auth.uid)).data.vendor_id;
+    }
+
+    // ── Sea Freight ─────────────────────────────────────────────────────────
+    match /warehouse_receipts/{id} {
+      allow read, write: if isMCL();
+      // Clients: read only their own WRs
+      allow read: if isClient() && resource.data.client_id == clientId();
+      match /lines/{lineId} {
+        allow read, write: if isMCL();
+        // Clients: read lines of their own WRs
+        allow read: if isClient()
+          && get(/databases/$(database)/documents/warehouse_receipts/$(id)).data.client_id == clientId();
+      }
+      match /sku_lines/{skuId} {
+        allow read, write: if isMCL();
+        allow read: if isClient()
+          && get(/databases/$(database)/documents/warehouse_receipts/$(id)).data.client_id == clientId();
+      }
+    }
+    match /wr_lines/{id} {
+      allow read, write: if isMCL();
+    }
+    match /dispatches/{id} {
+      allow read, write: if isMCL();
+      // Clients: read only dispatches that include their client_id
+      allow read: if isClient() && clientId() in resource.data.client_ids;
+    }
+    match /clients/{id} {
+      allow read, write: if isMCL();
+    }
+    match /consignees/{id} {
+      allow read, write: if isMCL();
+    }
+    match /billing_charges/{id} {
+      allow read, write: if isMCL();
+      // Clients: read only their own charges (client_id must match)
+      allow read: if isClient() && resource.data.client_id == clientId();
+    }
+    match /billing_rates/{id} {
+      allow read, write: if isMCL();
+    }
+    match /rate_schedule/{id} {
+      allow read, write: if isMCL();
+    }
+    match /client_billing_rates/{id} {
+      allow read, write: if isMCL();
+    }
+    match /client_billing_config/{id} {
+      allow read, write: if isMCL();
+    }
+    match /billing_profiles/{id} {
+      allow read, write: if isMCL();
+    }
+    match /invoices/{id} {
+      allow read, write: if isMCL();
+      allow read: if isClient() && resource.data.client_id == clientId();
+    }
+    match /inventory_documents/{id} {
+      allow read, write: if isMCL();
+      // Clients: read/write only their own docs
+      allow read: if isClient() && resource.data.client_id == clientId();
+      allow create: if isClient() && request.resource.data.client_id == clientId();
+      allow update: if isClient() && resource.data.client_id == clientId();
+    }
+    match /config/{id} {
+      allow read: if isMCL();
+      // wr_sequence and invoice_sequence need write access for all MCL staff
+      allow write: if isMCL() && (id == 'wr_sequence' || id == 'ws_wr_sequence' || id == 'invoice_sequence' || id == 'air_invoice_sequence' || id == 'do_sequence' || id == 'ws_do_sequence' || id == 'air_warehouse_sequence' || id == 'pu_sequence' || id == 'ws_invoice_sequence' || id == 'av_do_sequence' || id == 'av_invoice_sequence' || id == 'email_settings' || userRole() == 'admin');
+    }
+
+    // ── User roles (MCL write, client read own) ──────────────────────────────
+    match /user_roles/{uid} {
+      allow read: if isLoggedIn() && (isMCL() || request.auth.uid == uid);
+      allow write: if isMCL();
+      // Users can clear their own must_change_password flag after completing the
+      // forced first-login password change (only this one field, only to false).
+      allow update: if isLoggedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['must_change_password'])
+        && request.resource.data.must_change_password == false;
+    }
+
+    // ── Air Freight ──────────────────────────────────────────────────────────
+    match /airfreight_flights/{id} {
+      allow read: if isLoggedIn();
+      allow write: if isMCL() || isClient();
+    }
+
+    match /airfreight_bookings/{id} {
+      // MCL staff: full access
+      allow read, write: if isMCL();
+      // Clients: read/write/delete only their own bookings
+      // (includes ecommerce bookings with transportation fields in awb_lines)
+      allow read: if isClient() && resource.data.client_id == clientId();
+      allow create: if isClient() && request.resource.data.client_id == clientId();
+      allow update: if isClient() && resource.data.client_id == clientId();
+      allow delete: if isClient() && resource.data.client_id == clientId();
+      // Viewers: read-only, scoped to their client_id
+      allow read: if isViewer() && resource.data.client_id == clientId();
+    }
+
+    match /airfreight_clients/{id} {
+      allow read: if isLoggedIn();
+      allow write: if isMCL();
+    }
+
+    match /airfreight_destinations/{id} {
+      allow read: if isLoggedIn();
+      allow write: if isMCL();
+    }
+
+    match /airfreight_plans/{id} {
+      allow read, write: if isMCL();
+    }
+
+    // ── Airfreight Rate Schedule (solo Admin/Accounting MCL) ─────────────
+    match /air_rate_schedule/{id} {
+      allow read: if isMCL();
+      allow write: if isAdminOrAccounting();
+    }
+    match /air_rate_airline_overrides/{id} {
+      allow read, write: if isAdminOrAccounting();
+    }
+    match /air_rate_client_overrides/{id} {
+      allow read, write: if isAdminOrAccounting();
+    }
+
+    // ── Air Billing ────────────────────────────────────────────────────────
+    match /air_billing_profiles/{id} {
+      allow read, write: if isMCL();
+    }
+    match /air_billing_charges/{id} {
+      allow read, write: if isMCL();
+      allow read: if isClient() && resource.data.client_id == clientId();
+    }
+    match /air_invoices/{id} {
+      allow read, write: if isMCL();
+      allow read: if isClient() && resource.data.client_id == clientId();
+    }
+    match /uld_returns/{id} {
+      allow read: if isLoggedIn();
+      allow write: if isMCL();
+    }
+
+    // ── ULD Return Documents (generated PDFs, MCL only) ──────────────────
+    match /uld_return_documents/{id} {
+      allow read, write: if isMCL();
+    }
+
+    // ── Delivery Orders ─────────────────────────────────────────────────
+    match /delivery_orders/{id} {
+      allow read, write: if isMCL();
+    }
+
+    // ── Screening Agent ──────────────────────────────────────────────────
+    match /screening_events/{eventId} {
+      allow read: if isLoggedIn();
+      allow write: if isMCL();
+    }
+    match /screening_settings/{docId} {
+      allow read: if isLoggedIn();
+      allow write: if isMCL();
+      match /escalations/{escId} {
+        allow read: if isLoggedIn();
+        allow write: if isMCL();
+      }
+    }
+
+    // ── Airfreight Doc Receptions (Warehouse) ─────────────────────────────
+    match /airfreight_doc_receptions/{id} {
+      allow read, write: if isMCL();
+    }
+    match /airfreight_physical_pieces/{id} {
+      allow read, write: if isMCL();
+    }
+    match /uld_types/{id} {
+      allow read, write: if isMCL();
+    }
+    match /buildup_ulds/{id} {
+      allow read, write: if isMCL();
+    }
+    match /airfreight_shippers/{id} {
+      allow read, write: if isMCL();
+    }
+    match /airfreight_consignees/{id} {
+      allow read, write: if isMCL();
+    }
+    match /airfreight_shippers_consignees/{id} {
+      allow read, write: if isMCL();
+    }
+
+    // ── Airfreight Holds ──────────────────────────────────────────────────
+    match /airfreight_holds/{id} {
+      // MCL staff: full access
+      allow read, write: if isMCL();
+      // Clients: read only their own holds
+      allow read: if isClient() && resource.data.client_id == clientId();
+      // Clients: can create holds with their own client_id
+      allow create: if isClient() && request.resource.data.client_id == clientId();
+      // Clients: can update only when giving instructions (pending_instruction → fly/send_do)
+      allow update: if isClient() && resource.data.client_id == clientId();
+      // Viewers: read-only, scoped to their client_id
+      allow read: if isViewer() && resource.data.client_id == clientId();
+    }
+
+    // ── Driver Queue (public create for unauthenticated drivers) ──────────
+    match /driver_queue/{id} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if isMCL();
+    }
+
+    // ── Delivery Tracking ─────────────────────────────────────────────────
+    match /delivery_tracking/{id} {
+      allow read: if true;
+      allow update: if true;
+      allow create, delete: if isMCL();
+      // Vendor admins: read only their vendor's trackings
+      allow read: if isVendorAdmin() && resource.data.vendor_id == vendorId();
+    }
+
+    // ── Trucking Vendors ──────────────────────────────────────────────────
+    match /vendors/{id} {
+      allow read: if true;
+      allow write: if isMCL();
+    }
+
+    // ── Vendor Users ──────────────────────────────────────────────────────
+    match /vendor_users/{uid} {
+      allow read: if isMCL() || (isLoggedIn() && request.auth.uid == uid);
+      allow write: if isMCL();
+    }
+
+    // ── Backup collections (temporary admin tools) ───────────────────────
+    match /backup_express_line/{id} {
+      allow read, write: if isMCL();
+    }
+
+    // ── Warehouse Services ────────────────────────────────────────────────
+    match /warehouse_service_orders/{id} {
+      allow read, write: if isMCL();
+      allow read: if isClient() && resource.data.client_id == clientId();
+      allow create: if isClient() && request.resource.data.client_id == clientId();
+      allow update: if isClient() && resource.data.client_id == clientId();
+    }
+    match /warehouse_service_clients/{id} {
+      allow read: if isLoggedIn();
+      allow write: if isMCL();
+    }
+    match /ws_inspection_logs/{id} {
+      allow read, write: if isMCL();
+    }
+    match /ws_delivery_orders/{id} {
+      allow read, write: if isMCL();
+    }
+    match /ws_delivery_tracking/{id} {
+      allow read: if true;
+      allow update: if true;
+      allow create, delete: if isMCL();
+    }
+    match /ws_billing_charges/{id} {
+      allow read, write: if isMCL();
+      allow read: if isClient() && resource.data.client_id == clientId();
+    }
+    match /ws_invoices/{id} {
+      allow read, write: if isMCL();
+      allow read: if isClient() && resource.data.client_id == clientId();
+    }
+    match /ws_rate_schedule/{id} {
+      allow read: if isMCL();
+      allow write: if isAdminOrAccounting();
+    }
+    match /ws_client_rate_overrides/{id} {
+      allow read: if isMCL();
+      allow write: if isAdminOrAccounting();
+    }
+
+    // ── Avianca Cargo ────────────────────────────────────────────────────
+    match /av_flights/{id} {
+      allow read: if isMCL() || isAvViewer();
+      allow write: if isMCL();
+    }
+    match /av_flight_awbs/{id} {
+      allow read: if isMCL() || isAvViewer();
+      allow write: if isMCL();
+    }
+    match /av_pallet_tags/{id} {
+      allow read: if isMCL() || isAvViewer();
+      allow write: if isMCL();
+    }
+    match /av_screening_certs/{id} {
+      allow read: if isMCL() || isAvViewer();
+      allow write: if isMCL();
+    }
+    match /av_dg_dictionary/{id} {
+      allow read: if isMCL();
+      allow write: if isAdminOrAccounting();
+    }
+    match /av_billing_brackets/{id} {
+      allow read: if isMCL();
+      allow write: if isAdminOrAccounting();
+    }
+    match /av_billing_charges/{id} {
+      allow read, write: if isMCL();
+    }
+    match /av_invoices/{id} {
+      allow read, write: if isMCL();
+    }
+    match /av_manifest_checks/{id} {
+      allow read: if isMCL() || isAvViewer();
+      allow write: if isMCL();
+    }
+    match /av_delivery_orders/{id} {
+      allow read: if isMCL() || isAvViewer();
+      allow write: if isMCL();
+    }
+    match /av_screening_settings/{id} {
+      allow read, write: if isMCL();
+    }
+    match /av_screening_triggers/{id} {
+      allow read, create: if isMCL();
+    }
+    match /av_billing_config/{id} {
+      allow read: if isMCL();
+      allow write: if isAdminOrAccounting();
+    }
+    match /av_awb_logs/{id} {
+      allow read: if isMCL() || isAvViewer();
+      allow write: if isMCL();
+    }
+    match /av_config/{id} {
+      allow read: if isMCL();
+      allow write: if isMCL() && (userRole() == 'admin' || userRole() == 'gerente');
+    }
+
+    // ── Settings (global config: doc_sets, etc.) ────────────────────────
+    match /settings/{id} {
+      allow read: if isMCL();
+      allow write: if isMCL() && (userRole() == 'admin' || userRole() == 'soporte_it');
+    }
+
+    // ── Pickup Orders ────────────────────────────────────────────────────
+    match /pickup_orders/{id} {
+      allow read, write: if isMCL();
+    }
+
+    // ── Monitoring & Agent Collections ────────────────────────
+    match /_agent_state/{agentId} {
+      allow read: if isMCL();
+      // Write only from server (Firebase Admin SDK)
+    }
+    match /_metrics_daily/{docId} {
+      allow read: if isMCL();
+      // Write only from server (Firebase Admin SDK)
+    }
+    match /_client_metrics/{docId} {
+      allow read: if isMCL();
+      allow write: if request.auth != null;
+    }
+    match /_deploy_history/{docId} {
+      allow read: if isMCL();
+      // Write only from server (Firebase Admin SDK)
+    }
+
+    // ── Sheet Sync (agent alerts & runs) ────────────────────────
+    match /_sheet_sync_alerts/{id} {
+      allow read: if isMCL();
+      allow update: if isMCL();
+      // Create/delete only from server (Firebase Admin SDK)
+    }
+    match /_sheet_sync_runs/{id} {
+      allow read: if isMCL();
+    }
+  }
+}

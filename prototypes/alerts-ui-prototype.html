@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCL WMS — Alertas Sync Agent — Propuesta minimal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .pulse-dot { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<!-- Nav tabs -->
+<div class="bg-white border-b sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 flex items-center h-12 gap-6">
+    <span class="font-black text-sm text-[#1e3a5f]">MINCURL</span>
+    <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn text-xs font-semibold text-[#1e3a5f] border-b-2 border-[#1e3a5f] pb-1">1. Dashboard</button>
+    <button onclick="showTab('docrec')" id="tab-docrec" class="tab-btn text-xs font-medium text-gray-400">2. Rec. Documental</button>
+    <button onclick="showTab('popup')" id="tab-popup" class="tab-btn text-xs font-medium text-gray-400">3. Popup AWB</button>
+    <button onclick="showTab('popup-flight')" id="tab-popup-flight" class="tab-btn text-xs font-medium text-gray-400">4. Popup Vuelo</button>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- 1. DASHBOARD — Tabla existente + columna "Sync" con dot -->
+<!-- ================================================================== -->
+<div id="panel-dashboard" class="max-w-7xl mx-auto px-4 py-4">
+  <h2 class="text-sm font-bold text-gray-700 mb-1">Flight Operations Board</h2>
+  <p class="text-[11px] text-gray-400 mb-3">Click en el dot amber de Sync para abrir popup con todos los cambios del vuelo</p>
+
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-xs">
+      <thead class="bg-gray-50 border-b">
+        <tr>
+          <th class="px-2 py-2 text-left text-gray-500 font-medium">Airline</th>
+          <th class="px-2 py-2 text-left text-gray-500 font-medium">Flight#</th>
+          <th class="px-2 py-2 text-left text-gray-500 font-medium">ETD</th>
+          <th class="px-2 py-2 text-left text-gray-500 font-medium">Dest</th>
+          <th class="px-2 py-2 text-center text-gray-500 font-medium">AWBs</th>
+          <th class="px-2 py-2 text-center text-gray-500 font-medium">Pcs</th>
+          <th class="px-2 py-2 text-center text-gray-500 font-medium">CHW</th>
+          <th class="px-1 py-2 text-center text-gray-500 font-medium">Holds</th>
+          <th class="px-1 py-2 text-center text-gray-500 font-medium">DG</th>
+          <th class="px-1 py-2 text-center text-gray-500 font-medium">LB</th>
+          <th class="px-1 py-2 text-center text-gray-500 font-medium" style="background:#fffbeb">
+            <span title="Alertas del Sync Agent">Sync</span>
+          </th>
+          <th class="px-1 py-2 text-center text-gray-500 font-medium">Docs</th>
+          <th class="px-1 py-2 text-center text-gray-500 font-medium">Dist</th>
+          <th class="px-2 py-2 text-center text-gray-500 font-medium">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <!-- Flight WITH sync alerts — click opens flight popup -->
+        <tr class="hover:bg-blue-50/30 cursor-pointer">
+          <td class="px-2 py-2 text-gray-700 font-medium">AVIANCA</td>
+          <td class="px-2 py-2 font-mono text-gray-500">#QT4099</td>
+          <td class="px-2 py-2 text-gray-600 font-mono whitespace-nowrap">05/22 16:50</td>
+          <td class="px-2 py-2"><span class="font-mono font-semibold bg-blue-50 text-[#1e3a5f] px-1 py-0.5 rounded text-[10px]">EZE</span></td>
+          <td class="px-2 py-2 text-center text-gray-700">18</td>
+          <td class="px-2 py-2 text-center text-gray-700">1,612</td>
+          <td class="px-2 py-2 text-center text-gray-700">23,450</td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-red-500"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-yellow-500"></span></td>
+          <!-- SYNC column — amber dot clickable → opens flight popup -->
+          <td class="px-1 py-2 text-center" style="background:#fffbeb">
+            <button onclick="openFlightPopup()" title="5 cambios detectados — click para ver detalle">
+              <span class="relative inline-flex items-center justify-center w-5 h-5">
+                <span class="inline-block w-3.5 h-3.5 rounded-full bg-amber-500 pulse-dot"></span>
+                <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[8px] font-bold w-3 h-3 rounded-full flex items-center justify-center">5</span>
+              </span>
+            </button>
+          </td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-yellow-400"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-green-500"></span></td>
+          <td class="px-2 py-2 text-center"><span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-blue-100 text-blue-700">In Progress</span></td>
+        </tr>
+
+        <!-- Flight WITHOUT alerts -->
+        <tr class="hover:bg-blue-50/30 cursor-pointer">
+          <td class="px-2 py-2 text-gray-700 font-medium">LATAM</td>
+          <td class="px-2 py-2 font-mono text-gray-500">#UC-1105</td>
+          <td class="px-2 py-2 text-gray-600 font-mono whitespace-nowrap">05/22 18:00</td>
+          <td class="px-2 py-2"><span class="font-mono font-semibold bg-blue-50 text-[#1e3a5f] px-1 py-0.5 rounded text-[10px]">EZE</span></td>
+          <td class="px-2 py-2 text-center text-gray-700">5</td>
+          <td class="px-2 py-2 text-center text-gray-700">346</td>
+          <td class="px-2 py-2 text-center text-gray-700">3,381</td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-green-500"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-1 py-2 text-center" style="background:#fffbeb">
+            <span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span>
+          </td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-green-500"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-2 py-2 text-center"><span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-100 text-emerald-700">Booked</span></td>
+        </tr>
+
+        <!-- Flight with resolved alerts -->
+        <tr class="hover:bg-blue-50/30 cursor-pointer">
+          <td class="px-2 py-2 text-gray-700 font-medium">LATAM</td>
+          <td class="px-2 py-2 font-mono text-gray-500">#LA-0543</td>
+          <td class="px-2 py-2 text-gray-600 font-mono whitespace-nowrap">05/24 14:30</td>
+          <td class="px-2 py-2"><span class="font-mono font-semibold bg-blue-50 text-[#1e3a5f] px-1 py-0.5 rounded text-[10px]">EZE</span></td>
+          <td class="px-2 py-2 text-center text-gray-700">12</td>
+          <td class="px-2 py-2 text-center text-gray-700">890</td>
+          <td class="px-2 py-2 text-center text-gray-700">12,100</td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-1 py-2 text-center" style="background:#fffbeb">
+            <span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span>
+          </td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-1 py-2 text-center"><span class="inline-block w-3.5 h-3.5 rounded-full bg-gray-200"></span></td>
+          <td class="px-2 py-2 text-center"><span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-100 text-emerald-700">Booked</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- 2. RECEPCION DOCUMENTAL — Tabla existente + icono alerta -->
+<!-- ================================================================== -->
+<div id="panel-docrec" class="max-w-7xl mx-auto px-4 py-4 hidden">
+  <h2 class="text-sm font-bold text-gray-700 mb-1">Recepcion Documental</h2>
+  <p class="text-[11px] text-gray-400 mb-3">Icono triangulo de alerta al lado de la AWB cuando el sync agent detecta cambios. Click abre popup con detalle de esa AWB.</p>
+
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">AWB</th>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">Cliente</th>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">Tipo</th>
+          <th class="text-center px-3 py-3 font-medium text-gray-600">Piezas</th>
+          <th class="text-right px-3 py-3 font-medium text-gray-600">Peso (kg)</th>
+          <th class="text-right px-3 py-3 font-medium text-gray-600">Chg Wt (kg)</th>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">Almacen</th>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">Vuelo</th>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">Driver</th>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">Fecha</th>
+          <th class="text-left px-3 py-3 font-medium text-gray-600">Estado</th>
+          <th class="text-center px-3 py-3 font-medium text-gray-600">Rec. Fisica</th>
+          <th class="text-center px-3 py-3 font-medium text-gray-600">WR PDF</th>
+          <th class="px-3 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+
+        <!-- Row WITH alert (received_change) -->
+        <tr class="hover:bg-gray-50 cursor-pointer">
+          <td class="px-3 py-3">
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono font-medium text-blue-800">045-22209961</span>
+              <button onclick="openAwbPopup()"
+                title="Alerta: el cliente cambio datos criticos de esta guia"
+                class="text-amber-500 hover:text-amber-700 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+              </button>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-gray-700">
+            <div>Express Line</div>
+            <div class="mt-0.5"><span class="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded-full">Booking</span></div>
+          </td>
+          <td class="px-3 py-3"><span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">BUP - PMC12345</span></td>
+          <td class="px-3 py-3 text-center text-gray-700">103</td>
+          <td class="px-3 py-3 text-right font-mono text-gray-700">2,241.00</td>
+          <td class="px-3 py-3 text-right font-mono text-gray-700">2,800.00</td>
+          <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium">Bonded</span></td>
+          <td class="px-3 py-3">
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-600 font-mono text-xs">QT4099</span>
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-400" title="Booked"></span>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-gray-600">J. Rodriguez</td>
+          <td class="px-3 py-3 text-gray-500 text-xs">May 19, 14:58</td>
+          <td class="px-3 py-3"><span class="text-xs px-2 py-0.5 rounded-full font-medium bg-green-50 text-green-700">Completo</span></td>
+          <td class="px-3 py-3 text-center"><span class="text-gray-400 hover:text-blue-700 cursor-pointer">&#x1F4E6;</span></td>
+          <td class="px-3 py-3 text-center"><span class="text-gray-400 hover:text-red-600 cursor-pointer">&#x1F4C4;</span></td>
+          <td class="px-3 py-3"><span class="text-red-400 hover:text-red-600 cursor-pointer text-sm">&#x1F5D1;</span></td>
+        </tr>
+
+        <!-- Row WITH built_change alert -->
+        <tr class="hover:bg-gray-50 cursor-pointer">
+          <td class="px-3 py-3">
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono font-medium text-blue-800">045-22209493</span>
+              <button title="Alerta critica: guia distribuida, cambio bloqueado"
+                class="text-red-500 hover:text-red-700 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+              </button>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-gray-700">
+            <div>Express Line</div>
+            <div class="mt-0.5"><span class="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded-full">Booking</span></div>
+          </td>
+          <td class="px-3 py-3"><span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">BUP - PMC12346</span></td>
+          <td class="px-3 py-3 text-center text-gray-700">85</td>
+          <td class="px-3 py-3 text-right font-mono text-gray-700">1,592.00</td>
+          <td class="px-3 py-3 text-right font-mono text-gray-700">1,988.00</td>
+          <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium">Bonded</span></td>
+          <td class="px-3 py-3">
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-600 font-mono text-xs">QT4099</span>
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-500" title="Built"></span>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-gray-600">M. Gonzalez</td>
+          <td class="px-3 py-3 text-gray-500 text-xs">May 19, 19:32</td>
+          <td class="px-3 py-3"><span class="text-xs px-2 py-0.5 rounded-full font-medium bg-green-50 text-green-700">Completo</span></td>
+          <td class="px-3 py-3 text-center"><span class="text-gray-400">&#x1F4E6;</span></td>
+          <td class="px-3 py-3 text-center"><span class="text-gray-400 hover:text-red-600 cursor-pointer">&#x1F4C4;</span></td>
+          <td class="px-3 py-3"><span class="text-red-400 hover:text-red-600 cursor-pointer text-sm">&#x1F5D1;</span></td>
+        </tr>
+
+        <!-- Normal row -->
+        <tr class="hover:bg-gray-50 cursor-pointer">
+          <td class="px-3 py-3">
+            <span class="font-mono font-medium text-blue-800">045-22209935</span>
+          </td>
+          <td class="px-3 py-3 text-gray-700">
+            <div>Express Line</div>
+            <div class="mt-0.5"><span class="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded-full">Booking</span></div>
+          </td>
+          <td class="px-3 py-3"><span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">Loose</span></td>
+          <td class="px-3 py-3 text-center text-gray-700">100</td>
+          <td class="px-3 py-3 text-right font-mono text-gray-700">1,789.00</td>
+          <td class="px-3 py-3 text-right font-mono text-gray-700">2,100.00</td>
+          <td class="px-3 py-3"><span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium">Local</span></td>
+          <td class="px-3 py-3">
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-600 font-mono text-xs">QT4099</span>
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-400" title="Booked"></span>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-gray-600">C. Villegas</td>
+          <td class="px-3 py-3 text-gray-500 text-xs">May 19, 17:25</td>
+          <td class="px-3 py-3"><span class="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-50 text-amber-700">Pend. Fisica</span></td>
+          <td class="px-3 py-3 text-center"><span class="text-gray-400 hover:text-blue-700 cursor-pointer">&#x1F4E6;</span></td>
+          <td class="px-3 py-3 text-center"><span class="text-gray-300">&#x1F4C4;</span></td>
+          <td class="px-3 py-3"><span class="text-red-400 hover:text-red-600 cursor-pointer text-sm">&#x1F5D1;</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- 3. POPUP AWB — aparece al hacer click en el triangulo de una AWB -->
+<!-- ================================================================== -->
+<div id="panel-popup" class="max-w-7xl mx-auto px-4 py-4 hidden">
+  <h2 class="text-sm font-bold text-gray-700 mb-1">Popup de alerta (nivel AWB)</h2>
+  <p class="text-[11px] text-gray-400 mb-3">Aparece al hacer click en el triangulo de una AWB en Rec. Documental</p>
+
+  <div class="flex items-center justify-center py-8">
+    <button onclick="openAwbPopup()"
+      class="px-4 py-2 bg-amber-500 text-white font-bold text-sm rounded-lg hover:bg-amber-600">
+      Click para ver popup AWB
+    </button>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- 4. POPUP VUELO — aparece al hacer click en el dot Sync del Dashboard -->
+<!-- ================================================================== -->
+<div id="panel-popup-flight" class="max-w-7xl mx-auto px-4 py-4 hidden">
+  <h2 class="text-sm font-bold text-gray-700 mb-1">Popup de alertas (nivel Vuelo)</h2>
+  <p class="text-[11px] text-gray-400 mb-3">Aparece al hacer click en el dot Sync de un vuelo en el Dashboard. Muestra TODOS los cambios de ese vuelo.</p>
+
+  <div class="flex items-center justify-center py-8">
+    <button onclick="openFlightPopup()"
+      class="px-4 py-2 bg-amber-500 text-white font-bold text-sm rounded-lg hover:bg-amber-600">
+      Click para ver popup Vuelo
+    </button>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- POPUP: Alerta a nivel AWB (click en triangulo de Rec. Documental) -->
+<!-- ================================================================== -->
+<div id="popup-awb" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+  <div class="bg-white rounded-2xl shadow-2xl w-[480px] max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-5 py-4 border-b bg-amber-50 rounded-t-2xl">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        <h3 class="font-bold text-sm text-amber-800">Alerta Sync — AWB</h3>
+      </div>
+      <button onclick="closePopup('popup-awb')" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="px-5 py-4 space-y-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="font-mono font-bold text-lg text-[#1e3a5f]">045-22209961</span>
+          <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">received_change</span>
+        </div>
+        <p class="text-xs text-gray-500">Express Line &middot; Vuelo: <strong>QT4099</strong> &middot; 103 piezas</p>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <p class="text-xs text-amber-800 font-medium">
+          El cliente cambio datos de esta guia en su planilla. La guia ya tiene recepcion documental. Los cambios criticos <strong>NO fueron aplicados</strong> automaticamente.
+        </p>
+      </div>
+
+      <!-- Diff table -->
+      <div>
+        <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-2">Cambios detectados</h4>
+        <table class="w-full text-xs border border-gray-200 rounded-lg overflow-hidden">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 py-2 text-left text-gray-500 font-medium">Campo</th>
+              <th class="px-3 py-2 text-left text-gray-500 font-medium">En sistema</th>
+              <th class="px-3 py-2 text-left text-gray-500 font-medium">En planilla cliente</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr>
+              <td class="px-3 py-2 font-medium text-gray-700">Piezas</td>
+              <td class="px-3 py-2 text-gray-600">103</td>
+              <td class="px-3 py-2 text-red-600 font-bold">97</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2 font-medium text-gray-700">CW</td>
+              <td class="px-3 py-2 text-gray-600">2,800.00</td>
+              <td class="px-3 py-2 text-red-600 font-bold">2,650.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-[10px] text-gray-400">Detectado: May 19, 2026 &middot; 8:03 PM ET</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="px-5 py-4 border-t bg-gray-50 rounded-b-2xl flex gap-2">
+      <button onclick="closePopup('popup-awb')"
+        class="flex-1 px-4 py-2.5 bg-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-300">
+        Cerrar
+      </button>
+      <button onclick="alert('Marcada como revisada'); closePopup('popup-awb')"
+        class="flex-1 px-4 py-2.5 bg-amber-600 text-white text-xs font-bold rounded-lg hover:bg-amber-700">
+        Marcar revisada
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- POPUP: Alertas a nivel VUELO (click en dot Sync del Dashboard)     -->
+<!-- Muestra TODOS los cambios agrupados para ese vuelo                 -->
+<!-- ================================================================== -->
+<div id="popup-flight" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+  <div class="bg-white rounded-2xl shadow-2xl w-[580px] max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-5 py-4 border-b bg-amber-50 rounded-t-2xl">
+      <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        <div>
+          <h3 class="font-bold text-sm text-amber-800">Alertas Sync — Vuelo QT4099</h3>
+          <p class="text-[10px] text-amber-600 mt-0.5">AVIANCA &middot; EZE &middot; ETD 05/22 16:50 &middot; 18 AWBs</p>
+        </div>
+      </div>
+      <button onclick="closePopup('popup-flight')" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Summary bar -->
+    <div class="px-5 py-3 border-b bg-white flex items-center gap-3">
+      <span class="text-[10px] font-bold text-gray-400 uppercase">Resumen:</span>
+      <span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"/></svg>
+        1 ETD
+      </span>
+      <span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-red-50 text-red-700 px-2 py-0.5 rounded-full">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+        2 removidas
+      </span>
+      <span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        1 nueva
+      </span>
+      <span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        1 modificada
+      </span>
+    </div>
+
+    <!-- Content — List of changes -->
+    <div class="px-5 py-4 space-y-3">
+
+      <!-- ── CHANGE 1: ETD changed ── -->
+      <div class="border border-blue-200 rounded-xl overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-2.5 bg-blue-50">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="text-xs font-bold text-blue-800">Cambio de ETD</span>
+          <span class="ml-auto text-[10px] text-blue-500">May 19, 7:45 PM</span>
+        </div>
+        <div class="px-4 py-3 bg-white">
+          <div class="flex items-center gap-4 text-xs">
+            <div>
+              <span class="text-gray-400 text-[10px] uppercase">Anterior</span>
+              <div class="font-mono text-gray-500 line-through mt-0.5">05/22 16:50</div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            <div>
+              <span class="text-gray-400 text-[10px] uppercase">Nuevo</span>
+              <div class="font-mono text-blue-700 font-bold mt-0.5">05/22 18:30</div>
+            </div>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-2">Detectado via sync con planilla del cliente</p>
+        </div>
+      </div>
+
+      <!-- ── CHANGE 2: AWBs removed (2 guias salieron del vuelo) ── -->
+      <div class="border border-red-200 rounded-xl overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-2.5 bg-red-50">
+          <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+          <span class="text-xs font-bold text-red-800">Guias removidas del vuelo</span>
+          <span class="bg-red-100 text-red-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">2</span>
+          <span class="ml-auto text-[10px] text-red-500">May 19, 7:45 PM</span>
+        </div>
+        <div class="px-4 py-3 bg-white space-y-2">
+          <!-- Removed AWB 1 -->
+          <div class="flex items-center gap-3 text-xs bg-red-50/50 rounded-lg px-3 py-2">
+            <span class="font-mono font-bold text-red-700">045-22209493</span>
+            <span class="text-gray-500">Express Line</span>
+            <span class="text-gray-400">&middot;</span>
+            <span class="text-gray-500">85 pcs</span>
+            <span class="text-gray-400">&middot;</span>
+            <span class="text-gray-500">1,988 kg</span>
+            <span class="ml-auto">
+              <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-medium">Built</span>
+            </span>
+          </div>
+          <!-- Removed AWB 2 -->
+          <div class="flex items-center gap-3 text-xs bg-red-50/50 rounded-lg px-3 py-2">
+            <span class="font-mono font-bold text-red-700">045-22209820</span>
+            <span class="text-gray-500">Express Line</span>
+            <span class="text-gray-400">&middot;</span>
+            <span class="text-gray-500">42 pcs</span>
+            <span class="text-gray-400">&middot;</span>
+            <span class="text-gray-500">890 kg</span>
+            <span class="ml-auto">
+              <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">Received</span>
+            </span>
+          </div>
+          <p class="text-[10px] text-red-400 flex items-center gap-1 pt-1">
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            La guia 045-22209493 ya estaba distribuida (Built) — requiere accion manual
+          </p>
+        </div>
+      </div>
+
+      <!-- ── CHANGE 3: New AWB added ── -->
+      <div class="border border-green-200 rounded-xl overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-2.5 bg-green-50">
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span class="text-xs font-bold text-green-800">Guia nueva en el vuelo</span>
+          <span class="bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">1</span>
+          <span class="ml-auto text-[10px] text-green-500">May 19, 7:45 PM</span>
+        </div>
+        <div class="px-4 py-3 bg-white">
+          <div class="flex items-center gap-3 text-xs bg-green-50/50 rounded-lg px-3 py-2">
+            <span class="font-mono font-bold text-green-700">045-22210112</span>
+            <span class="text-gray-500">Express Line</span>
+            <span class="text-gray-400">&middot;</span>
+            <span class="text-gray-500">120 pcs</span>
+            <span class="text-gray-400">&middot;</span>
+            <span class="text-gray-500">3,200 kg</span>
+            <span class="text-gray-400">&middot;</span>
+            <span class="text-gray-500">BUP</span>
+          </div>
+          <p class="text-[10px] text-green-600 mt-2">Guia nueva detectada en planilla. Pendiente de recepcion documental.</p>
+        </div>
+      </div>
+
+      <!-- ── CHANGE 4: AWB data modified (piezas, peso, hold) ── -->
+      <div class="border border-amber-200 rounded-xl overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-2.5 bg-amber-50">
+          <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          <span class="text-xs font-bold text-amber-800">Datos modificados</span>
+          <span class="font-mono text-xs text-amber-700">045-22209961</span>
+          <span class="ml-auto text-[10px] text-amber-500">May 19, 8:03 PM</span>
+        </div>
+        <div class="px-4 py-3 bg-white">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="text-[10px] text-gray-400 uppercase">
+                <th class="text-left pb-1.5 font-medium">Campo</th>
+                <th class="text-left pb-1.5 font-medium">En sistema</th>
+                <th class="text-left pb-1.5 font-medium">Planilla cliente</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr>
+                <td class="py-1.5 font-medium text-gray-700">Piezas</td>
+                <td class="py-1.5 text-gray-500 line-through">103</td>
+                <td class="py-1.5 text-red-600 font-bold">97</td>
+              </tr>
+              <tr>
+                <td class="py-1.5 font-medium text-gray-700">Chg Wt</td>
+                <td class="py-1.5 text-gray-500 line-through">2,800.00</td>
+                <td class="py-1.5 text-red-600 font-bold">2,650.00</td>
+              </tr>
+              <tr>
+                <td class="py-1.5 font-medium text-gray-700">Hold</td>
+                <td class="py-1.5 text-gray-400">—</td>
+                <td class="py-1.5 text-red-600 font-bold flex items-center gap-1">
+                  <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                  TSA Hold
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mt-2 flex items-center gap-1.5">
+            <span class="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-medium">received_change</span>
+            <span class="text-[10px] text-gray-400">— Guia con recepcion documental, no se aplico automaticamente</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="px-5 py-4 border-t bg-gray-50 rounded-b-2xl flex gap-2">
+      <button onclick="closePopup('popup-flight')"
+        class="flex-1 px-4 py-2.5 bg-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-300">
+        Cerrar
+      </button>
+      <button onclick="alert('Todas las alertas marcadas como revisadas'); closePopup('popup-flight')"
+        class="flex-1 px-4 py-2.5 bg-amber-600 text-white text-xs font-bold rounded-lg hover:bg-amber-700">
+        Marcar todas revisadas
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('[id^="panel-"]').forEach(p => p.classList.add('hidden'))
+  document.getElementById('panel-' + name).classList.remove('hidden')
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('text-[#1e3a5f]', 'border-b-2', 'border-[#1e3a5f]', 'font-semibold')
+    b.classList.add('text-gray-400', 'font-medium')
+  })
+  const btn = document.getElementById('tab-' + name)
+  btn.classList.add('text-[#1e3a5f]', 'border-b-2', 'border-[#1e3a5f]', 'font-semibold')
+  btn.classList.remove('text-gray-400', 'font-medium')
+}
+function openAwbPopup() { document.getElementById('popup-awb').classList.remove('hidden') }
+function openFlightPopup() { document.getElementById('popup-flight').classList.remove('hidden') }
+function closePopup(id) { document.getElementById(id).classList.add('hidden') }
+</script>
+
+</body>
+</html>

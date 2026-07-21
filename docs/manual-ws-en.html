@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warehouse Services — User Manual | MinCurl Logistics</title>
+<style>
+  :root {
+    --navy: #1a3a5c;
+    --light-gray: #f4f5f7;
+    --green: #16a34a;
+    --red: #dc2626;
+    --amber: #d97706;
+    --border: #d1d5db;
+    --text: #1f2937;
+    --text-light: #6b7280;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: #fff;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  /* --- NAV / TOC sidebar --- */
+  .toc-nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--navy);
+    color: #fff;
+    overflow-y: auto;
+    padding: 24px 16px;
+    z-index: 100;
+  }
+  .toc-nav h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; color: #93c5fd; }
+  .toc-nav a {
+    display: block;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    transition: background .15s;
+  }
+  .toc-nav a:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .toc-nav a.active { background: rgba(255,255,255,.15); color: #fff; font-weight: 600; }
+
+  .main-content { margin-left: 260px; }
+
+  /* --- COVER PAGE --- */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(160deg, var(--navy) 0%, #2d5a8e 100%);
+    color: #fff;
+    padding: 60px 32px;
+  }
+  .cover img, .cover .logo-placeholder {
+    width: 180px;
+    margin-bottom: 40px;
+  }
+  .logo-placeholder {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border: 3px solid rgba(255,255,255,.4);
+    border-radius: 12px;
+    padding: 0 24px;
+  }
+  .cover h1 { font-size: 36px; margin-bottom: 8px; }
+  .cover h2 { font-size: 20px; font-weight: 400; color: #93c5fd; margin-bottom: 32px; }
+  .cover .meta { font-size: 14px; color: #94a3b8; line-height: 2; }
+
+  /* --- SECTIONS --- */
+  .section {
+    padding: 48px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .section:last-child { border-bottom: none; }
+
+  h2.section-title {
+    font-size: 26px;
+    color: var(--navy);
+    margin-bottom: 24px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--navy);
+    display: inline-block;
+  }
+
+  h3 { font-size: 18px; color: var(--navy); margin: 24px 0 12px; }
+  h4 { font-size: 15px; color: var(--text); margin: 16px 0 8px; }
+
+  p { margin-bottom: 12px; }
+  ul, ol { margin: 0 0 16px 24px; }
+  li { margin-bottom: 6px; }
+
+  /* --- BADGES --- */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    vertical-align: middle;
+  }
+  .badge-mcl { background: var(--navy); color: #fff; }
+  .badge-client { background: var(--green); color: #fff; }
+  .badge-admin { background: var(--amber); color: #fff; }
+
+  /* --- TABLES --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+  th {
+    background: var(--navy);
+    color: #fff;
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 600;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  tr:nth-child(even) td { background: var(--light-gray); }
+
+  /* --- SCREENSHOT PLACEHOLDER --- */
+  .screenshot {
+    width: 100%;
+    min-height: 220px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    margin: 20px 0 28px;
+    text-align: center;
+  }
+  .screenshot svg { margin-bottom: 12px; opacity: .4; }
+  .screenshot .label {
+    font-size: 14px;
+    color: var(--text-light);
+    font-style: italic;
+    max-width: 500px;
+  }
+
+  /* --- FLOW DIAGRAM (CSS) --- */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 24px 0;
+    justify-content: center;
+  }
+  .flow-step {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    font-size: 20px;
+    color: var(--navy);
+    padding: 0 6px;
+    font-weight: 700;
+  }
+
+  /* --- STATUS PILLS --- */
+  .status {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+  .status-requested { background: #dbeafe; color: #1d4ed8; }
+  .status-checkedin { background: #fef3c7; color: #92400e; }
+  .status-received { background: #d1fae5; color: #065f46; }
+  .status-inprogress { background: #ede9fe; color: #5b21b6; }
+  .status-completed { background: #d1fae5; color: #065f46; }
+  .status-billed { background: #f3f4f6; color: #374151; }
+
+  /* --- CODE / MONO --- */
+  code {
+    font-family: 'Courier New', monospace;
+    background: var(--light-gray);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  /* --- CALLOUT BOXES --- */
+  .callout {
+    border-left: 4px solid var(--navy);
+    background: #f0f4f8;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .callout-warning {
+    border-left-color: var(--amber);
+    background: #fffbeb;
+  }
+  .callout-success {
+    border-left-color: var(--green);
+    background: #f0fdf4;
+  }
+
+  /* --- PRINT STYLES --- */
+  @media print {
+    .toc-nav { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .cover { min-height: auto; padding: 40px 0; page-break-after: always; }
+    .section { page-break-before: always; padding: 24px 0; }
+    .section:first-of-type { page-break-before: avoid; }
+    body { font-size: 12px; }
+    .container { padding: 20px; }
+    a { color: var(--navy) !important; text-decoration: none !important; }
+    .screenshot { min-height: 160px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TOC NAV ============ -->
+<nav class="toc-nav">
+  <h3>Table of Contents</h3>
+  <a href="#cover">Cover</a>
+  <a href="#sec-1">1. Introduction</a>
+  <a href="#sec-2">2. Access &amp; Roles</a>
+  <a href="#sec-3">3. Dashboard</a>
+  <a href="#sec-4">4. Creating a Service Order</a>
+  <a href="#sec-5">5. Service Order Detail</a>
+  <a href="#sec-6">6. Physical Reception</a>
+  <a href="#sec-7">7. Screening Services</a>
+  <a href="#sec-8">8. Delivery Orders</a>
+  <a href="#sec-9">9. Warehouse Operations</a>
+  <a href="#sec-10">10. POD — Proof of Delivery</a>
+  <a href="#sec-11">11. Labels &amp; Printing</a>
+  <a href="#sec-12">12. Admin &amp; Configuration</a>
+  <a href="#sec-13">13. Quick Reference</a>
+</nav>
+
+<div class="main-content">
+
+  <!-- ============ COVER ============ -->
+  <div class="cover" id="cover">
+    <div class="logo-placeholder">MCL</div>
+    <h1>Warehouse Services</h1>
+    <h2>User Manual</h2>
+    <p style="font-size:18px; margin-bottom: 48px;">MinCurl Logistics LLC</p>
+    <div class="meta">
+      Version 1.0<br>
+      May 2026<br><br>
+      <em>Confidential &mdash; Internal Use</em>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- ============ 1. INTRODUCTION ============ -->
+    <div class="section" id="sec-1">
+      <h2 class="section-title">1. Introduction</h2>
+
+      <p>The <strong>Warehouse Services</strong> module provides a comprehensive platform for managing standalone warehouse operations at MinCurl Logistics. It covers the entire lifecycle of cargo handled at the warehouse&mdash;from initial service order creation through physical reception, screening, storage, and final delivery.</p>
+
+      <p>This module operates <strong>independently</strong> of the Sea Freight and Air Freight modules, serving clients who require warehouse services only (screening, storage, transport, repackaging, etc.).</p>
+
+      <h3>General Workflow</h3>
+      <div class="flow-diagram">
+        <span class="flow-step">SO Creation</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step">Check-in</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step">Physical Reception</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step">Services</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step">Delivery Order</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step">POD</span>
+      </div>
+
+      <p>Each Service Order (SO) groups one or more services to be performed on cargo. Services include <strong>Screening</strong> (K9, X-Ray, Manual), <strong>Transport</strong>, <strong>Storage</strong>, <strong>In/Out handling</strong>, <strong>Repack</strong>, and <strong>DG Inspection</strong>.</p>
+
+      <div class="callout">
+        <strong>Scope:</strong> This manual covers the Warehouse Services module only. For Air Freight or Sea Freight operations, refer to their respective documentation.
+      </div>
+    </div>
+
+    <!-- ============ 2. ACCESS & ROLES ============ -->
+    <div class="section" id="sec-2">
+      <h2 class="section-title">2. Access &amp; Roles</h2>
+
+      <h3>Role-Based Access</h3>
+      <p>Access to screens and features varies by role. The following table summarizes permissions:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Screen / Feature</th>
+            <th><span class="badge badge-mcl">MCL Staff</span></th>
+            <th><span class="badge badge-admin">Accounting</span></th>
+            <th><span class="badge badge-client">Client</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Dashboard</td><td>All orders</td><td>All orders</td><td>Own orders only</td></tr>
+          <tr><td>Create Service Order</td><td>Yes</td><td>No</td><td>No</td></tr>
+          <tr><td>SO Detail</td><td>Full access</td><td>Read-only</td><td>Read-only (own)</td></tr>
+          <tr><td>Physical Reception</td><td>Yes</td><td>No</td><td>No</td></tr>
+          <tr><td>Screening</td><td>Yes</td><td>No</td><td>No</td></tr>
+          <tr><td>Delivery Orders</td><td>Yes</td><td>No</td><td>No</td></tr>
+          <tr><td>Locate / Inventory</td><td>Yes</td><td>No</td><td>No</td></tr>
+          <tr><td>POD</td><td>Yes</td><td>No</td><td>No</td></tr>
+          <tr><td>Rates</td><td>Admin only</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Billing Charges</td><td>Admin only</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Invoices</td><td>Admin only</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Client Management</td><td>Admin only</td><td>No</td><td>No</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Accessing the Module</h3>
+      <p>Navigate to the <strong>Module Selector</strong> in the top navigation bar and choose <strong>Warehouse Services</strong>. If you are currently in the Air Freight module, you can use the module toggle (AIR / SEA / WS) available from the Airfreight Clients page.</p>
+
+      <div class="callout">
+        <strong>MCL Staff roles:</strong> Admin, Agent, Counter, and Bodega (warehouse) all have full operational access. The distinction between these roles primarily affects other modules.
+      </div>
+    </div>
+
+    <!-- ============ 3. DASHBOARD ============ -->
+    <div class="section" id="sec-3">
+      <h2 class="section-title">3. Dashboard</h2>
+
+      <h3>MCL View <span class="badge badge-mcl">MCL</span></h3>
+      <p>The dashboard displays <strong>all service orders</strong> with summary statistics at the top:</p>
+      <ul>
+        <li><strong>Requested</strong> &mdash; Orders awaiting check-in</li>
+        <li><strong>In Progress</strong> &mdash; Orders currently being serviced</li>
+        <li><strong>Completed</strong> &mdash; All services finished</li>
+        <li><strong>Billed</strong> &mdash; Invoice generated</li>
+      </ul>
+      <p>Use the <strong>status filter</strong> and <strong>search bar</strong> to find specific orders by SO number, client name, AWB, or PO reference.</p>
+
+      <h3>Client View <span class="badge badge-client">Client</span></h3>
+      <p>Clients see only their own orders with the same filter and search capabilities. Statistical counters reflect their orders only.</p>
+
+      <h3>Quick-Action Buttons</h3>
+      <p>The dashboard provides fast access to commonly used features:</p>
+      <ul>
+        <li><strong>+ New Order</strong> &mdash; Create a new Service Order</li>
+        <li><strong>Locate</strong> &mdash; Open the piece-location barcode workflow</li>
+        <li><strong>Inventory</strong> &mdash; View active warehouse inventory</li>
+        <li><strong>DOs</strong> &mdash; List all Delivery Orders</li>
+        <li><strong>Clients</strong> &mdash; Manage WS clients</li>
+      </ul>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: Dashboard showing service orders list with status statistics (Requested, In Progress, Completed, Billed), filter bar, and quick-action buttons along the top.</div>
+      </div>
+    </div>
+
+    <!-- ============ 4. CREATING A SERVICE ORDER ============ -->
+    <div class="section" id="sec-4">
+      <h2 class="section-title">4. Creating a Service Order <span class="badge badge-mcl">MCL</span></h2>
+
+      <p>To create a new Service Order, click <strong>+ New Order</strong> from the dashboard or navigate to the creation form.</p>
+
+      <h3>Step 1: Select Client</h3>
+      <p>Choose the client from the dropdown list of registered Warehouse Services clients.</p>
+
+      <h3>Step 2: Order Information</h3>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Description</th><th>Required</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>PO (Purchase Order)</td><td>Client's reference number</td><td>No</td></tr>
+          <tr><td>AWB (Air Waybill)</td><td>Airway bill number, if applicable</td><td>No</td></tr>
+          <tr><td>Notes</td><td>Additional instructions or comments</td><td>No</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Step 3: Select Services</h3>
+      <p>Check the services required for this order:</p>
+
+      <h4>Screening (select one)</h4>
+      <ul>
+        <li><strong>K9</strong> &mdash; Canine screening</li>
+        <li><strong>X-Ray</strong> &mdash; X-Ray inspection</li>
+        <li><strong>Manual</strong> &mdash; Manual physical inspection</li>
+      </ul>
+      <div class="callout-warning callout">
+        <strong>Note:</strong> Only one screening type can be selected per Service Order.
+      </div>
+
+      <h4>Other Services (select multiple)</h4>
+      <ul>
+        <li><strong>Transport</strong> &mdash; Includes pickup and/or delivery locations</li>
+        <li><strong>Storage</strong> &mdash; Warehouse storage</li>
+        <li><strong>In/Out</strong> &mdash; Warehouse handling (receiving/releasing)</li>
+        <li><strong>Repack</strong> &mdash; Cargo repackaging</li>
+        <li><strong>DG Inspection</strong> &mdash; Dangerous Goods inspection</li>
+      </ul>
+
+      <h3>Step 4: Cargo Details</h3>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pieces</td><td>Number of pieces</td></tr>
+          <tr><td>Weight</td><td>Total weight (kg or lbs)</td></tr>
+          <tr><td>Type</td><td>General / DG / Perishable / Oversize</td></tr>
+          <tr><td>Mode</td><td>Local / Bonded</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Step 5: Submit</h3>
+      <p>Two submission options are available:</p>
+      <ul>
+        <li><strong>Create SO</strong> &mdash; Creates the order with status <span class="status status-requested">Requested</span></li>
+        <li><strong>Create SO + Check-in</strong> &mdash; Creates the order and immediately checks in the cargo, setting status to <span class="status status-checkedin">Checked In</span></li>
+      </ul>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: New Service Order form showing client selector, PO/AWB fields, service checkboxes (Screening, Transport, Storage, etc.), cargo details section, and the two submit buttons.</div>
+      </div>
+    </div>
+
+    <!-- ============ 5. SERVICE ORDER DETAIL ============ -->
+    <div class="section" id="sec-5">
+      <h2 class="section-title">5. Service Order Detail</h2>
+
+      <h3>Header</h3>
+      <p>The SO Detail page shows the order number, client name, AWB, current status, and a visual timeline.</p>
+
+      <h3>Timeline Milestones</h3>
+      <div class="flow-diagram">
+        <span class="flow-step" style="background:#dbeafe;color:#1d4ed8;">Requested</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="background:#fef3c7;color:#92400e;">Checked In</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="background:#d1fae5;color:#065f46;">Received</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="background:#ede9fe;color:#5b21b6;">In Progress</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="background:#d1fae5;color:#065f46;">Completed</span>
+      </div>
+
+      <h3>Services Panel</h3>
+      <p>Each requested service is listed with its individual status:</p>
+      <ul>
+        <li><span class="status status-requested">Pending</span> &mdash; Not yet started</li>
+        <li><span class="status status-inprogress">In Progress</span> &mdash; Currently being executed</li>
+        <li><span class="status status-completed">Completed</span> &mdash; Finished successfully</li>
+        <li><span class="status" style="background:#fee2e2;color:#991b1b;">Failed</span> &mdash; Service failed (e.g., screening fail)</li>
+        <li><span class="status status-billed">Cancelled</span> &mdash; Service was cancelled</li>
+      </ul>
+
+      <h3>Available Actions by Status <span class="badge badge-mcl">MCL</span></h3>
+      <table>
+        <thead>
+          <tr><th>SO Status</th><th>Available Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="status status-requested">Requested</span></td><td>Check-in, Edit, Delete</td></tr>
+          <tr><td><span class="status status-checkedin">Checked In</span></td><td>Receive (physical reception)</td></tr>
+          <tr><td><span class="status status-received">Received</span></td><td>Execute services, Locate, Print Labels</td></tr>
+          <tr><td><span class="status status-inprogress">In Progress</span></td><td>Complete services, Create DO</td></tr>
+          <tr><td><span class="status status-completed">Completed</span></td><td>POD, View reports</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Client View <span class="badge badge-client">Client</span></h3>
+      <p>Clients see the same detail page in <strong>read-only</strong> mode. They can view the status, timeline, and any attached documents (reports, certificates), but cannot perform any actions.</p>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: Service Order Detail page showing SO header (SO#, client, AWB, status), visual timeline with milestones, services panel with individual statuses, and action buttons.</div>
+      </div>
+    </div>
+
+    <!-- ============ 6. PHYSICAL RECEPTION ============ -->
+    <div class="section" id="sec-6">
+      <h2 class="section-title">6. Physical Reception <span class="badge badge-mcl">MCL</span></h2>
+
+      <p>Physical reception is initiated from the SO Detail page by clicking the <strong>"Receive"</strong> button (available when status is <span class="status status-checkedin">Checked In</span>).</p>
+
+      <h3>Reception Lines</h3>
+      <p>For each piece or group of pieces, enter the following:</p>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Packing Type</td><td>Pallet / Box / Carton / Crate / Drum / Bag / Other</td></tr>
+          <tr><td>Quantity</td><td>Number of pieces of this type</td></tr>
+          <tr><td>Dimensions</td><td>L x W x H (inches or cm)</td></tr>
+          <tr><td>Weight</td><td>Weight per piece or total</td></tr>
+          <tr><td>Location</td><td>Warehouse location code</td></tr>
+          <tr><td>DG Flag</td><td>Mark if Dangerous Goods</td></tr>
+          <tr><td>LB Flag</td><td>Mark if Lithium Battery</td></tr>
+          <tr><td>Photos</td><td>Upload photos of the cargo</td></tr>
+          <tr><td>Remarks</td><td>Free-text notes</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Totals</h3>
+      <p>The system automatically calculates total pieces, CBM (cubic meters), and total weight from the reception lines.</p>
+
+      <h3>Submitting</h3>
+      <ul>
+        <li><strong>Save Draft</strong> &mdash; Saves progress without completing reception</li>
+        <li><strong>Complete Reception</strong> &mdash; Finalizes the reception, generates a <strong>Warehouse Receipt</strong> (format: <code>WS-XXXXXX</code>), and automatically activates storage and in/out services if selected</li>
+      </ul>
+
+      <div class="callout-success callout">
+        <strong>Tip:</strong> After completing reception, the SO status advances to <span class="status status-received">Received</span> and labels become available for printing.
+      </div>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: Physical Reception form with reception lines (packing type, qty, dimensions, weight, location), DG/LB flags, photo upload area, remarks field, and totals summary at the bottom.</div>
+      </div>
+    </div>
+
+    <!-- ============ 7. SCREENING SERVICES ============ -->
+    <div class="section" id="sec-7">
+      <h2 class="section-title">7. Screening Services <span class="badge badge-mcl">MCL</span></h2>
+
+      <h3>K9 Screening</h3>
+      <p>For K9 (canine) screening:</p>
+      <ol>
+        <li>Upload the screening certificate (image or PDF) provided by the K9 handler</li>
+        <li>Click <strong>Complete</strong> to mark the service as done</li>
+      </ol>
+
+      <h3>X-Ray / Manual / DG Inspection</h3>
+      <p>For these screening types, the operator fills out a screening form:</p>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Inspector Name</td><td>Name of the person performing the inspection</td></tr>
+          <tr><td>Pieces Inspected</td><td>Number of pieces inspected</td></tr>
+          <tr><td>Result</td><td>PASS or FAIL</td></tr>
+          <tr><td>Notes</td><td>Detailed observations</td></tr>
+          <tr><td>Photos</td><td>Evidence photos</td></tr>
+        </tbody>
+      </table>
+
+      <p>Upon completion, the system automatically generates a <strong>PDF report</strong> stored in Firebase Storage. A <strong>"View Report"</strong> link appears in the SO Detail services panel.</p>
+
+      <h3>CCSF Generation</h3>
+      <p>If the Service Order has an associated AWB, a <strong>CCSF (Cargo Screening Security Form)</strong> can be generated:</p>
+      <ol>
+        <li>Enter the MCL Agent name</li>
+        <li>Click <strong>Generate CCSF</strong></li>
+        <li>The system produces a CCSF certificate linked to the screening results</li>
+      </ol>
+
+      <div class="callout">
+        <strong>Note:</strong> CCSF generation is only available for orders that have an AWB number assigned.
+      </div>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: X-Ray screening form showing inspector name, pieces inspected, PASS/FAIL result selector, notes field, photo upload, and the auto-generated PDF report link.</div>
+      </div>
+    </div>
+
+    <!-- ============ 8. DELIVERY ORDERS ============ -->
+    <div class="section" id="sec-8">
+      <h2 class="section-title">8. Delivery Orders <span class="badge badge-mcl">MCL</span></h2>
+
+      <p>Delivery Orders (DOs) authorize the release of cargo from the warehouse.</p>
+
+      <h3>Creating a Delivery Order</h3>
+      <p>From the SO Detail page, click <strong>"Create DO"</strong> (available when the SO is <span class="status status-inprogress">In Progress</span> or later).</p>
+
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Service Order</td><td>Pre-selected from the current SO</td></tr>
+          <tr><td>Trucking Company</td><td>Name of the trucking company</td></tr>
+          <tr><td>Driver</td><td>Driver name</td></tr>
+          <tr><td>Custody Method</td><td>Seal / Escort / Locked Vehicle</td></tr>
+          <tr><td>MCL Agent</td><td>MCL staff member authorizing release</td></tr>
+        </tbody>
+      </table>
+
+      <p>The system generates a unique DO number in the format: <code>WS-DO-NNNNN</code>.</p>
+
+      <h3>Delivery Orders List</h3>
+      <p>All DOs can be viewed at <code>/warehouse-services/delivery-orders</code>. The list shows DO number, associated SO, client, trucking company, and status.</p>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: New Delivery Order form with SO selector, trucking company, driver name, custody method dropdown (Seal/Escort/Locked Vehicle), and MCL Agent name field.</div>
+      </div>
+    </div>
+
+    <!-- ============ 9. WAREHOUSE OPERATIONS ============ -->
+    <div class="section" id="sec-9">
+      <h2 class="section-title">9. Warehouse Operations <span class="badge badge-mcl">MCL</span></h2>
+
+      <h3>Locate Pieces (Barcode Workflow)</h3>
+      <p>The Locate function allows warehouse staff to assign physical positions to individual pieces using barcode scanning:</p>
+
+      <ol>
+        <li><strong>Scan piece barcode</strong> &mdash; Scan or type the piece barcode (format: <code>WS-XXXXXX##</code>, where <code>##</code> is the 2-digit piece number)</li>
+        <li><strong>Choose location type</strong> &mdash; Select: Rack, Floor, or Container</li>
+        <li><strong>Scan rack position</strong> &mdash; Scan or enter the location code (format: <code>##A-E##</code>, e.g., <code>03B-12</code>)</li>
+        <li><strong>Confirm &amp; Save</strong> &mdash; Review and confirm the assignment</li>
+      </ol>
+
+      <p>A session counter tracks how many pieces have been located during the current session.</p>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: Locate Pieces screen at step 1 — barcode scanner input field with a scanned piece code, location type selector (Rack/Floor/Container), and session counter.</div>
+      </div>
+
+      <h3>Inventory View</h3>
+      <p>The Inventory screen lists all active orders that have storage or in/out services. It provides a comprehensive overview of cargo currently in the warehouse.</p>
+
+      <table>
+        <thead>
+          <tr><th>Column</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SO#</td><td>Service Order number</td></tr>
+          <tr><td>Client</td><td>Client name</td></tr>
+          <tr><td>AWB</td><td>Air Waybill number</td></tr>
+          <tr><td>Pieces</td><td>Number of pieces</td></tr>
+          <tr><td>Weight</td><td>Total weight</td></tr>
+          <tr><td>Location</td><td>Warehouse location(s)</td></tr>
+          <tr><td>Storage Days</td><td>Days since reception</td></tr>
+          <tr><td>Received</td><td>Reception date</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout-warning callout">
+        <strong>Alert:</strong> Orders with storage exceeding 7 days are highlighted in orange to flag potential overstays.
+      </div>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: Inventory view table showing active warehouse orders with columns for SO#, Client, AWB, Pieces, Weight, Location, Storage Days (with orange highlight for >7 days), and Received date.</div>
+      </div>
+    </div>
+
+    <!-- ============ 10. POD ============ -->
+    <div class="section" id="sec-10">
+      <h2 class="section-title">10. POD &mdash; Proof of Delivery <span class="badge badge-mcl">MCL</span></h2>
+
+      <p>The Proof of Delivery panel appears in the SO Detail page once the order has a completed Delivery Order.</p>
+
+      <h3>Recording a POD</h3>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Receiver Name</td><td>Name of the person receiving the cargo</td></tr>
+          <tr><td>Receiver ID</td><td>Government-issued ID number</td></tr>
+          <tr><td>Notes</td><td>Any delivery observations</td></tr>
+          <tr><td>Photo</td><td>Photo evidence of delivery</td></tr>
+        </tbody>
+      </table>
+
+      <h3>What Happens on POD Confirmation</h3>
+      <ul>
+        <li>The SO timeline milestone advances to <span class="status status-completed">Completed</span></li>
+        <li>Storage and In/Out services are <strong>automatically completed</strong></li>
+        <li>The delivery is formally recorded with timestamp and evidence</li>
+      </ul>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: POD panel within SO Detail showing receiver name and ID fields, notes area, photo upload for delivery evidence, and confirm button.</div>
+      </div>
+    </div>
+
+    <!-- ============ 11. LABELS & PRINTING ============ -->
+    <div class="section" id="sec-11">
+      <h2 class="section-title">11. Labels &amp; Printing</h2>
+
+      <p>Labels can be printed from the SO Detail page or from the Warehouse Receipt print view by clicking <strong>"Print Labels"</strong>.</p>
+
+      <h3>Label Format (12 &times; 15 cm)</h3>
+      <p>Each label contains:</p>
+      <table>
+        <thead>
+          <tr><th>Element</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>MCL Logo</td><td>Company logo at the top</td></tr>
+          <tr><td>Origin / Destination</td><td>Cargo origin and destination</td></tr>
+          <tr><td>Date &amp; Time</td><td>Reception date and time</td></tr>
+          <tr><td>Warehouse Number</td><td>Warehouse Receipt number (WS-XXXXXX)</td></tr>
+          <tr><td>Shipper / Consignee</td><td>Shipping and receiving party names</td></tr>
+          <tr><td>SO Number</td><td><strong>Primary identifier</strong> &mdash; displayed prominently in large font</td></tr>
+          <tr><td>PO &amp; AWB</td><td>Secondary reference fields</td></tr>
+          <tr><td>Weight per Piece</td><td>Individual piece weight</td></tr>
+          <tr><td>Barcode</td><td>CODE128 barcode with format <code>WS-XXXXXX##</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>Barcode Format:</strong> The barcode uses the Warehouse Receipt number followed by a 2-digit piece number (e.g., <code>WS-00012301</code> for piece 1). It does not include the PO suffix.
+      </div>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: Sample warehouse label (12x15cm) showing MCL logo, origin/destination, warehouse number, large SO number, shipper/consignee, PO, AWB, piece weight, and CODE128 barcode at the bottom.</div>
+      </div>
+    </div>
+
+    <!-- ============ 12. ADMIN & CONFIGURATION ============ -->
+    <div class="section" id="sec-12">
+      <h2 class="section-title">12. Admin &amp; Configuration <span class="badge badge-mcl">MCL</span> <span class="badge badge-admin">Admin</span></h2>
+
+      <p>Administrative functions are accessed from the <strong>Admin Hub</strong> at <code>/warehouse-services/admin</code>. The hub presents navigation cards for each admin area.</p>
+
+      <h3>Clients</h3>
+      <p>Full CRUD (Create, Read, Update, Delete) management of Warehouse Services clients:</p>
+      <ul>
+        <li>Company name and contact information</li>
+        <li>Billing information</li>
+        <li>Payment terms</li>
+      </ul>
+
+      <h3>Rates <span class="badge badge-admin">Admin</span></h3>
+      <p>Define and manage rate schedules by service type. Rates are used to calculate billing charges when services are completed.</p>
+
+      <h3>Billing Charges <span class="badge badge-admin">Admin</span></h3>
+      <p>View and manage charges generated for each Service Order. Charges are calculated based on the rates configured and the services performed.</p>
+
+      <h3>Invoices <span class="badge badge-admin">Admin</span></h3>
+      <p>Create and manage invoices for billed services. Invoices can be generated from accumulated billing charges.</p>
+
+      <div class="screenshot">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="10.5" r="2.5"/><path d="M21 21l-5.6-5.6"/><path d="M14 14l3 3 4-4"/></svg>
+        <div class="label">Screenshot: Admin Hub page showing navigation cards for Clients, Rates, Billing Charges, and Invoices, each with an icon and description.</div>
+      </div>
+    </div>
+
+    <!-- ============ 13. QUICK REFERENCE ============ -->
+    <div class="section" id="sec-13">
+      <h2 class="section-title">13. Quick Reference</h2>
+
+      <h3>Status Flow</h3>
+      <div class="flow-diagram">
+        <span class="flow-step" style="font-size:12px;">requested</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="font-size:12px;">checked_in</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="font-size:12px;">received</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="font-size:12px;">in_progress</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="font-size:12px;">completed</span>
+        <span class="flow-arrow">&rarr;</span>
+        <span class="flow-step" style="font-size:12px;">billed</span>
+      </div>
+
+      <h3>Service Types</h3>
+      <table>
+        <thead>
+          <tr><th>Service Code</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>screening_k9</code></td><td>Canine screening</td></tr>
+          <tr><td><code>screening_xray</code></td><td>X-Ray inspection</td></tr>
+          <tr><td><code>screening_manual</code></td><td>Manual physical inspection</td></tr>
+          <tr><td><code>transport</code></td><td>Pickup / delivery transport</td></tr>
+          <tr><td><code>storage</code></td><td>Warehouse storage</td></tr>
+          <tr><td><code>in_out</code></td><td>Warehouse handling (in/out)</td></tr>
+          <tr><td><code>repack</code></td><td>Cargo repackaging</td></tr>
+          <tr><td><code>dg_inspection</code></td><td>Dangerous Goods inspection</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Number Formats</h3>
+      <table>
+        <thead>
+          <tr><th>Entity</th><th>Format</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Service Order</td><td><code>SO-YYMMDD-NNNN</code></td><td>SO-260506-0001</td></tr>
+          <tr><td>Warehouse Receipt</td><td><code>WS-XXXXXX</code></td><td>WS-001234</td></tr>
+          <tr><td>Delivery Order</td><td><code>WS-DO-NNNNN</code></td><td>WS-DO-00045</td></tr>
+          <tr><td>Piece Barcode</td><td><code>WS-XXXXXX##</code></td><td>WS-00123401</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Support</h3>
+      <p>For questions, issues, or feature requests, contact:</p>
+      <p><strong>Email:</strong> <a href="mailto:diego.garcia@mincurllogistics.com">diego.garcia@mincurllogistics.com</a></p>
+    </div>
+
+    <!-- ============ FOOTER ============ -->
+    <div style="text-align:center; padding:40px 0 20px; color:var(--text-light); font-size:12px;">
+      &copy; 2026 MinCurl Logistics LLC. All rights reserved.<br>
+      Warehouse Services User Manual v1.0
+    </div>
+
+  </div><!-- /.container -->
+</div><!-- /.main-content -->
+
+</body>
+</html>

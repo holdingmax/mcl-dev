@@ -1,0 +1,137 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "airfreight_bookings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "airfreight_bookings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "flight_id", "order": "ASCENDING" },
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "airfreight_bookings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "flight_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "ASCENDING" }
+      ]
+    }
+    ,{
+      "collectionGroup": "airfreight_holds",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "warehouse_receipts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "dispatches",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_ids", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "billing_charges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "client_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "warehouse_receipts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "dispatch_status", "order": "ASCENDING" },
+        { "fieldPath": "client_id", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "airfreight_flights",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "flight_status", "order": "ASCENDING" },
+        { "fieldPath": "flight_datetime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "delivery_tracking",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "vendor_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "delivery_tracking",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "airline", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "warehouse_service_orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "global_status", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "airfreight_physical_pieces",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "doc_reception_id", "order": "ASCENDING" },
+        { "fieldPath": "piece_number", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "airfreight_physical_pieces",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "doc_reception_id", "order": "ASCENDING" },
+        { "fieldPath": "uld_id", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "screening_events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "matched_booking_id", "order": "ASCENDING" },
+        { "fieldPath": "extracted.awb", "order": "ASCENDING" },
+        { "fieldPath": "extracted.pieces", "order": "ASCENDING" },
+        { "fieldPath": "extracted.date", "order": "ASCENDING" },
+        { "fieldPath": "extracted.time", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "airfreight_doc_receptions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "booking_id", "order": "ASCENDING" },
+        { "fieldPath": "awb_normalized", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

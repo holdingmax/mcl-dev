@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Paste from Excel — Prototype</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f3f4f6; color: #1a1a1a; padding: 20px; }
+
+  .header { max-width: 1400px; margin: 0 auto 16px; display: flex; align-items: center; gap: 16px; }
+  .header h1 { font-size: 18px; color: #1a3a6b; }
+  .header .badge { background: #1a3a6b; color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 10px; }
+
+  .instructions { max-width: 1400px; margin: 0 auto 12px; background: #fffde7; border: 1px solid #f0c000; border-radius: 6px; padding: 12px 16px; font-size: 13px; line-height: 1.5; }
+  .instructions b { color: #b45309; }
+  .instructions code { background: #f5f5f5; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+
+  .toolbar { max-width: 1400px; margin: 0 auto 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .toolbar button { padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+  .btn-save { background: #16a34a; color: #fff; }
+  .btn-save:hover { background: #15803d; }
+  .btn-save:disabled { background: #9ca3af; cursor: not-allowed; }
+  .btn-clear { background: #dc2626; color: #fff; }
+  .btn-clear:hover { background: #b91c1c; }
+  .btn-add { background: #2563eb; color: #fff; }
+  .btn-add:hover { background: #1d4ed8; }
+  .btn-add-multi { background: #7c3aed; color: #fff; }
+  .btn-add-multi:hover { background: #6d28d9; }
+  .row-count { font-size: 13px; color: #555; margin-left: auto; }
+  .stats { font-size: 12px; color: #1a3a6b; font-weight: 600; }
+
+  .paste-zone {
+    max-width: 1400px; margin: 0 auto 12px;
+    border: 2px dashed #9ca3af; border-radius: 8px;
+    padding: 14px; text-align: center; font-size: 13px; color: #6b7280;
+    background: #fff; cursor: text; transition: all 0.2s;
+  }
+  .paste-zone.active { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+  .paste-zone:focus { outline: none; border-color: #2563eb; background: #eff6ff; }
+
+  .table-wrap { max-width: 1400px; margin: 0 auto; overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid #d1d5db; max-height: 70vh; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  thead th {
+    background: #1a3a6b; color: #fff; padding: 7px 4px; text-align: left;
+    font-size: 10px; font-weight: 600; white-space: nowrap; position: sticky; top: 0; z-index: 2;
+  }
+  tbody tr { border-bottom: 1px solid #e5e7eb; }
+  tbody tr:hover { background: #f0f7ff; }
+  tbody tr.flight-group { border-top: 2px solid #1a3a6b; }
+  tbody td { padding: 2px 3px; position: relative; }
+  tbody td input[type="text"] {
+    width: 100%; border: 1px solid transparent; background: transparent;
+    padding: 3px 4px; font-size: 11px; border-radius: 3px; font-family: inherit;
+  }
+  tbody td input[type="text"]:focus { border-color: #2563eb; background: #fff; outline: none; }
+  /* Active cell highlight */
+  tbody td.cell-active { background: #dbeafe; }
+  tbody td.cell-pasted { animation: flashGreen 0.6s ease-out; }
+  @keyframes flashGreen {
+    0% { background: #bbf7d0; }
+    100% { background: transparent; }
+  }
+
+  td.cb-cell { text-align: center; width: 40px; }
+  td.cb-cell input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; }
+  td.row-num { text-align: center; color: #9ca3af; font-size: 10px; width: 30px; font-weight: 600; cursor: pointer; user-select: none; }
+  td.row-num:hover { background: #e0e7ff; }
+  tr.row-selected { background: #dbeafe !important; }
+  tr.row-selected td.row-num { background: #2563eb; color: #fff; }
+  td.del-cell { text-align: center; width: 28px; }
+  .del-btn { background: none; border: none; color: #dc2626; font-size: 15px; cursor: pointer; padding: 2px 5px; border-radius: 4px; }
+  .del-btn:hover { background: #fef2f2; }
+
+  .hold-yes { color: #dc2626; font-weight: 600; }
+
+  .output { max-width: 1400px; margin: 16px auto; background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px; font-size: 12px; display: none; }
+  .output pre { white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+
+  .hint { max-width: 1400px; margin: 8px auto 0; font-size: 11px; color: #9ca3af; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Booking — Paste from Excel</h1>
+  <span class="badge">PROTOTYPE</span>
+</div>
+
+<div class="instructions">
+  <b>Instrucciones:</b>
+  <br>1. <b>Tabla vacia:</b> Pega en la zona de arriba para crear filas nuevas.
+  <br>2. <b>En cualquier celda:</b> Haz click en una celda y pega con <code>Ctrl+V</code>. Los datos se llenan desde esa celda hacia abajo y a la derecha, igual que en Excel.
+  <br>3. Si hay mas filas pegadas que espacio, se agregan filas nuevas automaticamente.
+  <br>4. <b>Eliminar filas:</b> Click en el numero de fila para seleccionar. <code>Shift+click</code> para rango, <code>Ctrl+click</code> para multiples. Luego presiona <code>Delete</code> o el boton rojo.
+  <br>5. Puedes editar cualquier celda manualmente.
+  <br><br>
+  <b>Columnas:</b> Flight # | 1st Leg AWB# | 2nd Leg AWB# | ULD/LOOSE | PCs | CW | Pickup From | Ready for Pickup | Last Day Free | Deliver To | Dest | Cut Off | ETD | Hold BG# | Hold Box# | Battery
+</div>
+
+<div class="paste-zone" id="pasteZone" tabindex="0">
+  Click aqui y pega con Ctrl+V para agregar filas nuevas
+</div>
+
+<div class="toolbar">
+  <button class="btn-add" onclick="addEmptyRow()">+ 1 fila</button>
+  <button class="btn-add-multi" onclick="addMultipleRows()">+ N filas</button>
+  <button class="btn-del-selected" id="btnDelSelected" onclick="deleteSelectedRows()" style="display:none; background:#dc2626; color:#fff; padding:8px 20px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; border:none;">Eliminar seleccion</button>
+  <button class="btn-clear" onclick="clearAll()">Limpiar todo</button>
+  <button class="btn-save" id="btnSave" onclick="saveData()" disabled>Guardar</button>
+  <span class="row-count" id="rowCount">0 filas</span>
+  <span class="stats" id="statsLine"></span>
+</div>
+
+<div class="table-wrap" id="tableWrap">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Flight</th>
+        <th>1st Leg AWB</th>
+        <th>2nd Leg AWB</th>
+        <th>ULD</th>
+        <th>PCs</th>
+        <th>CW</th>
+        <th>Pickup From</th>
+        <th>Ready Pickup</th>
+        <th>Last Day Free</th>
+        <th>Deliver To</th>
+        <th>Dest</th>
+        <th>Cut Off</th>
+        <th>ETD</th>
+        <th>Hold BG#</th>
+        <th>Hold Box#</th>
+        <th>LB</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<div class="hint" id="cursorHint"></div>
+
+<div class="output" id="output">
+  <b>Datos a guardar (JSON):</b>
+  <pre id="outputJson"></pre>
+</div>
+
+<script>
+let rows = []
+let nextId = 1
+
+// Track active cell position
+let activeRowIdx = -1
+let activeColIdx = -1
+
+// Track selected rows
+let selectedRows = new Set()
+let lastClickedRow = -1
+
+const COL_KEYS = ['flight','awb1','awb2','uldType','pieces','cw','pickupFrom','readyPickup','lastDayFree','deliverTo','dest','cutoff','etd','holdBg','holdBox','battery']
+
+const COLUMNS = [
+  { key: 'flight',       type: 'text', width: '90px' },
+  { key: 'awb1',         type: 'text', width: '120px' },
+  { key: 'awb2',         type: 'text', width: '120px' },
+  { key: 'uldType',      type: 'text', width: '70px' },
+  { key: 'pieces',       type: 'text', width: '50px' },
+  { key: 'cw',           type: 'text', width: '60px' },
+  { key: 'pickupFrom',   type: 'text', width: '100px' },
+  { key: 'readyPickup',  type: 'text', width: '95px' },
+  { key: 'lastDayFree',  type: 'text', width: '95px' },
+  { key: 'deliverTo',    type: 'text', width: '100px' },
+  { key: 'dest',         type: 'text', width: '55px' },
+  { key: 'cutoff',       type: 'text', width: '95px' },
+  { key: 'etd',          type: 'text', width: '95px' },
+  { key: 'holdBg',       type: 'text', width: '90px' },
+  { key: 'holdBox',      type: 'text', width: '90px' },
+  { key: 'battery',      type: 'checkbox' },
+]
+
+function isYes(val) {
+  if (typeof val === 'boolean') return val
+  const s = String(val).trim().toUpperCase()
+  return s === 'YES' || s === 'Y' || s === 'SI' || s === 'X' || s === '1' || s === 'TRUE'
+}
+
+function isHold(val) {
+  const s = String(val).trim().toUpperCase()
+  return s && s !== 'NO HOLD' && s !== 'NO' && s !== 'N/A' && s !== ''
+}
+
+function makeEmptyRow() {
+  return {
+    _id: nextId++,
+    flight: '', awb1: '', awb2: '', uldType: '', pieces: '', cw: '',
+    pickupFrom: '', readyPickup: '', lastDayFree: '', deliverTo: '',
+    dest: '', cutoff: '', etd: '', holdBg: '', holdBox: '',
+    battery: false,
+  }
+}
+
+// Split clipboard text into logical lines, respecting quoted fields with embedded newlines.
+// Excel wraps cells containing newlines in double-quotes: "9950 NW 17th St\nSTE 101"
+// We must NOT split on \n inside quotes.
+function splitLogicalLines(text) {
+  const lines = []
+  let current = ''
+  let inQuotes = false
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+
+    if (ch === '"') {
+      // Toggle quote state (handle "" as escaped quote)
+      if (inQuotes && text[i + 1] === '"') {
+        current += '"'
+        i++ // skip next quote
+      } else {
+        inQuotes = !inQuotes
+      }
+      continue // don't include the quote character itself
+    }
+
+    if ((ch === '\n' || ch === '\r') && !inQuotes) {
+      // End of logical line
+      if (ch === '\r' && text[i + 1] === '\n') i++ // skip \r\n pair
+      if (current.trim()) lines.push(current)
+      current = ''
+    } else if ((ch === '\n' || ch === '\r') && inQuotes) {
+      // Newline inside quotes — replace with space (handles \r, \n, \r\n)
+      if (ch === '\r' && text[i + 1] === '\n') i++ // skip \r\n pair
+      current += ' '
+    } else {
+      current += ch
+    }
+  }
+  if (current.trim()) lines.push(current)
+  return lines
+}
+
+// Detect orphan row: no flight number and no AWB patterns — likely overflow from multi-line cell
+function isOrphanRow(cells) {
+  const flight = (cells[0] || '').trim()
+  const awb1 = (cells[1] || '').trim()
+  const awb2 = (cells[2] || '').trim()
+  if (/\d{3}-\d{7,}/.test(awb1)) return false
+  if (/\d{3}-\d{7,}/.test(awb2)) return false
+  if (flight && /[A-Z0-9]{2}[-\s]?\d{2,}/i.test(flight)) return false
+  return true
+}
+
+// Merge orphan cells into previous row by appending non-empty values
+function mergeOrphan(prev, orphan) {
+  const merged = [...prev]
+  for (let i = 0; i < orphan.length; i++) {
+    const val = (orphan[i] || '').trim()
+    if (!val) continue
+    if (i >= merged.length) { merged.push(val); continue }
+    const p = (merged[i] || '').trim()
+    merged[i] = p ? p + ' ' + val : val
+  }
+  return merged
+}
+
+// Parse clipboard into raw cell arrays (with orphan merging fallback)
+function parseClipboardRaw(text) {
+  const rawLines = splitLogicalLines(text).map(l => l.split('\t').map(c => c.trim()))
+  // Merge orphan rows as fallback
+  const merged = []
+  for (const cells of rawLines) {
+    if (merged.length > 0 && isOrphanRow(cells)) {
+      merged[merged.length - 1] = mergeOrphan(merged[merged.length - 1], cells)
+    } else {
+      merged.push(cells)
+    }
+  }
+  return merged
+}
+
+// Parse clipboard into full row objects (for paste zone — filters headers/blanks)
+function parseClipboardRows(text) {
+  const lines = splitLogicalLines(text)
+  // First: split into cell arrays and merge orphans
+  const allCells = []
+  for (const line of lines) {
+    const cells = line.split('\t').map(c => c.trim())
+    const first = cells[0]?.toLowerCase()
+    if (first === 'flight #' || first === 'flight' || first === '#' || first === 'no') continue
+    if (allCells.length > 0 && isOrphanRow(cells)) {
+      allCells[allCells.length - 1] = mergeOrphan(allCells[allCells.length - 1], cells)
+    } else {
+      allCells.push(cells)
+    }
+  }
+  // Convert to row objects, skip empty
+  const parsed = []
+  for (const cells of allCells) {
+    const nonEmpty = cells.filter(c => c).length
+    if (nonEmpty < 2) continue
+    parsed.push(cellsToRow(cells))
+  }
+  return parsed
+}
+
+function cellsToRow(cells) {
+  return {
+    _id: nextId++,
+    flight:      cells[0]?.trim() || '',
+    awb1:        cells[1]?.trim() || '',
+    awb2:        cells[2]?.trim() || '',
+    uldType:     cells[3]?.trim() || '',
+    pieces:      cells[4]?.trim() || '',
+    cw:          cells[5]?.trim() || '',
+    pickupFrom:  cells[6]?.trim().replace(/[\r\n]+/g, ' ') || '',
+    readyPickup: cells[7]?.trim() || '',
+    lastDayFree: cells[8]?.trim() || '',
+    deliverTo:   cells[9]?.trim().replace(/[\r\n]+/g, ' ') || '',
+    dest:        cells[10]?.trim() || '',
+    cutoff:      cells[11]?.trim() || '',
+    etd:         cells[12]?.trim() || '',
+    holdBg:      cells[13]?.trim() || '',
+    holdBox:     cells[14]?.trim() || '',
+    battery:     isYes(cells[15]),
+  }
+}
+
+function updateStats() {
+  const totalPcs = rows.reduce((sum, r) => sum + (parseInt(r.pieces) || 0), 0)
+  const totalCw = rows.reduce((sum, r) => sum + (parseFloat(r.cw) || 0), 0)
+  const flights = [...new Set(rows.map(r => r.flight).filter(Boolean))]
+  const holds = rows.filter(r => isHold(r.holdBg) || isHold(r.holdBox)).length
+  const batteries = rows.filter(r => r.battery).length
+
+  let stats = `${flights.length} vuelos | ${totalPcs.toLocaleString()} pcs | ${totalCw.toLocaleString()} kg`
+  if (holds > 0) stats += ` | ${holds} holds`
+  if (batteries > 0) stats += ` | ${batteries} LB`
+  document.getElementById('statsLine').textContent = stats
+}
+
+function updateCursorHint() {
+  const hint = document.getElementById('cursorHint')
+  if (activeRowIdx >= 0 && activeColIdx >= 0) {
+    hint.textContent = `Celda activa: fila ${activeRowIdx + 1}, columna ${COLUMNS[activeColIdx]?.key || activeColIdx} — Ctrl+V para pegar desde aqui`
+  } else {
+    hint.textContent = ''
+  }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody')
+  tbody.innerHTML = ''
+  let prevFlight = null
+
+  rows.forEach((row, rowIdx) => {
+    const tr = document.createElement('tr')
+
+    if (row.flight && row.flight !== prevFlight && prevFlight !== null) {
+      tr.className = 'flight-group'
+    }
+    prevFlight = row.flight || prevFlight
+
+    // Row number — click to select
+    const tdNum = document.createElement('td')
+    tdNum.className = 'row-num'
+    tdNum.textContent = rowIdx + 1
+    tdNum.addEventListener('click', (e) => handleRowSelect(rowIdx, e))
+    if (selectedRows.has(rowIdx)) tr.classList.add('row-selected')
+    tr.appendChild(tdNum)
+
+    COLUMNS.forEach((col, colIdx) => {
+      const td = document.createElement('td')
+      td.dataset.row = rowIdx
+      td.dataset.col = colIdx
+
+      if (col.type === 'checkbox') {
+        td.className = 'cb-cell'
+        const cb = document.createElement('input')
+        cb.type = 'checkbox'
+        cb.checked = !!row[col.key]
+        cb.addEventListener('change', () => { row[col.key] = cb.checked; updateStats() })
+        cb.addEventListener('focus', () => setActiveCell(rowIdx, colIdx))
+        td.appendChild(cb)
+      } else {
+        const inp = document.createElement('input')
+        inp.type = 'text'
+        inp.value = row[col.key] || ''
+        if (col.width) inp.style.width = col.width
+
+        if ((col.key === 'holdBg' || col.key === 'holdBox') && isHold(row[col.key])) {
+          inp.className = 'hold-yes'
+        }
+
+        inp.addEventListener('input', () => {
+          row[col.key] = inp.value
+          if (col.key === 'holdBg' || col.key === 'holdBox') {
+            inp.className = isHold(inp.value) ? 'hold-yes' : ''
+          }
+          updateStats()
+        })
+
+        // Track active cell on focus
+        inp.addEventListener('focus', () => setActiveCell(rowIdx, colIdx))
+
+        // Handle paste inside an input — intercept tabular data
+        inp.addEventListener('paste', (e) => {
+          const text = e.clipboardData.getData('text/plain')
+          // If it contains tabs or multiple lines, it's tabular data from Excel
+          if (text.includes('\t') || text.split(/\r?\n/).filter(l => l.trim()).length > 1) {
+            e.preventDefault()
+            e.stopPropagation()
+            pasteAtCell(rowIdx, colIdx, text)
+          }
+          // Otherwise let normal single-cell paste happen
+        })
+
+        td.appendChild(inp)
+      }
+      tr.appendChild(td)
+    })
+
+    // Delete button
+    const tdDel = document.createElement('td')
+    tdDel.className = 'del-cell'
+    const delBtn = document.createElement('button')
+    delBtn.className = 'del-btn'
+    delBtn.textContent = '\u00d7'
+    delBtn.title = 'Eliminar fila'
+    delBtn.addEventListener('click', () => { rows.splice(rowIdx, 1); renderTable() })
+    tdDel.appendChild(delBtn)
+    tr.appendChild(tdDel)
+
+    tbody.appendChild(tr)
+  })
+  updateSaveBtn()
+  updateStats()
+}
+
+function setActiveCell(rowIdx, colIdx) {
+  // Remove previous highlight
+  document.querySelectorAll('td.cell-active').forEach(td => td.classList.remove('cell-active'))
+  activeRowIdx = rowIdx
+  activeColIdx = colIdx
+  // Highlight current
+  const td = document.querySelector(`td[data-row="${rowIdx}"][data-col="${colIdx}"]`)
+  if (td) td.classList.add('cell-active')
+  updateCursorHint()
+}
+
+function pasteAtCell(startRow, startCol, text) {
+  const rawLines = parseClipboardRaw(text)
+  if (rawLines.length === 0) return
+
+  // Track cells that were pasted for visual feedback
+  const pastedCells = []
+
+  for (let r = 0; r < rawLines.length; r++) {
+    const targetRow = startRow + r
+
+    // Add empty rows if we exceed current table
+    while (targetRow >= rows.length) {
+      rows.push(makeEmptyRow())
+    }
+
+    const cells = rawLines[r]
+    for (let c = 0; c < cells.length; c++) {
+      const targetCol = startCol + c
+      if (targetCol >= COL_KEYS.length) break // don't overflow past last column
+
+      const key = COL_KEYS[targetCol]
+      const val = cells[c]?.trim().replace(/[\r\n]+/g, ' ') || ''
+
+      if (key === 'battery') {
+        rows[targetRow][key] = isYes(val)
+      } else {
+        rows[targetRow][key] = val
+      }
+
+      pastedCells.push({ row: targetRow, col: targetCol })
+    }
+  }
+
+  renderTable()
+
+  // Flash pasted cells green
+  for (const { row, col } of pastedCells) {
+    const td = document.querySelector(`td[data-row="${row}"][data-col="${col}"]`)
+    if (td) td.classList.add('cell-pasted')
+  }
+
+  // Restore focus to start cell
+  const startTd = document.querySelector(`td[data-row="${startRow}"][data-col="${startCol}"]`)
+  if (startTd) {
+    const inp = startTd.querySelector('input')
+    if (inp) inp.focus()
+  }
+}
+
+function handleRowSelect(rowIdx, e) {
+  if (e.shiftKey && lastClickedRow >= 0) {
+    // Shift+click: select range
+    const from = Math.min(lastClickedRow, rowIdx)
+    const to = Math.max(lastClickedRow, rowIdx)
+    for (let i = from; i <= to; i++) selectedRows.add(i)
+  } else if (e.ctrlKey || e.metaKey) {
+    // Ctrl+click: toggle single row
+    if (selectedRows.has(rowIdx)) selectedRows.delete(rowIdx)
+    else selectedRows.add(rowIdx)
+  } else {
+    // Plain click: select only this row (or deselect if already sole selected)
+    if (selectedRows.size === 1 && selectedRows.has(rowIdx)) {
+      selectedRows.clear()
+    } else {
+      selectedRows.clear()
+      selectedRows.add(rowIdx)
+    }
+  }
+  lastClickedRow = rowIdx
+  updateSelection()
+}
+
+function updateSelection() {
+  // Update row highlights
+  document.querySelectorAll('#tableBody tr').forEach((tr, idx) => {
+    if (selectedRows.has(idx)) tr.classList.add('row-selected')
+    else tr.classList.remove('row-selected')
+    // Update row-num style
+    const td = tr.querySelector('td.row-num')
+    if (td) {
+      if (selectedRows.has(idx)) { td.style.background = '#2563eb'; td.style.color = '#fff' }
+      else { td.style.background = ''; td.style.color = '' }
+    }
+  })
+  // Show/hide delete button
+  const btn = document.getElementById('btnDelSelected')
+  if (selectedRows.size > 0) {
+    btn.style.display = ''
+    btn.textContent = `Eliminar ${selectedRows.size} fila${selectedRows.size > 1 ? 's' : ''}`
+  } else {
+    btn.style.display = 'none'
+  }
+}
+
+function deleteSelectedRows() {
+  if (selectedRows.size === 0) return
+  const sorted = [...selectedRows].sort((a, b) => b - a) // delete from end to preserve indices
+  for (const idx of sorted) {
+    if (idx >= 0 && idx < rows.length) rows.splice(idx, 1)
+  }
+  selectedRows.clear()
+  lastClickedRow = -1
+  renderTable()
+}
+
+function updateSaveBtn() {
+  const btn = document.getElementById('btnSave')
+  const count = document.getElementById('rowCount')
+  btn.disabled = rows.length === 0
+  count.textContent = `${rows.length} fila${rows.length !== 1 ? 's' : ''}`
+}
+
+function addEmptyRow() {
+  rows.push(makeEmptyRow())
+  renderTable()
+  const tbody = document.getElementById('tableBody')
+  const lastRow = tbody.lastElementChild
+  if (lastRow) {
+    const firstInput = lastRow.querySelector('input[type="text"]')
+    if (firstInput) firstInput.focus()
+  }
+}
+
+function addMultipleRows() {
+  const n = parseInt(prompt('Cuantas filas agregar?', '10'))
+  if (!n || n < 1) return
+  for (let i = 0; i < n; i++) rows.push(makeEmptyRow())
+  renderTable()
+}
+
+function clearAll() {
+  if (rows.length > 0 && !confirm('Limpiar todas las filas?')) return
+  rows = []
+  nextId = 1
+  activeRowIdx = -1
+  activeColIdx = -1
+  renderTable()
+  document.getElementById('output').style.display = 'none'
+  updateCursorHint()
+}
+
+function saveData() {
+  // Filter out completely empty rows
+  const clean = rows
+    .filter(r => r.flight || r.awb1 || r.awb2 || r.pieces || r.cw)
+    .map(r => ({
+      flight: r.flight,
+      awb1: r.awb1,
+      awb2: r.awb2,
+      uldType: r.uldType,
+      pieces: r.pieces,
+      cw: r.cw,
+      pickupFrom: r.pickupFrom,
+      readyPickup: r.readyPickup,
+      lastDayFree: r.lastDayFree,
+      deliverTo: r.deliverTo,
+      dest: r.dest,
+      cutoff: r.cutoff,
+      etd: r.etd,
+      holdBg: r.holdBg,
+      holdBox: r.holdBox,
+      battery: r.battery,
+    }))
+  const out = document.getElementById('output')
+  document.getElementById('outputJson').textContent = JSON.stringify(clean, null, 2)
+  out.style.display = 'block'
+  alert(`${clean.length} filas listas para guardar (${rows.length - clean.length} vacias omitidas). En produccion esto crearia los bookings en Firestore.`)
+}
+
+// ── Paste zone handler (for initial bulk paste) ──
+const pasteZone = document.getElementById('pasteZone')
+
+pasteZone.addEventListener('focus', () => pasteZone.classList.add('active'))
+pasteZone.addEventListener('blur', () => pasteZone.classList.remove('active'))
+
+pasteZone.addEventListener('paste', (e) => {
+  e.preventDefault()
+  const text = e.clipboardData.getData('text/plain')
+  if (!text.trim()) return
+
+  const parsed = parseClipboardRows(text)
+  if (parsed.length === 0) {
+    alert('No se encontraron filas validas en el contenido pegado.')
+    return
+  }
+
+  if (rows.length > 0) {
+    const append = confirm(`Ya hay ${rows.length} filas. OK para agregar ${parsed.length} nuevas, Cancelar para reemplazar.`)
+    if (!append) rows = []
+  }
+
+  rows.push(...parsed)
+  renderTable()
+  pasteZone.textContent = `${parsed.length} filas pegadas correctamente`
+  setTimeout(() => { pasteZone.textContent = 'Click aqui y pega con Ctrl+V para agregar filas nuevas' }, 3000)
+})
+
+// Keyboard navigation: arrow keys move between cells, Delete to remove selected rows
+document.addEventListener('keydown', (e) => {
+  // Delete/Backspace on selected rows (when not typing in an input)
+  if ((e.key === 'Delete' || (e.key === 'Backspace' && e.target.tagName !== 'INPUT')) && selectedRows.size > 0) {
+    e.preventDefault()
+    deleteSelectedRows()
+    return
+  }
+
+  // Ctrl+A to select all rows
+  if ((e.ctrlKey || e.metaKey) && e.key === 'a' && e.target.tagName !== 'INPUT') {
+    e.preventDefault()
+    selectedRows.clear()
+    for (let i = 0; i < rows.length; i++) selectedRows.add(i)
+    updateSelection()
+    return
+  }
+
+  if (activeRowIdx < 0 || activeColIdx < 0) return
+  const target = e.target
+  if (target.tagName !== 'INPUT') return
+
+  let newRow = activeRowIdx
+  let newCol = activeColIdx
+
+  if (e.key === 'ArrowDown' || (e.key === 'Enter' && !e.shiftKey)) {
+    e.preventDefault()
+    newRow = Math.min(activeRowIdx + 1, rows.length - 1)
+  } else if (e.key === 'ArrowUp' || (e.key === 'Enter' && e.shiftKey)) {
+    e.preventDefault()
+    newRow = Math.max(activeRowIdx - 1, 0)
+  } else if (e.key === 'Tab' && !e.shiftKey) {
+    e.preventDefault()
+    newCol = activeColIdx + 1
+    if (newCol >= COLUMNS.length) { newCol = 0; newRow = Math.min(newRow + 1, rows.length - 1) }
+  } else if (e.key === 'Tab' && e.shiftKey) {
+    e.preventDefault()
+    newCol = activeColIdx - 1
+    if (newCol < 0) { newCol = COLUMNS.length - 1; newRow = Math.max(newRow - 1, 0) }
+  } else {
+    return
+  }
+
+  const td = document.querySelector(`td[data-row="${newRow}"][data-col="${newCol}"]`)
+  if (td) {
+    const inp = td.querySelector('input')
+    if (inp) { inp.focus(); inp.select() }
+  }
+})
+
+renderTable()
+</script>
+</body>
+</html>

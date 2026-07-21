@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCL WMS - Documentacion Tecnica Completa</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 15mm;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1a1a2e;
+    background: #f0f2f5;
+    line-height: 1.65;
+    font-size: 14px;
+  }
+  .print-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: #1a3a6b; color: #fff; padding: 10px 24px;
+    display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  .print-bar button {
+    background: #fff; color: #1a3a6b; border: none; padding: 8px 24px;
+    border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer;
+  }
+  .print-bar button:hover { background: #e0e7ff; }
+  .print-bar span { font-size: 13px; opacity: .85; }
+
+  .container {
+    max-width: 960px; margin: 70px auto 40px; background: #fff;
+    border-radius: 10px; box-shadow: 0 2px 20px rgba(0,0,0,.08);
+    padding: 48px 56px;
+  }
+
+  /* Cover */
+  .cover { text-align: center; padding: 40px 0 32px; border-bottom: 3px solid #1a3a6b; margin-bottom: 32px; }
+  .cover h1 { font-size: 28px; color: #1a3a6b; margin-bottom: 4px; }
+  .cover .subtitle { font-size: 16px; color: #555; margin-bottom: 20px; }
+  .cover .meta { font-size: 12px; color: #888; }
+  .cover .meta span { display: inline-block; margin: 0 12px; }
+  .cover .badge { display: inline-block; background: #dc2626; color: #fff; font-size: 11px; padding: 3px 14px; border-radius: 10px; font-weight: 700; letter-spacing: .5px; margin-top: 12px; }
+
+  /* TOC */
+  .toc { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 28px; margin-bottom: 32px; }
+  .toc h2 { font-size: 16px; color: #1a3a6b; margin-bottom: 10px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 5px 0; }
+  .toc a { color: #2563eb; text-decoration: none; font-size: 13px; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Headings */
+  h2 { font-size: 22px; color: #1a3a6b; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; page-break-after: avoid; }
+  h3 { font-size: 17px; color: #2d3748; margin: 28px 0 10px; page-break-after: avoid; }
+  h4 { font-size: 14px; color: #4a5568; margin: 18px 0 8px; font-weight: 700; }
+
+  p { margin: 8px 0; }
+  strong { color: #1a1a2e; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 12.5px; }
+  thead th {
+    background: #1a3a6b; color: #fff; padding: 8px 10px; text-align: left;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .3px;
+  }
+  tbody td { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  tbody tr:hover { background: #f7fafc; }
+  tbody tr:nth-child(even) { background: #fafbfc; }
+  tbody tr:nth-child(even):hover { background: #f0f4f8; }
+  td code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11.5px; color: #b91c1c; }
+
+  /* Code blocks */
+  pre {
+    background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 8px;
+    overflow-x: auto; font-size: 12px; line-height: 1.55; margin: 12px 0 20px;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    page-break-inside: avoid;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 12.5px;
+  }
+  p code, li code {
+    background: #f1f5f9; padding: 1px 5px; border-radius: 3px; color: #b91c1c;
+  }
+
+  /* Lists */
+  ul, ol { margin: 8px 0 8px 20px; }
+  li { margin: 3px 0; }
+
+  /* Info boxes */
+  .note {
+    background: #fffde7; border-left: 4px solid #f59e0b; padding: 12px 16px;
+    border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 13px;
+  }
+  .note strong { color: #b45309; }
+  .critical {
+    background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px 16px;
+    border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 13px;
+  }
+  .critical strong { color: #dc2626; }
+  .ok {
+    background: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px 16px;
+    border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 13px;
+  }
+
+  /* Diagram boxes */
+  .diagram { background: #f8fafc; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px 0; margin: 16px 0; overflow-x: auto; }
+  .diagram pre { background: transparent; color: #1e293b; margin: 0; padding: 16px 20px; font-size: 11.5px; }
+
+  /* Severity badges */
+  .sev-critical { display: inline-block; background: #dc2626; color: #fff; padding: 1px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+  .sev-high { display: inline-block; background: #f59e0b; color: #fff; padding: 1px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+  .sev-medium { display: inline-block; background: #3b82f6; color: #fff; padding: 1px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+  .sev-low { display: inline-block; background: #6b7280; color: #fff; padding: 1px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* Print styles */
+  @media print {
+    .print-bar { display: none !important; }
+    body { background: #fff; font-size: 11pt; }
+    .container { margin: 0; padding: 0; box-shadow: none; border-radius: 0; max-width: 100%; }
+    h2 { page-break-before: always; margin-top: 20px; }
+    h2:first-of-type { page-break-before: avoid; }
+    .cover { page-break-after: always; padding: 80px 0; }
+    .toc { page-break-after: always; }
+    table { page-break-inside: auto; }
+    tr { page-break-inside: avoid; }
+    pre { page-break-inside: avoid; font-size: 9pt; }
+    .diagram pre { font-size: 8.5pt; }
+    a { color: #1a3a6b !important; text-decoration: none !important; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container { padding: 20px; margin: 56px 8px 20px; }
+    pre { font-size: 11px; }
+    table { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-bar">
+  <button onclick="window.print()">Exportar a PDF</button>
+  <span>Abrir el dialogo de impresion y seleccionar "Guardar como PDF" como destino</span>
+</div>
+
+<div class="container">
+
+<!-- ============================================================= -->
+<!-- COVER -->
+<!-- ============================================================= -->
+<div class="cover">
+  <h1>MCL WMS</h1>
+  <div class="subtitle">Documentacion Tecnica Completa</div>
+  <div class="subtitle" style="font-size:14px; color:#1a3a6b; font-weight:600;">MinCurl Logistics Warehouse Management System</div>
+  <div class="meta">
+    <span>Version 2.0.0</span> |
+    <span>Mayo 2026 (actualizado 11 mayo)</span> |
+    <span>Proyecto Firebase: <code>wms-mcl</code></span>
+  </div>
+  <div class="badge">CONFIDENCIAL - SOLO EQUIPO IT AUTORIZADO</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- TABLE OF CONTENTS -->
+<!-- ============================================================= -->
+<div class="toc">
+  <h2>Tabla de Contenidos</h2>
+  <ol>
+    <li><a href="#sec1">Arquitectura General del Sistema</a></li>
+    <li><a href="#sec2">Lenguajes, Frameworks y Librerias</a></li>
+    <li><a href="#sec3">Infraestructura y Hosting</a></li>
+    <li><a href="#sec4">Base de Datos — Modulo Warehouse</a></li>
+    <li><a href="#sec4b">Base de Datos — Modulo Airfreight</a></li>
+    <li><a href="#sec5">Seguridad</a></li>
+    <li><a href="#sec6">Integraciones</a></li>
+    <li><a href="#sec7">Flujo Operativo del WMS (Warehouse)</a></li>
+    <li><a href="#sec7b">Modulo Airfreight — Flujos y Funcionalidad</a></li>
+    <li><a href="#sec7c">Cloud Functions — Screening Agent</a></li>
+    <li><a href="#sec7d">Billing y Facturacion Airfreight</a></li>
+    <li><a href="#sec8">Mantenimiento y Soporte</a></li>
+    <li><a href="#sec9">Riesgos Tecnicos y Recomendaciones</a></li>
+    <li><a href="#appendix-a">Apendice A: Variables de Entorno y Secrets</a></li>
+    <li><a href="#appendix-b">Apendice B: Comandos Utiles</a></li>
+    <li><a href="#appendix-c">Apendice C: Contactos y Accesos</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================= -->
+<!-- SECTION 1 -->
+<!-- ============================================================= -->
+<h2 id="sec1">1. Arquitectura General del Sistema</h2>
+
+<h3>1.1 Patron Arquitectonico</h3>
+<p>MCL WMS es una <strong>Single Page Application (SPA) serverless</strong> construida sobre la plataforma Firebase de Google Cloud. No existen servidores propios ni infraestructura que gestionar: el frontend se sirve como archivos estaticos y toda la logica de backend se ejecuta en Cloud Functions bajo demanda.</p>
+
+<h3>1.2 Diagrama de Arquitectura</h3>
+<div class="diagram"><pre>
++---------------------------------------------------------------------+
+|                        USUARIOS                                     |
+|  [Staff MCL]   [Clientes]   [Viewers]   [Vendors]   [Drivers]      |
++--------+---------------+----------+-----------+-----------+---------+
+         |               |          |           |           |
+         v               v          v           v           v
++---------------------------------------------------------------------+
+|                   FIREBASE HOSTING (CDN)                            |
+|                   https://wms-mcl.web.app                          |
+|                   SPA React (dist/)                                 |
++---------------------------------------------------------------------+
+         |
+         v
++---------------------------------------------------------------------+
+|                     FRONTEND (React SPA)                            |
+|  +------------------+  +------------------+  +------------------+   |
+|  |   Sea Freight    |  |   Air Freight    |  | Warehouse Svcs   |   |
+|  |   Module         |  |   Module         |  | Module           |   |
+|  +------------------+  +------------------+  +------------------+   |
+|  +------------------+  +------------------+  +------------------+   |
+|  |   Billing        |  |  Admin / Setup   |  | Driver Portal    |   |
+|  +------------------+  +------------------+  +------------------+   |
++---------------------------------------------------------------------+
+         |                        |                       |
+         v                        v                       v
++---------------------+  +-------------------+  +-------------------+
+| FIREBASE AUTH       |  | CLOUD FIRESTORE   |  | CLOUD STORAGE     |
+| - Google OAuth 2.0  |  | - NoSQL Document  |  | - PDFs, fotos     |
+| - Email/Password    |  | - 30+ colecciones |  | - Documentos AWB  |
+| - Session-only      |  | - Security Rules  |  | - Screening certs |
++---------------------+  +-------------------+  +-------------------+
+                                  ^
+                                  |
++---------------------------------------------------------------------+
+|                    CLOUD FUNCTIONS (Node 22)                        |
+|  +---------------------------+  +-------------------------------+   |
+|  | processScreeningEmails    |  | checkScreeningAlerts          |   |
+|  | (Scheduled 5x/dia)        |  | (Scheduled 1x/dia)           |   |
+|  +---------------------------+  +-------------------------------+   |
+|  +---------------------------+  +-------------------------------+   |
+|  | triggerScreeningManual    |  | cleanupDriverQueue            |   |
+|  | (Callable - on demand)    |  | (Scheduled cada 30 min)      |   |
+|  +---------------------------+  +-------------------------------+   |
+|  +---------------------------+  +-------------------------------+   |
+|  | deleteClientUser          |  | deleteVendorUser              |   |
+|  | (Callable)                |  | (Callable)                    |   |
+|  +---------------------------+  +-------------------------------+   |
+|  +---------------------------+  +-------------------------------+   |
+|  | getScreeningPdf           |  | resetScreeningData            |   |
+|  | (Callable - proxy)        |  | (Callable - admin)            |   |
+|  +---------------------------+  +-------------------------------+   |
++---------------------------------------------------------------------+
+         |                        |
+         v                        v
++---------------------+  +-------------------+
+| GMAIL API           |  | SMTP (Nodemailer) |
+| - OAuth2            |  | - Gmail App Pwd   |
+| - Leer screening    |  | - Alertas email   |
+| - Marcar leidos     |  | - Escalaciones    |
++---------------------+  +-------------------+
+</pre></div>
+
+<h3>1.3 Flujo de Informacion</h3>
+<ol>
+  <li><strong>Usuario</strong> accede a <code>https://wms-mcl.web.app</code> via navegador</li>
+  <li><strong>Firebase Hosting</strong> sirve el bundle React (HTML/JS/CSS) desde CDN global</li>
+  <li><strong>React SPA</strong> se carga en el navegador y maneja toda la navegacion client-side</li>
+  <li><strong>Firebase Auth</strong> autentica al usuario (Google SSO o email/password)</li>
+  <li><strong>Firestore SDK</strong> (client-side) lee/escribe directamente a la base de datos</li>
+  <li><strong>Security Rules</strong> validan cada operacion segun rol y pertenencia del dato</li>
+  <li><strong>Cloud Functions</strong> ejecutan procesos automatizados (screening, alertas, limpieza)</li>
+  <li><strong>Cloud Storage</strong> almacena archivos binarios (PDFs, fotos, documentos)</li>
+</ol>
+
+<h3>1.4 Componentes Principales</h3>
+<table>
+  <thead><tr><th>Componente</th><th>Responsabilidad</th></tr></thead>
+  <tbody>
+    <tr><td><strong>React SPA</strong></td><td>Interfaz de usuario, logica de presentacion, generacion de PDFs client-side</td></tr>
+    <tr><td><strong>Firebase Auth</strong></td><td>Autenticacion, gestion de sesiones, proveedores OAuth</td></tr>
+    <tr><td><strong>Cloud Firestore</strong></td><td>Persistencia de datos, consultas en tiempo real, reglas de seguridad</td></tr>
+    <tr><td><strong>Cloud Storage</strong></td><td>Almacenamiento de archivos (PDFs, fotos, documentos escaneados)</td></tr>
+    <tr><td><strong>Cloud Functions</strong></td><td>Procesos backend: screening automatico, alertas, limpieza de datos</td></tr>
+    <tr><td><strong>Gmail API</strong></td><td>Lectura automatizada de emails de certificados de screening</td></tr>
+    <tr><td><strong>SMTP/Nodemailer</strong></td><td>Envio de alertas y notificaciones por email</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================= -->
+<!-- SECTION 2 -->
+<!-- ============================================================= -->
+<h2 id="sec2">2. Lenguajes, Frameworks y Librerias</h2>
+
+<h3>2.1 Frontend</h3>
+<table>
+  <thead><tr><th>Tecnologia</th><th>Version</th><th>Rol</th></tr></thead>
+  <tbody>
+    <tr><td><strong>TypeScript</strong></td><td>5.2</td><td>Lenguaje principal (tipado estatico sobre JavaScript)</td></tr>
+    <tr><td><strong>React</strong></td><td>18.2</td><td>Framework UI (componentes, estado, ciclo de vida)</td></tr>
+    <tr><td><strong>React Router</strong></td><td>6.22</td><td>Navegacion SPA con lazy loading y route guards</td></tr>
+    <tr><td><strong>Tailwind CSS</strong></td><td>3.4</td><td>Framework CSS utility-first para estilos</td></tr>
+    <tr><td><strong>Vite</strong></td><td>5.1</td><td>Build tool y dev server (HMR, bundling, code splitting)</td></tr>
+  </tbody>
+</table>
+
+<h3>2.2 Librerias Criticas del Frontend</h3>
+<table>
+  <thead><tr><th>Libreria</th><th>Version</th><th>Proposito</th></tr></thead>
+  <tbody>
+    <tr><td><code>firebase</code></td><td>10.8</td><td>SDK cliente para Auth, Firestore, Storage, Functions</td></tr>
+    <tr><td><code>pdf-lib</code></td><td>1.17</td><td>Generacion y anotacion de PDFs (Delivery Orders, AWB cut)</td></tr>
+    <tr><td><code>pdfjs-dist</code></td><td>5.6</td><td>Renderizado de PDF a imagen (previews, OCR pipeline)</td></tr>
+    <tr><td><code>html2pdf.js</code></td><td>0.14</td><td>Conversion HTML a PDF (Warehouse Receipts, labels)</td></tr>
+    <tr><td><code>exceljs</code></td><td>4.4</td><td>Generacion de archivos Excel (exportaciones de inventario)</td></tr>
+    <tr><td><code>xlsx</code></td><td>0.18</td><td>Lectura de archivos Excel (importacion de datos)</td></tr>
+    <tr><td><code>date-fns</code></td><td>3.3</td><td>Manipulacion y formateo de fechas</td></tr>
+    <tr><td><code>recharts</code></td><td>3.8</td><td>Graficos y dashboards</td></tr>
+    <tr><td><code>tesseract.js</code></td><td>7.0</td><td>OCR en navegador (lectura de etiquetas con camara)</td></tr>
+    <tr><td><code>@zxing/browser</code></td><td>0.1</td><td>Escaneo de codigos de barras con camara</td></tr>
+    <tr><td><code>react-barcode</code></td><td>1.6</td><td>Generacion de codigos de barras Code128 para etiquetas</td></tr>
+    <tr><td><code>react-to-print</code></td><td>2.15</td><td>Impresion de componentes React (WR, labels, DO)</td></tr>
+  </tbody>
+</table>
+
+<h3>2.3 Backend (Cloud Functions)</h3>
+<table>
+  <thead><tr><th>Tecnologia</th><th>Version</th><th>Rol</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Node.js</strong></td><td>22</td><td>Runtime de Cloud Functions</td></tr>
+    <tr><td><code>firebase-functions</code></td><td>7.2</td><td>Framework para definir Cloud Functions (v2)</td></tr>
+    <tr><td><code>firebase-admin</code></td><td>13.7</td><td>SDK administrativo (Firestore, Auth, Storage sin restricciones)</td></tr>
+    <tr><td><code>googleapis</code></td><td>140.0</td><td>Cliente Google APIs (Gmail API para screening)</td></tr>
+    <tr><td><code>@anthropic-ai/sdk</code></td><td>0.52</td><td>SDK Claude AI (reservado, usado previamente para vision OCR)</td></tr>
+    <tr><td><code>nodemailer</code></td><td>6.9</td><td>Envio de emails SMTP (alertas de screening)</td></tr>
+    <tr><td><code>@google-cloud/secret-manager</code></td><td>6.1</td><td>Gestion de secretos en Cloud Functions</td></tr>
+  </tbody>
+</table>
+
+<h3>2.4 Justificacion de Decisiones Tecnologicas</h3>
+<ul>
+  <li><strong>Firebase completo:</strong> Elimina la necesidad de mantener servidores, bases de datos o infraestructura. Escala automaticamente.</li>
+  <li><strong>Firestore (NoSQL):</strong> Los datos logisticos son jerarquicos y variados. Un esquema flexible permite evolucionar sin migraciones.</li>
+  <li><strong>Vite sobre Webpack:</strong> Build rapido (~3s vs ~30s), HMR instantaneo, code splitting nativo.</li>
+  <li><strong>Tailwind CSS:</strong> Desarrollo UI rapido sin archivos CSS separados. Consistencia de diseno.</li>
+  <li><strong>pdf-lib (client-side):</strong> Genera PDFs sin backend, reduce latencia y costos de Cloud Functions.</li>
+  <li><strong>tesseract.js (client-side):</strong> OCR de etiquetas directamente en el navegador del operario de bodega.</li>
+</ul>
+
+<!-- ============================================================= -->
+<!-- SECTION 3 -->
+<!-- ============================================================= -->
+<h2 id="sec3">3. Infraestructura y Hosting</h2>
+
+<h3>3.1 Servicios Firebase en Uso</h3>
+<table>
+  <thead><tr><th>Servicio</th><th>Plan</th><th>Proyecto</th></tr></thead>
+  <tbody>
+    <tr><td>Firebase Hosting</td><td>Spark/Blaze</td><td><code>wms-mcl</code></td></tr>
+    <tr><td>Cloud Firestore</td><td>Blaze (pay-as-you-go)</td><td><code>wms-mcl</code></td></tr>
+    <tr><td>Firebase Auth</td><td>Gratuito (incluido)</td><td><code>wms-mcl</code></td></tr>
+    <tr><td>Cloud Storage</td><td>Blaze</td><td><code>wms-mcl.firebasestorage.app</code></td></tr>
+    <tr><td>Cloud Functions</td><td>Blaze (Node 22)</td><td><code>wms-mcl</code></td></tr>
+    <tr><td>Secret Manager</td><td>Blaze</td><td>Secretos de screening</td></tr>
+  </tbody>
+</table>
+
+<h3>3.2 Entornos</h3>
+<table>
+  <thead><tr><th>Entorno</th><th>Estado</th><th>URL</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Produccion</strong></td><td>Activo</td><td><code>https://wms-mcl.web.app</code></td></tr>
+    <tr><td><strong>Desarrollo local</strong></td><td><code>vite dev</code></td><td><code>http://localhost:5173</code></td></tr>
+    <tr><td><strong>Emuladores Firebase</strong></td><td>Parcial (solo Storage)</td><td><code>localhost:9199</code> (Storage), <code>localhost:4000</code> (UI)</td></tr>
+  </tbody>
+</table>
+<div class="note"><strong>Nota:</strong> No existe un entorno de staging ni de QA separado. Todas las pruebas se hacen contra Firestore de produccion o localmente con emuladores parciales.</div>
+
+<h3>3.3 Proceso de Deploy Actual</h3>
+<pre>
+# 1. Build del frontend
+npm run build          # Vite genera dist/
+
+# 2. Deploy de hosting + reglas
+firebase deploy --only hosting
+firebase deploy --only firestore:rules
+firebase deploy --only storage
+
+# 3. Deploy de Cloud Functions
+cd functions
+firebase deploy --only functions
+</pre>
+<p><strong>Configuracion de caching (firebase.json):</strong></p>
+<ul>
+  <li><code>index.html</code>: <code>no-cache, no-store, must-revalidate</code> (siempre fresco)</li>
+  <li><code>/assets/**</code>: <code>public, max-age=31536000, immutable</code> (1 ano, versionados por hash)</li>
+  <li>SPA rewrite: todas las rutas redirigen a <code>index.html</code></li>
+</ul>
+
+<h3>3.4 Recomendacion: Deploy Profesional</h3>
+<div class="diagram"><pre>
++------------------+     +-------------------+     +------------------+
+| GitHub repo      | --> | GitHub Actions    | --> | Firebase Hosting |
+| (push a main)    |     | CI/CD pipeline    |     | + Functions      |
++------------------+     +-------------------+     +------------------+
+</pre></div>
+<p><strong>Pipeline sugerido (GitHub Actions):</strong></p>
+<pre>
+# .github/workflows/deploy.yml
+name: Deploy to Firebase
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: live
+</pre>
+
+<!-- ============================================================= -->
+<!-- SECTION 4 -->
+<!-- ============================================================= -->
+<h2 id="sec4">4. Base de Datos</h2>
+
+<h3>4.1 Tipo y Caracteristicas</h3>
+<ul>
+  <li><strong>Motor:</strong> Cloud Firestore (Google Cloud)</li>
+  <li><strong>Modelo:</strong> NoSQL orientado a documentos</li>
+  <li><strong>Estructura:</strong> Colecciones &gt; Documentos &gt; Campos (+ subcolecciones)</li>
+  <li><strong>Consultas:</strong> Indices compuestos, filtros por igualdad y rango, array-contains</li>
+  <li><strong>Tiempo real:</strong> Listeners con <code>onSnapshot()</code> para actualizaciones instantaneas</li>
+</ul>
+
+<h3>4.2 Mapa de Colecciones</h3>
+<div class="diagram"><pre>
+FIRESTORE DATABASE (wms-mcl)
+|
++-- config/                          # Configuracion del sistema
+|   +-- wr_sequence                  # Secuencia WR: {next: number}
+|   +-- ws_wr_sequence               # Secuencia WR Warehouse Services
+|   +-- invoice_sequence             # Secuencia facturas sea freight
+|   +-- air_invoice_sequence         # Secuencia facturas airfreight
+|   +-- do_sequence                  # Secuencia Delivery Orders
+|   +-- mcl_roles                    # Config de roles
+|   +-- anthropic_key                # API key Claude (legacy)
+|
++-- user_roles/{uid}                 # Roles y permisos por usuario
+|   +-- role: string                 # admin|accounting|super_agent|agent|
+|   |                                # counter|bodega|client|viewer|vendor_admin
+|   +-- client_id: string            # (solo clients/viewers) FK a cliente
+|   +-- modules: string[]            # ['seafreight','airfreight','warehouse_services']
+|   +-- must_change_password: bool   # Forzar cambio en primer login
+|   +-- is_ecommerce: bool           # Cliente tipo ecommerce
+|   +-- can_view_charges: bool       # Puede ver cargos/billing
+|
++== SEA FREIGHT ======================================================
+|
++-- clients/{id}                     # Clientes sea freight
+|   +-- name, shippers[], consignees[], email_recipients[]
+|
++-- consignees/{id}                  # Consignatarios (legacy)
+|
++-- warehouse_receipts/{id}          # Recibos de almacen
+|   +-- wr_number: string            # "LI0000000001"
+|   +-- client_id, client_name
+|   +-- po_number, shipper, consignee
+|   +-- driver_name, dl_number, dl_photo_url
+|   +-- status: received|dispatched|partial
+|   +-- dispatch_status: pending|dispatched|partial
+|   +-- total_qty, total_cbm, total_weight_kg
+|   +-- created_at, updated_at
+|   +-- /lines/{lineId}             # Lineas de carga
+|   |   +-- packing_type, qty, length, width, height, weight_kg
+|   |   +-- cbm, is_lb, is_dg, location, remarks, photo_urls[]
+|   +-- /sku_lines/{skuId}          # Detalle SKU
+|       +-- sku, vin, received_qty, case_pack
+|
++-- dispatches/{id}                  # Despachos / consolidaciones
+|   +-- container_number, container_size, booking_number
+|   +-- seal_number, vendor, destination
+|   +-- client_ids[]                 # Array de client_ids incluidos
+|   +-- wr_ids[], status, gate_out_date
+|
++-- billing_charges/{id}             # Cargos sea freight
++-- invoices/{id}                    # Facturas sea freight
++-- rate_schedule/{id}               # Tarifario base
++-- client_billing_rates/{id}        # Overrides por cliente
++-- client_billing_config/{id}       # Config billing por cliente
++-- billing_profiles/{id}            # Perfiles de facturacion
++-- inventory_documents/{id}         # Docs de inventario y ETD
+|
++== AIR FREIGHT ======================================================
+|
++-- airfreight_flights/{id}          # Vuelos
+|   +-- flight_number, airline, flight_datetime
+|   +-- flight_status: booked|terminado|dispatched
+|   +-- doc_do_tsa, doc_distribution  # Docs nivel vuelo
+|
++-- airfreight_bookings/{id}         # Bookings de carga aerea
+|   +-- booking_type: simple|mawb|ecommerce|export
+|   +-- client_id, client_name, flight_id, flight_number
+|   +-- mawb_number                  # (mawb/ecommerce types)
+|   +-- awb_lines: AwbLine[]         # Lineas AWB con detalle
+|   |   +-- awb_number, awb_2nd_leg, uld_type
+|   |   +-- pieces, chargeable_weight
+|   |   +-- pickup_from, deliver_to, destination
+|   |   +-- ready_pickup, last_day_free, cutoff, etd
+|   |   +-- hold_bg, hold_box, is_battery
+|   |   +-- screening_status, screening_pieces_screened
+|   |   +-- doc_screening_cert (con versionado + historial)
+|   |   +-- dispatch_status, dispatched_at, move_log[]
+|   +-- screening_status: pending|partial|complete|error
+|   +-- screening_pieces_total, screening_events[]
+|
++-- airfreight_clients/{id}          # Clientes airfreight
++-- airfreight_destinations/{id}     # Destinos configurados
++-- airfreight_holds/{id}            # Holds (CBP, docs, customs)
++-- delivery_orders/{id}             # Ordenes de entrega (DO-0000001)
++-- pickup_orders/{id}               # Ordenes de pickup (PU-0000001)
+|
++-- screening_events/{id}            # Eventos de screening procesados
+|   +-- gmail_message_id, pdf_url, pdf_storage_path
+|   +-- extracted: { mawb, awb, date, time, pieces, uld_lines[] }
+|   +-- matched_booking_id, match_method, match_status
+|
++-- screening_settings/config        # Config del agente screening
+|   +-- enabled, phantom_k9_emails[], mcl_alert_emails[]
+|   +-- last_run, last_run_status, last_run_diag[]
+|   +-- /escalations/{id}           # Historial de alertas
+|
++== AIR BILLING ======================================================
+|
++-- air_rate_schedule/{id}           # Tarifario base aereo
++-- air_rate_airline_overrides/{id}  # Overrides por aerolinea
++-- air_rate_client_overrides/{id}   # Overrides por cliente
++-- air_billing_profiles/{id}        # Perfiles billing aereo
++-- air_billing_charges/{id}         # Cargos aereos
++-- air_invoices/{id}                # Facturas aereas
+|
++== WAREHOUSE SERVICES ===============================================
+|
++-- warehouse_service_orders/{id}    # Ordenes de servicio 3PL
++-- warehouse_service_clients/{id}   # Clientes WS
++-- ws_inspection_logs/{id}          # Logs de inspeccion
++-- ws_delivery_orders/{id}          # DOs warehouse services
++-- ws_billing_charges/{id}          # Cargos WS
++-- ws_invoices/{id}                 # Facturas WS
++-- ws_rate_schedule/{id}            # Tarifario WS
+|
++== TRANSPORTE Y VENDORS =============================================
+|
++-- vendors/{id}                     # Proveedores de transporte
++-- vendor_users/{uid}               # Usuarios de vendors
++-- driver_queue/{id}                # Cola de drivers (check-in)
++-- delivery_tracking/{id}           # Tracking en tiempo real
+|
++== OTROS ============================================================
+|
++-- backup_express_line/{id}         # Backups temporales (admin)
+</pre></div>
+
+<h3>4.3 Indices Compuestos</h3>
+<p>Definidos en <code>firestore.indexes.json</code>:</p>
+<table>
+  <thead><tr><th>Coleccion</th><th>Campos</th><th>Proposito</th></tr></thead>
+  <tbody>
+    <tr><td><code>airfreight_bookings</code></td><td>client_id ASC + created_at DESC</td><td>Bookings por cliente, ordenados</td></tr>
+    <tr><td><code>airfreight_bookings</code></td><td>flight_id + client_id + created_at</td><td>Bookings por vuelo y cliente</td></tr>
+    <tr><td><code>airfreight_bookings</code></td><td>flight_id + created_at</td><td>Bookings por vuelo</td></tr>
+    <tr><td><code>airfreight_holds</code></td><td>client_id + created_at DESC</td><td>Holds por cliente</td></tr>
+    <tr><td><code>warehouse_receipts</code></td><td>client_id + created_at DESC</td><td>WRs por cliente</td></tr>
+    <tr><td><code>warehouse_receipts</code></td><td>dispatch_status + client_id</td><td>WRs por estado de despacho</td></tr>
+    <tr><td><code>dispatches</code></td><td>client_ids ARRAY_CONTAINS + created_at DESC</td><td>Despachos que incluyen cliente</td></tr>
+    <tr><td><code>billing_charges</code></td><td>client_id + created_at DESC</td><td>Cargos por cliente</td></tr>
+    <tr><td><code>airfreight_flights</code></td><td>flight_status + flight_datetime</td><td>Vuelos por estado y fecha</td></tr>
+    <tr><td><code>screening_events</code></td><td>matched_booking_id + campos extraccion</td><td>Eventos screening por booking</td></tr>
+  </tbody>
+</table>
+
+<h3>4.4 Buenas Practicas y Riesgos</h3>
+<div class="ok"><strong>Buenas practicas implementadas:</strong>
+<ul>
+  <li>Secuencias atomicas (<code>config/wr_sequence</code>) con <code>runTransaction()</code> para evitar duplicados</li>
+  <li><code>client_ids</code> como array para consultas <code>array-contains</code> en dispatches multi-cliente</li>
+  <li>Campos desnormalizados (<code>client_name</code> en bookings) para evitar JOINs costosos</li>
+  <li>Soft deletes en vendors (flag <code>deleted</code> en vez de borrar documentos)</li>
+</ul>
+</div>
+<div class="critical"><strong>Riesgos a mitigar:</strong>
+<ul>
+  <li><strong>Sin backups automaticos:</strong> Firestore no tiene backups programados por defecto</li>
+  <li><strong>Desnormalizacion:</strong> Si cambia el nombre de un cliente, hay que actualizar todos los documentos relacionados</li>
+  <li><strong>Limites Firestore:</strong> Max 1 escritura/doc/segundo. Batch max 500 docs</li>
+  <li><strong>Consultas limitadas:</strong> Sin soporte nativo para OR, JOIN, ni full-text search</li>
+</ul>
+</div>
+
+<!-- ============================================================= -->
+<!-- SECTION 4b — AIRFREIGHT DATA MODEL -->
+<!-- ============================================================= -->
+<h2 id="sec4b">4b. Base de Datos — Modulo Airfreight</h2>
+
+<p>El modulo airfreight gestiona el proceso completo de carga aerea: desde la reserva de vuelos hasta la facturacion. Los datos se almacenan en colecciones Firestore independientes del modulo warehouse.</p>
+
+<h3>Colecciones Principales</h3>
+<table>
+  <thead><tr><th>Coleccion</th><th>Descripcion</th><th>Documentos Aprox.</th></tr></thead>
+  <tbody>
+    <tr><td><code>airfreight_flights</code></td><td>Vuelos programados con datos de aerolinea, ETD, cutoff, status</td><td>~100+</td></tr>
+    <tr><td><code>airfreight_bookings</code></td><td>Reservas de carga. 4 tipos: <code>ecommerce</code>, <code>mawb</code>, <code>simple</code>, <code>export</code></td><td>~1,000+</td></tr>
+    <tr><td><code>airfreight_clients</code></td><td>Clientes airfreight con configuracion de billing</td><td>~20</td></tr>
+    <tr><td><code>airfreight_destinations</code></td><td>Destinos disponibles (BOG, EZE, MVD, SDQ, etc.)</td><td>~15</td></tr>
+    <tr><td><code>airfreight_holds</code></td><td>Retenciones de carga (holds)</td><td>Variable</td></tr>
+    <tr><td><code>delivery_orders</code></td><td>Delivery Orders generadas para despacho</td><td>~200+</td></tr>
+    <tr><td><code>air_billing_charges</code></td><td>Cargos de facturacion (auto y manuales)</td><td>~2,000+</td></tr>
+    <tr><td><code>air_invoices</code></td><td>Facturas generadas</td><td>~100+</td></tr>
+    <tr><td><code>screening_events</code></td><td>Eventos de screening procesados por el agente</td><td>~500+</td></tr>
+    <tr><td><code>screening_settings/config</code></td><td>Configuracion del screening agent (tokens, last_run, etc.)</td><td>1</td></tr>
+    <tr><td><code>air_rate_schedule</code></td><td>Catalogo de tarifas para cargos manuales</td><td>~20</td></tr>
+    <tr><td><code>air_billing_profiles</code></td><td>Perfiles de facturacion por cliente</td><td>~10</td></tr>
+  </tbody>
+</table>
+
+<h3>Estructura: <code>airfreight_flights</code></h3>
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>airline</code></td><td>string</td><td>Nombre de aerolinea (Avianca, LATAM, etc.)</td></tr>
+    <tr><td><code>flight_number</code></td><td>string</td><td>Numero de vuelo (#AVIANCA A, #LA-0543, etc.)</td></tr>
+    <tr><td><code>flight_datetime</code></td><td>string (ISO)</td><td>Fecha y hora de salida (ETD)</td></tr>
+    <tr><td><code>cutoff_datetime</code></td><td>string (ISO)</td><td>Fecha limite de entrega</td></tr>
+    <tr><td><code>destinations</code></td><td>array&lt;string&gt;</td><td>Destinos del vuelo (["BOG"])</td></tr>
+    <tr><td><code>flight_status</code></td><td>string</td><td><code>booked</code> → <code>terminado</code> → <code>dispatched</code></td></tr>
+    <tr><td><code>dispatched_at</code></td><td>string (ISO) | null</td><td>Timestamp de despacho</td></tr>
+    <tr><td><code>booking_updated</code></td><td>boolean</td><td>Flag de cambios pendientes de revision</td></tr>
+    <tr><td><code>doc_do_tsa</code></td><td>object | null</td><td>Documento DO/TSA a nivel vuelo</td></tr>
+    <tr><td><code>doc_do_tsa_files</code></td><td>array</td><td>Archivos DO/TSA multiples</td></tr>
+    <tr><td><code>doc_distribucion_files</code></td><td>array</td><td>Archivos de distribucion</td></tr>
+    <tr><td><code>doc_manifesto</code></td><td>object | null</td><td>Documento manifesto</td></tr>
+  </tbody>
+</table>
+
+<h3>Estructura: <code>airfreight_bookings</code></h3>
+<p>Existen 4 tipos de booking, determinados por el campo <code>booking_type</code>:</p>
+
+<h4>Campos comunes (todos los tipos)</h4>
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>booking_type</code></td><td>string</td><td><code>ecommerce</code> | <code>mawb</code> | <code>simple</code> | <code>export</code></td></tr>
+    <tr><td><code>flight_id</code></td><td>string</td><td>Referencia al vuelo</td></tr>
+    <tr><td><code>flight_number</code></td><td>string</td><td>Numero de vuelo (denormalizado)</td></tr>
+    <tr><td><code>airline</code></td><td>string</td><td>Aerolinea (denormalizado)</td></tr>
+    <tr><td><code>client_id</code></td><td>string</td><td>Referencia al cliente</td></tr>
+    <tr><td><code>client_name</code></td><td>string</td><td>Nombre del cliente (denormalizado)</td></tr>
+    <tr><td><code>status</code></td><td>string</td><td><code>submitted</code></td></tr>
+    <tr><td><code>created_at</code></td><td>string (ISO)</td><td>Fecha de creacion</td></tr>
+    <tr><td><code>created_by</code></td><td>string</td><td>Email del creador</td></tr>
+    <tr><td><code>documents</code></td><td>map</td><td>Documentos a nivel booking (7512, DO/TSA, CCSF, etc.)</td></tr>
+  </tbody>
+</table>
+
+<h4>Tipo <code>ecommerce</code> — AWBs individuales por linea</h4>
+<p>Los AWBs se almacenan en el array <code>awb_lines[]</code>. Cada linea tiene:</p>
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>awb_number</code></td><td>string</td><td>AWB 1st leg (ej: 369-99172393)</td></tr>
+    <tr><td><code>awb_2nd_leg</code></td><td>string</td><td>AWB 2nd leg (ej: 729-93888734)</td></tr>
+    <tr><td><code>pieces</code></td><td>number</td><td>Cantidad de piezas</td></tr>
+    <tr><td><code>weight</code></td><td>number</td><td>Peso bruto</td></tr>
+    <tr><td><code>chargeable_weight</code></td><td>number</td><td>Peso cobrable</td></tr>
+    <tr><td><code>uld_type</code></td><td>string</td><td><code>LOOSE</code> o tipo ULD (BUP)</td></tr>
+    <tr><td><code>battery</code></td><td>boolean</td><td>Contiene bateria de litio</td></tr>
+    <tr><td><code>ddgg</code></td><td>boolean</td><td>Mercancias peligrosas</td></tr>
+    <tr><td><code>hold</code></td><td>boolean | "pending"</td><td>Estado de retencion</td></tr>
+    <tr><td><code>on_hand</code></td><td>boolean</td><td>Carga en mano</td></tr>
+    <tr><td><code>dispatched</code></td><td>boolean</td><td>Marcado como despachado</td></tr>
+    <tr><td><code>dispatched_at</code></td><td>string (ISO)</td><td>Timestamp de despacho</td></tr>
+    <tr><td><code>documents</code></td><td>map</td><td>Documentos por AWB (doc_hawb, doc_7512, etc.)</td></tr>
+    <tr><td><code>doc_screening_cert</code></td><td>object</td><td>Certificado de screening (subido por agente)</td></tr>
+    <tr><td><code>screening_status</code></td><td>string</td><td><code>pending</code> | <code>partial</code> | <code>screened</code> | <code>error</code></td></tr>
+    <tr><td><code>screening_pieces_screened</code></td><td>number</td><td>Total piezas screened</td></tr>
+  </tbody>
+</table>
+
+<h4>Tipo <code>mawb</code> — MAWB con multiples HAWBs</h4>
+<p>Misma estructura que ecommerce con <code>awb_lines[]</code>, mas campos adicionales:</p>
+<ul>
+  <li><code>mawb_number</code>: Numero del MAWB padre</li>
+  <li><code>deliver_to</code>: Destino de entrega (aerolinea o direccion)</li>
+  <li>Documentos WHR y MAWB se guardan a nivel booking (<code>documents.doc_whr</code>, <code>documents.doc_mawb_def</code>)</li>
+  <li>Billing: se genera un unico cargo por booking cuando TODAS las lineas estan despachadas</li>
+</ul>
+
+<h4>Tipo <code>simple</code> — AWB individual sin array</h4>
+<div class="note"><strong>Importante:</strong> A diferencia de ecommerce/mawb, los datos del AWB estan al nivel del documento, NO dentro de <code>awb_lines</code>.</div>
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>awb_1st_leg</code></td><td>string</td><td>AWB 1st leg</td></tr>
+    <tr><td><code>awb_2nd_leg</code></td><td>string</td><td>AWB 2nd leg</td></tr>
+    <tr><td><code>destination_id</code></td><td>string</td><td>Destino</td></tr>
+    <tr><td><code>pieces</code></td><td>number</td><td>Piezas</td></tr>
+    <tr><td><code>chargeable_weight</code></td><td>number</td><td>Peso cobrable</td></tr>
+    <tr><td><code>dispatched</code></td><td>boolean</td><td>A nivel documento (no en awb_lines)</td></tr>
+    <tr><td><code>dispatched_at</code></td><td>string (ISO)</td><td>A nivel documento</td></tr>
+    <tr><td><code>screening_status</code></td><td>string</td><td>A nivel documento</td></tr>
+    <tr><td><code>doc_screening_cert</code></td><td>object</td><td>A nivel documento</td></tr>
+  </tbody>
+</table>
+<p>Uso principal: cuando un cliente sube AWBs que no van agrupados bajo un MAWB. Tambien se genera al "desagrupar" un booking MAWB incorrecto.</p>
+
+<h4>Tipo <code>export</code> — Exportaciones</h4>
+<p>Similar a ecommerce con <code>awb_lines[]</code>, pero con campos adicionales de exportacion (<code>cargo_sub_type</code>: bonded, bonded_local, etc.).</p>
+
+<h3>Estructura: <code>airfreight_clients</code></h3>
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>name</code></td><td>string</td><td>Nombre del cliente</td></tr>
+    <tr><td><code>booking_type</code></td><td>string</td><td><code>ecommerce</code> | <code>mawb</code> | <code>simple</code></td></tr>
+    <tr><td><code>active</code></td><td>boolean</td><td>Estado activo</td></tr>
+    <tr><td><code>billing</code></td><td>map</td><td>Configuracion completa de facturacion (ver seccion Billing)</td></tr>
+    <tr><td><code>user_emails</code></td><td>array</td><td>Emails autorizados para login como este cliente</td></tr>
+  </tbody>
+</table>
+
+<h3>Estructura: <code>air_billing_charges</code></h3>
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>booking_id</code></td><td>string</td><td>Referencia al booking</td></tr>
+    <tr><td><code>flight_id</code></td><td>string</td><td>Referencia al vuelo</td></tr>
+    <tr><td><code>billing_unit_id</code></td><td>string</td><td><code>{bookingId}__{awbIndex}</code> para ecommerce, <code>{bookingId}</code> para mawb/simple</td></tr>
+    <tr><td><code>booking_type</code></td><td>string</td><td>Tipo de booking</td></tr>
+    <tr><td><code>charge_name</code></td><td>string</td><td>Nombre del servicio</td></tr>
+    <tr><td><code>unit</code></td><td>string</td><td>KG, QTY, per_kg, etc.</td></tr>
+    <tr><td><code>qty</code></td><td>number</td><td>Cantidad</td></tr>
+    <tr><td><code>rate</code></td><td>number</td><td>Tarifa unitaria</td></tr>
+    <tr><td><code>total</code></td><td>number</td><td>Total = qty x rate</td></tr>
+    <tr><td><code>source</code></td><td>string</td><td><code>auto</code> (generado al dispatch) | <code>manual</code> (agregado por agente)</td></tr>
+    <tr><td><code>status</code></td><td>string</td><td><code>pending</code> → <code>invoiced</code></td></tr>
+    <tr><td><code>invoice_id</code></td><td>string | null</td><td>Referencia a factura si fue facturado</td></tr>
+  </tbody>
+</table>
+
+<h3>Estructura: <code>screening_events</code></h3>
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>gmail_message_id</code></td><td>string</td><td>ID unico del email de Gmail</td></tr>
+    <tr><td><code>awb</code></td><td>string</td><td>Numero AWB (ej: 045-22209655)</td></tr>
+    <tr><td><code>booking_id</code></td><td>string</td><td>Booking donde se aplico</td></tr>
+    <tr><td><code>awb_line_index</code></td><td>number</td><td><code>&gt;=0</code>: linea en awb_lines, <code>-1</code>: match MAWB, <code>-2</code>: match simple</td></tr>
+    <tr><td><code>pieces</code></td><td>number</td><td>Piezas screened</td></tr>
+    <tr><td><code>uld_type</code></td><td>string</td><td>Tipo ULD</td></tr>
+    <tr><td><code>uld_number</code></td><td>string</td><td>Numero ULD</td></tr>
+    <tr><td><code>status</code></td><td>string</td><td><code>matched</code> | <code>unmatched</code> | <code>error</code></td></tr>
+    <tr><td><code>processed_at</code></td><td>string (ISO)</td><td>Timestamp de procesamiento</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================= -->
+<!-- SECTION 5 -->
+<!-- ============================================================= -->
+<h2 id="sec5">5. Seguridad</h2>
+
+<h3>5.1 Autenticacion</h3>
+<table>
+  <thead><tr><th>Proveedor</th><th>Usuarios</th><th>Detalles</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Google OAuth 2.0</strong></td><td>Staff MCL (<code>@mincurllogistics.com</code>)</td><td>SSO corporativo</td></tr>
+    <tr><td><strong>Email/Password</strong></td><td>Clientes, viewers, vendors</td><td>Creados por admin con password temporal</td></tr>
+  </tbody>
+</table>
+<p><strong>Gestion de sesiones:</strong></p>
+<ul>
+  <li>Persistencia: <code>browserSessionPersistence</code> (se cierra al cerrar pestana)</li>
+  <li>Inactividad: Auto-logout a los <strong>30 minutos</strong> sin interaccion</li>
+  <li>Primer login: Fuerza cambio de password (<code>must_change_password</code> flag)</li>
+  <li>Tokens Gmail: Solo en <code>sessionStorage</code> (no persisten entre sesiones)</li>
+</ul>
+
+<h3>5.2 Modelo de Autorizacion (Roles)</h3>
+<div class="diagram"><pre>
++------------------------------------------------------------------+
+|                     JERARQUIA DE ROLES                           |
++------------------------------------------------------------------+
+|                                                                  |
+|  admin --------- Acceso total. CRUD en todo. Deploy, config.     |
+|  accounting ---- Billing completo. Rates, invoices, charges.     |
+|  super_agent --- Operaciones + edicion de WRs ya creados.        |
+|  agent --------- Operaciones: counter, recepcion, despacho.     |
+|  counter ------- Solo recepcion documental (counter).            |
+|  bodega -------- Solo recepcion fisica (warehouse floor).        |
+|  client -------- Ver/editar SOLO sus propios datos.              |
+|  viewer -------- Solo lectura de datos de su cliente.            |
+|  vendor_admin -- Solo portal de tracking de su vendor.           |
+|                                                                  |
++------------------------------------------------------------------+
+</pre></div>
+<p><strong>Modulos por usuario</strong> (<code>user_roles.modules[]</code>):</p>
+<ul>
+  <li><code>seafreight</code> — Acceso al modulo maritimo</li>
+  <li><code>airfreight</code> — Acceso al modulo aereo</li>
+  <li><code>warehouse_services</code> — Acceso al modulo 3PL</li>
+</ul>
+
+<h3>5.3 Reglas de Firestore</h3>
+<p>Las reglas estan en <code>firebase/firestore.rules</code> (283 lineas). Patron principal:</p>
+<pre>
+// Funciones helper reutilizadas en todas las reglas:
+function isMCL()           // Email @mincurllogistics.com
+function isLoggedIn()      // Cualquier usuario autenticado
+function userRole()        // Lee rol desde user_roles/{uid}
+function isClient()        // Rol == 'client'
+function isViewer()        // Rol == 'viewer'
+function clientId()        // Lee client_id desde user_roles/{uid}
+function isAdminOrAccounting()  // MCL + (admin || accounting)
+function isVendorAdmin()   // Rol == 'vendor_admin'
+function vendorId()        // Lee vendor_id desde vendor_users/{uid}
+</pre>
+<p><strong>Ejemplos de reglas por coleccion:</strong></p>
+<table>
+  <thead><tr><th>Coleccion</th><th>MCL</th><th>Client</th><th>Otros</th></tr></thead>
+  <tbody>
+    <tr><td><code>warehouse_receipts</code></td><td>read + write</td><td>read solo si <code>client_id</code> coincide</td><td>—</td></tr>
+    <tr><td><code>airfreight_bookings</code></td><td>read + write</td><td>CRUD si <code>client_id</code> coincide</td><td>Viewer: read solo si <code>client_id</code> coincide</td></tr>
+    <tr><td><code>air_rate_schedule</code></td><td>read</td><td>—</td><td>Solo Admin/Accounting pueden write</td></tr>
+    <tr><td><code>driver_queue</code></td><td>update + delete</td><td>—</td><td>PUBLICO: create + read</td></tr>
+    <tr><td><code>delivery_tracking</code></td><td>create + delete</td><td>—</td><td>PUBLICO: read + update. Vendor: read su vendor_id</td></tr>
+    <tr><td><code>user_roles</code></td><td>read + write</td><td>—</td><td>Usuario: read su doc. Update solo <code>must_change_password</code> a false</td></tr>
+  </tbody>
+</table>
+
+<h3>5.4 Reglas de Storage</h3>
+<table>
+  <thead><tr><th>Path</th><th>Read</th><th>Write</th><th>Notas</th></tr></thead>
+  <tbody>
+    <tr><td><code>airfreight/tracking-photos/*</code></td><td>Publico</td><td>Publico (imagenes, 10MB max)</td><td>Drivers no autenticados suben fotos</td></tr>
+    <tr><td><code>airfreight/**</code></td><td>Logueados</td><td>Logueados (10MB max)</td><td>Documentos generales airfreight</td></tr>
+    <tr><td><code>airfreight/screening-certs/**</code></td><td>MCL</td><td>MCL (10MB max)</td><td>Certificados de screening</td></tr>
+    <tr><td><code>uld_returns/**</code></td><td>MCL</td><td>MCL (10MB max)</td><td>PDFs de retorno ULD</td></tr>
+    <tr><td><code>ws_screening_reports/**</code></td><td>MCL</td><td>MCL (10MB max)</td><td>Reportes WS</td></tr>
+    <tr><td><code>seafreight/**</code></td><td>Logueados</td><td>Logueados (10MB max)</td><td>Documentos sea freight</td></tr>
+  </tbody>
+</table>
+
+<h3>5.5 Manejo de Secretos</h3>
+<table>
+  <thead><tr><th>Secreto</th><th>Ubicacion</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td>Firebase config (API keys)</td><td><code>.env</code> (frontend, VITE_*)</td><td>Config publica del SDK (normal en Firebase)</td></tr>
+    <tr><td>Google Vision API Key</td><td><code>.env</code></td><td>OCR de documentos</td></tr>
+    <tr><td>GMAIL_CLIENT_ID</td><td>Firebase Secret Manager</td><td>OAuth2 para Gmail API</td></tr>
+    <tr><td>GMAIL_CLIENT_SECRET</td><td>Firebase Secret Manager</td><td>OAuth2 para Gmail API</td></tr>
+    <tr><td>GMAIL_REFRESH_TOKEN</td><td>Firebase Secret Manager</td><td>Token persistente Gmail</td></tr>
+    <tr><td>GMAIL_USER</td><td>Firebase Secret Manager</td><td>Cuenta email para SMTP</td></tr>
+    <tr><td>GMAIL_APP_PASSWORD</td><td>Firebase Secret Manager</td><td>App password Gmail</td></tr>
+    <tr><td>ANTHROPIC_API_KEY</td><td>Firebase Secret Manager</td><td>Claude API (screening legacy)</td></tr>
+  </tbody>
+</table>
+<div class="note"><strong>Nota:</strong> Las API keys de Firebase en el <code>.env</code> son <strong>intencionalmente publicas</strong> — la seguridad de Firebase depende de las Security Rules, no de ocultar las keys. Sin embargo, la Google Vision API Key deberia estar restringida por dominio en Google Cloud Console.</div>
+
+<h3>5.6 Recomendaciones de Endurecimiento</h3>
+<ol>
+  <li><strong>Restringir API keys</strong> en Google Cloud Console (dominio + IP)</li>
+  <li><strong>Activar App Check</strong> en Firebase para prevenir acceso desde apps no autorizadas</li>
+  <li><strong>Auditar <code>delivery_tracking</code>:</strong> actualmente permite <code>update: if true</code>. Limitar a drivers con PIN valido.</li>
+  <li><strong>Auditar <code>driver_queue</code>:</strong> <code>create: if true</code> permite spam. Considerar rate limiting.</li>
+  <li><strong>Auditar <code>vendors</code>:</strong> <code>read: if true</code> expone lista de proveedores. Restringir a logueados.</li>
+  <li><strong>Activar Firestore audit logging</strong> en Google Cloud para trazabilidad.</li>
+  <li><strong>Rotar GMAIL_REFRESH_TOKEN</strong> periodicamente.</li>
+  <li><strong>Implementar backups automaticos</strong> de Firestore (export diario a Cloud Storage).</li>
+</ol>
+
+<!-- ============================================================= -->
+<!-- SECTION 6 -->
+<!-- ============================================================= -->
+<h2 id="sec6">6. Integraciones</h2>
+
+<h3>6.1 Gmail API (Screening Automatico)</h3>
+<div class="diagram"><pre>
++-------------------+     +---------------------+     +--------------------+
+| Phantom K9        | --> | Gmail (screening@   | --> | processScreening   |
+| (envia cert PDF)  |     | mincurllogistics)   |     | Emails (CF)        |
++-------------------+     +---------------------+     +--------------------+
+                                                              |
+                                      +------+------+--------+--------+
+                                      v      v      v                 v
+                               [Parse email] [Download PDF] [Match AWB to booking]
+                                      |           |                   |
+                                      v           v                   v
+                               [screening_events] [Storage]  [Update booking status]
+</pre></div>
+<p><strong>Detalles:</strong></p>
+<ul>
+  <li><strong>Autenticacion:</strong> OAuth2 con refresh token</li>
+  <li><strong>Busqueda:</strong> <code>subject:"screening result" has:attachment after:[timestamp]</code></li>
+  <li><strong>Parsing:</strong> Regex para AWB, ULD, piezas, screener, fecha</li>
+  <li><strong>Matching:</strong> AWB directo &gt; MAWB fallback &gt; near-match (1-2 chars diferencia)</li>
+  <li><strong>Deduplicacion:</strong> Por ULD key (<code>bookingId::awb::uld</code>)</li>
+  <li><strong>Frecuencia:</strong> 5 veces/dia (8am, 1pm, 6pm, 9pm, 11pm PST)</li>
+</ul>
+
+<h3>6.2 SMTP / Nodemailer (Alertas)</h3>
+<ul>
+  <li><strong>Servicio:</strong> Gmail SMTP con App Password</li>
+  <li><strong>Usos:</strong> Alertas de screening incompleto, errores de piezas, escalaciones</li>
+  <li><strong>Escalacion:</strong> Dias 1-3 diario, dia 4+ cada 2 dias</li>
+  <li><strong>Destinatarios:</strong> Phantom K9 + CC MCL alert emails</li>
+</ul>
+
+<h3>6.3 Gmail API (Frontend - Envio de Emails)</h3>
+<ul>
+  <li><strong>Uso:</strong> Confirmacion de despacho maritimo (draft creation)</li>
+  <li><strong>Scopes:</strong> <code>gmail.send</code>, <code>gmail.compose</code></li>
+  <li><strong>Autenticacion:</strong> OAuth2 token del usuario logueado</li>
+  <li><strong>Almacenamiento:</strong> Token en <code>sessionStorage</code> (no persiste)</li>
+</ul>
+
+<h3>6.4 Claude AI / Anthropic (AWB Cut)</h3>
+<ul>
+  <li><strong>Uso:</strong> Procesamiento de Distribution Sheets en modulo AWB Cut</li>
+  <li><strong>Funcion:</strong> <code>callProcessDistribution()</code> y <code>callIdentifyAwbs()</code> en <code>src/lib/awbCut.ts</code></li>
+  <li><strong>Modelo:</strong> Claude Vision para extraer AWB-to-pallet mapping de PDFs escaneados</li>
+  <li><strong>API Key:</strong> Almacenada en Firestore <code>config/anthropic_key</code></li>
+</ul>
+
+<h3>6.5 Google Vision API (Legacy/Parcial)</h3>
+<ul>
+  <li><strong>Uso:</strong> OCR de documentos en el frontend</li>
+  <li><strong>API Key:</strong> En <code>.env</code> como <code>VITE_GOOGLE_VISION_API_KEY</code></li>
+  <li><strong>Estado:</strong> Configurado pero el uso principal de OCR ahora es tesseract.js (client-side)</li>
+</ul>
+
+<h3>6.6 Resumen de Integraciones</h3>
+<table>
+  <thead><tr><th>Integracion</th><th>Protocolo</th><th>Direccion</th><th>Modulo</th></tr></thead>
+  <tbody>
+    <tr><td>Gmail API (lectura)</td><td>REST/OAuth2</td><td>Inbound</td><td>Screening Agent (Cloud Function)</td></tr>
+    <tr><td>Gmail API (envio)</td><td>REST/OAuth2</td><td>Outbound</td><td>Sea Freight (Frontend)</td></tr>
+    <tr><td>SMTP/Nodemailer</td><td>SMTP</td><td>Outbound</td><td>Screening Alerts (Cloud Function)</td></tr>
+    <tr><td>Claude Vision API</td><td>REST/API Key</td><td>Outbound</td><td>AWB Cut (Frontend)</td></tr>
+    <tr><td>Google Vision API</td><td>REST/API Key</td><td>Outbound</td><td>OCR docs (Frontend, legacy)</td></tr>
+    <tr><td>Firebase Auth</td><td>SDK</td><td>Bidirectional</td><td>Todos los modulos</td></tr>
+    <tr><td>Cloud Firestore</td><td>SDK</td><td>Bidirectional</td><td>Todos los modulos</td></tr>
+    <tr><td>Cloud Storage</td><td>SDK</td><td>Bidirectional</td><td>Todos los modulos</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================= -->
+<!-- SECTION 7 -->
+<!-- ============================================================= -->
+<h2 id="sec7">7. Flujo Operativo del WMS</h2>
+
+<h3>7.1 Modulo Sea Freight</h3>
+<div class="diagram"><pre>
+RECEPCION DOCUMENTAL (Counter)
+================================
+[Cliente llega con carga]
+        |
+        v
+[CounterNew] --> Crear Warehouse Receipt
+  - Seleccionar cliente
+  - Ingresar: PO#, shipper, consignee
+  - Registrar: driver name, DL#, foto DL
+  - Generar WR# automatico (LI + 10 digitos)
+        |
+        v
+RECEPCION FISICA (Bodega)
+================================
+[PhysicalReception] --> Registrar carga linea por linea
+  - Tipo embalaje (SKID, Bolsa, Crate, etc.)
+  - Piezas, peso, dimensiones (L x W x H)
+  - CBM calculado automaticamente
+  - LB (Lithium Battery), DG (Dangerous Goods)
+  - Ubicacion en bodega, fotos por linea
+  - Detalle SKU (opcional)
+        |
+        v
+[auto] --> Calcular cargos de recepcion
+  - Unloading (por CBM)
+  - In/Out (por pallets o CBM)
+        |
+        v
+INVENTARIO Y DOCUMENTACION
+================================
+[Inventory] --> Ver inventario recibido
+[InventoryDocuments] --> Tracking de documentacion y ETD
+        |
+        v
+DESPACHO / CONSOLIDACION
+================================
+[DispatchNew] --> Crear despacho
+  - Seleccionar WRs a incluir
+  - Asignar contenedor, booking, seal
+  - Seleccionar vendor de transporte
+        |
+        v
+[auto] --> Calcular cargos de despacho
+  - Loading, drayage, hazmat, storage
+  - Storage con dias libres por tipo de carga
+        |
+        v
+[Dispatch Confirm] --> Confirmar gate-out
+  - Email de confirmacion via Gmail API
+  - Actualizar status de WRs
+        |
+        v
+FACTURACION
+================================
+[BillingCharges] --> Revisar cargos acumulados
+[Invoices] --> Generar facturas por cliente
+[ExportGateOut] --> Exportar a Excel
+</pre></div>
+
+<h3>7.2 Modulo Air Freight</h3>
+<div class="diagram"><pre>
+CREACION DE BOOKING
+================================
+[AirfreightBookingNew] --> Crear booking
+  Tipos:
+  (a) Simple: 1 AWB por booking
+  (b) MAWB: Master + HAWBs
+  (c) Ecommerce: Multi-AWB (paste from Excel)
+  (d) Export: Exportaciones
+        |
+        v
+  - Seleccionar vuelo (o crear nuevo)
+  - Ingresar AWB lines: flight#, AWB 1st/2nd leg
+  - ULD type, piezas, chargeable weight
+  - Pickup from, deliver to, destination
+  - Fechas: ready pickup, last day free, cutoff, ETD
+  - Hold BG#, Hold Box#, Battery flag
+        |
+        v
+GESTION DE VUELO
+================================
+[AirfreightDashboard] --> Flight Operations Board
+  - Vista por vuelo con bookings, docs, screening, holds
+  - Estado: booked --> terminado --> dispatched
+        |
+        v
+DOCUMENTACION
+================================
+[AirfreightDocs] --> Subir documentos por booking
+  - Cliente: 7512, HAWB, MAWB draft/final, LB checklist
+  - MCL: distribution list, DO/TSA
+  - Versionado de documentos con historial
+        |
+        v
+SCREENING
+================================
+[AirfreightScreening] --> Proceso automatico
+  - Cloud Function lee emails de Phantom K9
+  - Extrae AWB, ULD, piezas del certificado
+  - Match con bookings: pending -> partial -> complete
+  - Alertas email si piezas no coinciden
+        |
+        v
+HOLDS / ULD / AWB CUT
+================================
+[AirfreightHolds] --> Gestionar holds CBP
+[AirfreightUldControl] --> Empacar AWBs en ULDs
+[AirfreightAwbCut] --> Procesar distribution (Claude Vision OCR)
+        |
+        v
+DESPACHO DE VUELO
+================================
+[Flight Dispatch] --> Status = "dispatched"
+  - Genera cargos automaticos (ALL-IN, Handling, etc.)
+  - Bloquea edicion de bookings
+        |
+        v
+DELIVERY & PICKUP
+================================
+[DeliveryOrder] --> DO multi-AWB con PDF y tracking GPS
+[PickupOrder] --> PU con HTML imprimible
+        |
+        v
+FACTURACION AEREA
+================================
+[AirBillingCharges] --> Revisar cargos
+[AirBillingSummary] --> Facturas (Draft->Sealed->Void/Unlock)
+</pre></div>
+
+<h3>7.3 Modulo Warehouse Services</h3>
+<div class="diagram"><pre>
+ORDEN DE SERVICIO
+================================
+[WSOrderNew] --> Crear orden
+  - Cliente, tipo servicio (screening, transport, storage, etc.)
+  - Items con detalle de carga
+  - Status: requested
+        |
+        v
+RECEPCION
+================================
+[WSReception] --> Recibir carga
+  - Escaneo codigos de barra (camara + Tesseract OCR)
+  - Captura de peso
+  - Status: checked_in -> received
+        |
+        v
+SCREENING / INSPECCION
+================================
+[WSScreening] --> Inspeccion
+  - Formularios (K9, X-Ray, manual)
+  - Log de inspeccion, upload reportes
+  - Status: in_progress
+        |
+        v
+ENTREGA
+================================
+[WSDeliveryOrders] --> Ordenes de entrega
+  - Status: completed
+        |
+        v
+FACTURACION
+================================
+[WSBillingCharges] --> Cargos por servicio
+[WSInvoices] --> Facturas
+</pre></div>
+
+<h3>7.4 Manejo de Errores y Validaciones</h3>
+<table>
+  <thead><tr><th>Contexto</th><th>Validacion</th><th>Accion</th></tr></thead>
+  <tbody>
+    <tr><td>WR duplicado</td><td>Secuencia atomica con <code>runTransaction()</code></td><td>Retry automatico</td></tr>
+    <tr><td>Booking sin vuelo</td><td>Validacion en formulario</td><td>Bloquea submit</td></tr>
+    <tr><td>Screening pcs &gt; booking</td><td>Status = 'error'</td><td>Alerta email automatica</td></tr>
+    <tr><td>AWB no encontrado</td><td>Near-match (1-2 chars)</td><td>Sugiere correccion manual</td></tr>
+    <tr><td>Vuelo dispatched</td><td>UI bloquea edicion</td><td>Mensaje al usuario</td></tr>
+    <tr><td>Invoice sealed</td><td>Requiere void/unlock</td><td>Solo admin/accounting</td></tr>
+    <tr><td>Driver queue expired</td><td><code>cleanupDriverQueue</code> cada 30min</td><td>Auto-expira entradas &gt;3h</td></tr>
+    <tr><td>Password debil</td><td><code>validatePasswordStrength()</code></td><td>Min 10 chars, mixto</td></tr>
+    <tr><td>In-app browser</td><td><code>InAppBrowserBlock</code></td><td>Bloquea acceso, sugiere navegador real</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================= -->
+<!-- SECTION 7b — AIRFREIGHT MODULE -->
+<!-- ============================================================= -->
+<h2 id="sec7b">7b. Modulo Airfreight — Flujos y Funcionalidad</h2>
+
+<h3>7b.1 Vision General</h3>
+<p>El modulo airfreight gestiona el ciclo completo de carga aerea para MCL: reservas, documentacion, screening K9, delivery orders, despacho y facturacion. Es el modulo principal del sistema y el mas complejo.</p>
+
+<h3>7b.2 Paginas del Modulo</h3>
+<table>
+  <thead><tr><th>Pagina</th><th>Ruta</th><th>Archivo</th><th>Funcion</th></tr></thead>
+  <tbody>
+    <tr><td>Dashboard</td><td><code>/airfreight</code></td><td><code>AirfreightDashboard.tsx</code></td><td>Vista de vuelos con status, totales, ciclo de estados (Booked→Terminado→Dispatched)</td></tr>
+    <tr><td>Booking</td><td><code>/airfreight/bookings/new?flight=X</code></td><td><code>AirfreightBookingNew.tsx</code></td><td>Crear/editar bookings dentro de un vuelo. Soporta ecommerce, MAWB, simple, export</td></tr>
+    <tr><td>Booking List</td><td><code>/airfreight/bookings</code></td><td><code>AirfreightBookingList.tsx</code></td><td>Lista plana de AWBs con dispatch individual, filtros por fecha/status/cliente</td></tr>
+    <tr><td>AWB Log</td><td><code>/airfreight/awb-log</code></td><td><code>AirfreightAwbLog.tsx</code></td><td>Vista de documentos por AWB (7512, WHR, AWB, Screening, DO/TSA, MCL Transfer, etc.)</td></tr>
+    <tr><td>Screening</td><td><code>/airfreight/screening</code></td><td><code>AirfreightScreening.tsx</code></td><td>Dashboard del agente de screening: estado, last run, configuracion</td></tr>
+    <tr><td>Delivery Order</td><td><code>/airfreight/delivery-order/:id/:idx</code></td><td><code>AirfreightDeliveryOrder.tsx</code></td><td>Crear/editar DOs, seleccionar AWBs, generar PDF</td></tr>
+    <tr><td>Billing Charges</td><td><code>/airfreight/billing</code></td><td><code>AirfreightBillingCharges.tsx</code></td><td>Cargos por vuelo/cliente, generar facturas, recalcular tarifas</td></tr>
+    <tr><td>Billing Summary</td><td><code>/airfreight/billing-summary</code></td><td><code>AirfreightBillingSummary.tsx</code></td><td>Resumen de facturacion</td></tr>
+    <tr><td>Docs</td><td><code>/airfreight/docs</code></td><td><code>AirfreightDocs.tsx</code></td><td>Documentos a nivel vuelo</td></tr>
+    <tr><td>Admin</td><td><code>/airfreight/admin</code></td><td><code>AirfreightAdmin.tsx</code></td><td>Configuracion de clientes, destinos, tarifas</td></tr>
+  </tbody>
+</table>
+
+<h3>7b.3 Flujo de Vida de un Vuelo</h3>
+<div class="diagram"><pre>
+  VUELO CREADO         BOOKINGS           DOCUMENTOS         SCREENING         DISPATCH          BILLING
+  (Dashboard)         ASIGNADOS          CARGADOS           K9 AGENT          (Dashboard)       (Auto)
+       |                  |                  |                  |                  |                |
+  flight_status:     booking_type:     AWB Log dots       processScreening   Booked →          calculateAir
+    "booked"        ecommerce/mawb/   7512, WHR, AWB,     Emails match      Terminado →       freightCharges()
+       |            simple/export      MCL Transfer,      → screening_events  Dispatched            |
+       |                  |            DO/TSA, CCSF            |                  |           air_billing_charges
+       |                  |                  |                  |                  |                |
+       v                  v                  v                  v                  v                v
+  airfreight_flights  airfreight_bookings  Storage/Firestore  screening_events  dispatched=true  air_invoices
+</pre></div>
+
+<h3>7b.4 Ciclo de Status del Vuelo</h3>
+<p>Se controla desde el Dashboard haciendo click en el badge de status:</p>
+<ol>
+  <li><strong>Booked</strong> — Vuelo creado, se pueden agregar/editar bookings</li>
+  <li><strong>Terminado</strong> — Cutoff pasado, ya no se aceptan cambios de clientes</li>
+  <li><strong>Dispatched</strong> — Vuelo despachado. Al hacer dispatch:
+    <ul>
+      <li>Todas las AWBs de bookings ecommerce/simple se marcan <code>dispatched=true</code></li>
+      <li>Se genera <code>drop_off_time</code> en AWBs con <code>on_hand=true</code></li>
+      <li>Se generan cargos automaticos de billing via <code>calculateAirfreightCharges()</code></li>
+      <li>Se verifican facturas existentes que necesiten revision</li>
+    </ul>
+  </li>
+</ol>
+<div class="note"><strong>Reabrir vuelo:</strong> Un usuario admin puede hacer click en "Dispatched" para revertir a "Booked". Esto elimina cargos auto pendientes y permite re-despachar.</div>
+
+<h3>7b.5 Tipos de Booking — Diferencias Clave</h3>
+<table>
+  <thead><tr><th>Aspecto</th><th>Ecommerce</th><th>MAWB</th><th>Simple</th><th>Export</th></tr></thead>
+  <tbody>
+    <tr><td>AWBs</td><td><code>awb_lines[]</code></td><td><code>awb_lines[]</code></td><td>Nivel documento</td><td><code>awb_lines[]</code></td></tr>
+    <tr><td>Dispatched flag</td><td><code>awb_lines[i].dispatched</code></td><td>No (via vuelo)</td><td>Documento raiz</td><td><code>awb_lines[i].dispatched</code></td></tr>
+    <tr><td>Billing trigger</td><td>Por AWB despachado</td><td>Cuando TODAS las lineas despachadas</td><td>Por booking al dispatch del vuelo</td><td>Por AWB despachado</td></tr>
+    <tr><td>billing_unit_id</td><td><code>{bookingId}__{idx}</code></td><td><code>{bookingId}</code></td><td><code>{bookingId}</code></td><td><code>{bookingId}__{idx}</code></td></tr>
+    <tr><td>Documentos AWB</td><td><code>awb_lines[i].documents</code></td><td><code>awb_lines[i].documents</code></td><td><code>documents.{key}</code></td><td><code>awb_lines[i].documents</code></td></tr>
+    <tr><td>Screening</td><td><code>awb_lines[i].screening_*</code></td><td><code>awb_lines[i].screening_*</code></td><td>Documento raiz</td><td>N/A</td></tr>
+    <tr><td>Uso</td><td>Clientes regulares</td><td>Consolidadores</td><td>AWBs sueltos / desagrupados</td><td>Exportaciones</td></tr>
+  </tbody>
+</table>
+
+<h3>7b.6 Delivery Orders (DO)</h3>
+<p>Las DOs se generan desde el AWB Log o la pagina de DO. Agrupan AWBs de un vuelo para despacho.</p>
+<ul>
+  <li>El modal "Add AWB" consulta bookings <code>ecommerce</code>, <code>mawb</code>, <code>export</code>, y <code>simple</code></li>
+  <li>Filtro: vuelos <code>dispatched</code> solo si fueron despachados hoy; vuelos <code>terminado</code> no se muestran</li>
+  <li>Cada DO tiene <code>awb_keys</code>: array de <code>"{bookingId}::{awbIndex}"</code></li>
+  <li>Se genera PDF con datos de consignatario, AWBs, piezas, peso</li>
+</ul>
+
+<h3>7b.7 AWB Log — Documentos por AWB</h3>
+<p>Columnas de documentos (cada circulo indica estado: gris=sin doc, verde=subido, amarillo=pendiente):</p>
+<table>
+  <thead><tr><th>Columna</th><th>Almacenamiento</th><th>Upload</th></tr></thead>
+  <tbody>
+    <tr><td>HOLD</td><td>awb_lines[i].hold / booking.hold</td><td>Sistema</td></tr>
+    <tr><td>7512</td><td>awb_lines[i].documents.doc_7512 / booking.documents.doc_7512</td><td>Ecommerce: manual. Otros: sistema</td></tr>
+    <tr><td>ACCEPT</td><td>awb_lines[i].doc_acceptance / booking.documents.doc_acceptance</td><td>Manual</td></tr>
+    <tr><td>WHR</td><td>awb_lines[i].doc_whr / booking.documents.doc_whr</td><td>Manual</td></tr>
+    <tr><td>AWB</td><td>awb_lines[i].documents.doc_hawb / booking.documents.doc_hawb</td><td>Ecommerce/Simple: manual</td></tr>
+    <tr><td>SCREEN</td><td>awb_lines[i].doc_screening_cert / booking.doc_screening_cert</td><td>Screening agent (automatico)</td></tr>
+    <tr><td>MCL TR</td><td>awb_lines[i].doc_mcl_transfer_files / booking.documents.doc_mcl_transfer_files</td><td>Manual (multi-file)</td></tr>
+    <tr><td>DO/TSA</td><td>flight.doc_do_tsa_files / awb_lines[i].documents.doc_do_tsa</td><td>Manual</td></tr>
+    <tr><td>CCSF</td><td>booking.documents.doc_ccsf_files</td><td>Manual (multi-file)</td></tr>
+    <tr><td>MANIF</td><td>flight.doc_manifesto / awb_lines[i].documents.doc_manifesto</td><td>Manual</td></tr>
+    <tr><td>DIST</td><td>flight.doc_distribucion_files</td><td>Manual (multi-file, nivel vuelo)</td></tr>
+    <tr><td>LB</td><td>awb_lines[i].documents.doc_lb_checklist</td><td>Manual</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================= -->
+<!-- SECTION 7c — SCREENING AGENT -->
+<!-- ============================================================= -->
+<h2 id="sec7c">7c. Cloud Functions — Screening Agent</h2>
+
+<h3>7c.1 Vision General</h3>
+<p>El screening agent es una Cloud Function (<code>processScreeningEmails</code>) que se ejecuta cada 5 minutos via Cloud Scheduler. Lee emails de la cuenta de screening, extrae datos de certificados K9 de Phantom, y los asocia automaticamente a los AWBs correspondientes en el sistema.</p>
+
+<h3>7c.2 Arquitectura</h3>
+<div class="diagram"><pre>
+  Gmail (recepcion@...)    Cloud Scheduler (cada 5 min)    Firestore
+         |                          |                          |
+         v                          v                          |
+    Gmail API ──────────> processScreeningEmails ────────> screening_events
+    (OAuth2 + refresh)         (Cloud Function)            airfreight_bookings
+         |                          |                     (screening_status,
+    Leer emails               Parse HTML body              doc_screening_cert)
+    no leidos              Extraer AWBs + piezas               |
+         |                     + ULD info                      |
+         v                          |                          v
+    Marcar como leido         Match con bookings         Storage (PDFs)
+                              Generar PDF cert
+</pre></div>
+
+<h3>7c.3 Cloud Functions Desplegadas</h3>
+<table>
+  <thead><tr><th>Funcion</th><th>Tipo</th><th>Trigger</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>processScreeningEmails</code></td><td>onSchedule</td><td>Cada 5 min</td><td>Lee emails, extrae datos, actualiza bookings</td></tr>
+    <tr><td><code>processScreeningEmailsHttp</code></td><td>onRequest</td><td>HTTP (Run Now)</td><td>Version manual del mismo proceso</td></tr>
+    <tr><td><code>resetScreeningData</code></td><td>onCall</td><td>Manual</td><td>Reset screening desde fecha, borrar eventos, recalcular</td></tr>
+    <tr><td><code>sendEmailNotification</code></td><td>onCall</td><td>Manual</td><td>Envio de emails (facturas, notificaciones)</td></tr>
+  </tbody>
+</table>
+
+<h3>7c.4 Parseo de Emails — Patrones Regex</h3>
+<p>El agente parsea el body HTML de emails de Phantom K9. Soporta 3 patrones:</p>
+<table>
+  <thead><tr><th>Patron</th><th>Formato</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Pattern 1</td><td>AWB + ULD entre parentesis</td><td><code>045-22209655 (84 PCS) ULD: PMC 45086QT</code></td></tr>
+    <tr><td>Pattern 2</td><td>AWB + piezas en linea siguiente</td><td><code>045-22209655\n84 PCS</code></td></tr>
+    <tr><td>Pattern 3a</td><td>ULD primero, coma, AWB piezas (sin parentesis)</td><td><code>PAG72202R7 84, 045-22209655 84 PCS</code></td></tr>
+    <tr><td>Pattern 3b</td><td>AWB primero, coma, ULD piezas</td><td><code>045-22417080 1225, PAG62640R7 89 PCS</code></td></tr>
+  </tbody>
+</table>
+
+<h3>7c.5 Matching de AWBs</h3>
+<p>El agente busca el booking correspondiente en 3 pasos:</p>
+<ol>
+  <li><strong>Step 1 — awb_lines match:</strong> Busca el AWB en <code>awb_lines[].awb_2nd_leg</code> o <code>awb_lines[].awb_number</code>. Si encuentra, <code>awb_line_index &gt;= 0</code>.</li>
+  <li><strong>Step 1b — Simple booking match:</strong> Busca en <code>awb_2nd_leg</code> o <code>awb_1st_leg</code> a nivel documento para bookings tipo <code>simple</code>. Si encuentra, <code>awb_line_index = -2</code>.</li>
+  <li><strong>Step 2 — MAWB match:</strong> Busca el AWB como <code>mawb_number</code>. Si encuentra, <code>awb_line_index = -1</code>.</li>
+  <li><strong>Step 3 — Fuzzy match:</strong> Busca sufijo numerico del AWB (ultimos 8 digitos) en cualquier campo.</li>
+</ol>
+
+<h3>7c.6 Deduplicacion ULD</h3>
+<p>Para evitar doble-conteo cuando el mismo ULD aparece en multiples emails:</p>
+<ul>
+  <li>El agente mantiene un set de <code>processed_ulds</code> por AWB</li>
+  <li>Si un ULD ya fue procesado para ese AWB, se ignora</li>
+  <li>El campo <code>screening_events</code> registra cada evento individual</li>
+</ul>
+
+<h3>7c.7 Retry de Eventos No Matcheados</h3>
+<p>Antes de procesar nuevos emails, el agente reintenta eventos con status <code>unmatched</code> o <code>error</code>. Esto permite que AWBs creados despues del email se asocien retroactivamente.</p>
+
+<h3>7c.8 Secrets (Secret Manager)</h3>
+<table>
+  <thead><tr><th>Secret</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td><code>GMAIL_CLIENT_ID</code></td><td>OAuth client ID para Gmail API</td></tr>
+    <tr><td><code>GMAIL_CLIENT_SECRET</code></td><td>OAuth client secret para Gmail API</td></tr>
+    <tr><td><code>GMAIL_REFRESH_TOKEN</code></td><td>Refresh token de la cuenta de screening</td></tr>
+    <tr><td><code>GMAIL_USER</code></td><td>Cuenta de email para envio de notificaciones</td></tr>
+    <tr><td><code>GMAIL_APP_PASSWORD</code></td><td>App password para envio SMTP</td></tr>
+    <tr><td><code>ANTHROPIC_API_KEY</code></td><td>API key de Claude (usado en AWB Cut, no en screening)</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================= -->
+<!-- SECTION 7d — BILLING -->
+<!-- ============================================================= -->
+<h2 id="sec7d">7d. Billing y Facturacion Airfreight</h2>
+
+<h3>7d.1 Vision General</h3>
+<p>El sistema de billing genera cargos automaticos al despachar un vuelo y permite agregar cargos manuales. Los cargos se agrupan por vuelo+cliente para generar facturas.</p>
+<p><strong>Archivo principal:</strong> <code>src/lib/airBilling.ts</code></p>
+
+<h3>7d.2 Flujo de Billing</h3>
+<div class="diagram"><pre>
+  DISPATCH            CARGOS AUTO         CARGOS MANUALES        FACTURA
+  (Dashboard)        (por AWB/booking)    (por agente)          (por vuelo+cliente)
+       |                   |                    |                     |
+  calculateAir        air_billing_charges   addManualAir         generateAir
+  freightCharges()    source: "auto"        Charge()             Invoice()
+       |              status: "pending"          |               invoice_number
+       |                   |                    |               charge_ids[]
+       v                   v                    v                     v
+  Evalua client.     BUILD UP + K9 +      Service catalog      air_invoices
+  billing config     DROP OFF, PICK UP,   (air_rate_schedule)  status: generated
+  (tarifas, tipo)    BREAKDOWN, etc.                           → sent → paid
+</pre></div>
+
+<h3>7d.3 Tipos de Cargo Automatico</h3>
+<p>Se generan segun la configuracion de billing del cliente (<code>airfreight_clients.billing</code>):</p>
+<table>
+  <thead><tr><th>#</th><th>Cargo</th><th>Condicion</th><th>Unidad</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><strong>BUILD UP + K9 SCREENING + DROP OFF</strong></td><td>deliver_to = aerolinea O flat rate configurada</td><td>KG (CW x rate)</td></tr>
+    <tr><td>2</td><td><strong>HANDLING LOOSE</strong></td><td>deliver_to = direccion, sin flat rate</td><td>KG</td></tr>
+    <tr><td>3</td><td><strong>DROP OFF LOOSE</strong></td><td>deliver_to = direccion, sin flat rate</td><td>KG</td></tr>
+    <tr><td>4</td><td><strong>PICK UP</strong></td><td>Cargo LOOSE</td><td>KG</td></tr>
+    <tr><td>5</td><td><strong>PICK UP - BUP</strong></td><td>Cargo BUP</td><td>QTY (flat por AWB)</td></tr>
+    <tr><td>6</td><td><strong>BREAKDOWN</strong></td><td>Cargo BUP</td><td>KG</td></tr>
+    <tr><td>7</td><td><strong>WOODEN PALLET</strong></td><td>Cargo LOOSE</td><td>QTY (piezas/16)</td></tr>
+    <tr><td>8</td><td><strong>BUILD UP WOODEN PALLET</strong></td><td>Airlines especificas</td><td>QTY (CW/divisor x multiplicador)</td></tr>
+  </tbody>
+</table>
+
+<h3>7d.4 Configuracion de Billing por Cliente</h3>
+<p>Cada cliente tiene un objeto <code>billing</code> dentro de <code>airfreight_clients</code> con estos campos clave:</p>
+<ul>
+  <li><code>auto_charges_enabled</code>: Activa/desactiva cargos automaticos</li>
+  <li><code>all_in_flat_rate</code>: Tarifa plana ALL-IN (ej: Merflex $0.17/kg)</li>
+  <li><code>handling_bup_rate</code>: Tarifa handling BUP</li>
+  <li><code>handling_bup_overrides</code>: Overrides por aerolinea</li>
+  <li><code>screening_rate</code>, <code>drop_off_bup_rate</code>: Componentes del ALL-IN</li>
+  <li><code>handling_loose_enabled/rate</code>: Handling para LOOSE</li>
+  <li><code>pickup_loose_enabled/rate</code>: Pick up para LOOSE</li>
+  <li><code>breakdown_enabled/rate</code>: Breakdown para BUP</li>
+  <li><code>payment_terms_days</code>: Dias de pago (default 30)</li>
+  <li><code>company_legal_name</code>, <code>billing_address</code>: Datos de facturacion</li>
+</ul>
+
+<h3>7d.5 Facturacion</h3>
+<p>Funciones principales en <code>airBilling.ts</code>:</p>
+<table>
+  <thead><tr><th>Funcion</th><th>Descripcion</th></tr></thead>
+  <tbody>
+    <tr><td><code>calculateAirfreightCharges()</code></td><td>Genera cargos auto al despachar</td></tr>
+    <tr><td><code>addManualAirCharge()</code></td><td>Agrega cargo manual (agente selecciona servicio)</td></tr>
+    <tr><td><code>undoDispatchCharges()</code></td><td>Elimina cargos auto pendientes (al reabrir)</td></tr>
+    <tr><td><code>recalculateAutoCharges()</code></td><td>Recalcula cargos auto para vuelo+cliente</td></tr>
+    <tr><td><code>generateAirInvoice()</code></td><td>Genera factura con numero secuencial (C00000XXXXX)</td></tr>
+    <tr><td><code>voidAirInvoice()</code></td><td>Anula factura, cargos vuelven a pending</td></tr>
+    <tr><td><code>unlockAirInvoice()</code></td><td>Desbloquea para edicion (draft)</td></tr>
+    <tr><td><code>resealAirInvoice()</code></td><td>Re-sella invoice draft con cargos actuales</td></tr>
+    <tr><td><code>checkBillingReviewNeeded()</code></td><td>Verifica si facturas existentes necesitan revision tras re-dispatch</td></tr>
+  </tbody>
+</table>
+
+<h3>7d.6 Determinacion de Cargo Type</h3>
+<ul>
+  <li>Si <code>uld_type</code> esta vacio o es "LOOSE" → <code>LOOSE</code></li>
+  <li>Cualquier otro valor de <code>uld_type</code> → <code>BUP</code></li>
+</ul>
+
+<h3>7d.7 Deteccion deliver_to</h3>
+<p>La funcion <code>isDeliverToAirline()</code> determina si la entrega es a una aerolinea o a una direccion fisica:</p>
+<ul>
+  <li>Sin <code>deliver_to</code> → asume aerolinea</li>
+  <li>Contiene patrones de direccion (numeros + AVE/STREET/etc.) → direccion</li>
+  <li>Contiene nombre de aerolinea conocida → aerolinea</li>
+  <li>Esto afecta si se genera ALL-IN o Handling Loose + Drop Off Loose</li>
+</ul>
+
+<!-- ============================================================= -->
+<!-- SECTION 8 -->
+<!-- ============================================================= -->
+<h2 id="sec8">8. Mantenimiento y Soporte</h2>
+
+<h3>8.1 Levantar Entorno Local</h3>
+<p><strong>Prerrequisitos:</strong> Node.js 22+, npm, Firebase CLI (<code>npm install -g firebase-tools</code>), Git</p>
+<pre>
+# 1. Clonar repositorio
+git clone &lt;repo-url&gt; mcl-wms
+cd mcl-wms
+
+# 2. Instalar dependencias frontend
+npm install
+
+# 3. Configurar variables de entorno
+cp .env.example .env
+# Editar .env con las credenciales de Firebase
+# (solicitar a admin las credenciales del proyecto wms-mcl)
+
+# 4. Iniciar servidor de desarrollo
+npm run dev
+# Abre http://localhost:5173
+
+# 5. (Opcional) Instalar dependencias de Cloud Functions
+cd functions && npm install && cd ..
+
+# 6. (Opcional) Iniciar emuladores Firebase
+firebase emulators:start --only storage
+# Storage emulator en localhost:9199, UI en localhost:4000
+</pre>
+
+<h3>8.2 Estructura del Repositorio</h3>
+<pre>
+mcl-wms/
+  src/
+    App.tsx              # Router principal (67 rutas lazy-loaded)
+    main.tsx             # Entry point React
+    index.css            # Estilos globales (Tailwind)
+    components/          # 6 componentes compartidos
+    contexts/            # AuthContext (393 lineas)
+    data/                # Seed data (clientes, vendors, emails)
+    lib/                 # Logica de negocio (13 archivos, ~1800 lineas)
+    pages/               # ~67 paginas organizadas por modulo
+    types/               # Definiciones TypeScript (1267 lineas)
+  functions/
+    index.js             # Cloud Functions (1430 lineas)
+  firebase/
+    firestore.rules      # Reglas Firestore (283 lineas)
+    storage.rules        # Reglas Storage (79 lineas)
+  docs/                  # Documentacion y prototipos
+  public/                # Assets estaticos
+</pre>
+
+<h3>8.3 Depuracion de Errores Comunes</h3>
+<table>
+  <thead><tr><th>Problema</th><th>Causa Probable</th><th>Solucion</th></tr></thead>
+  <tbody>
+    <tr><td>"Permission denied" en Firestore</td><td>Reglas de seguridad rechazan operacion</td><td>Verificar rol en <code>user_roles/{uid}</code>. Verificar <code>client_id</code> matches.</td></tr>
+    <tr><td>Login con Google falla</td><td>In-app browser (WhatsApp, Instagram)</td><td>Abrir en Chrome/Safari externo</td></tr>
+    <tr><td>Screening no procesa emails</td><td>Token Gmail expirado</td><td>Verificar <code>GMAIL_REFRESH_TOKEN</code> en Secret Manager. Regenerar.</td></tr>
+    <tr><td>WR con numero duplicado</td><td>Race condition en secuencia</td><td><code>runTransaction()</code> previene esto. Verificar <code>config/wr_sequence</code>.</td></tr>
+    <tr><td>PDF no se genera</td><td><code>html2pdf.js</code> falla en ciertos navegadores</td><td>Usar Chrome. Verificar que no haya AdBlocker.</td></tr>
+    <tr><td>Build falla</td><td>Dependencias desactualizadas</td><td><code>rm -rf node_modules && npm install</code></td></tr>
+    <tr><td>Cloud Function timeout</td><td>Proceso tarda &gt;540s</td><td>Revisar logs en Cloud Console. Optimizar queries.</td></tr>
+    <tr><td>Cargos no se generan al dispatch</td><td>Rate schedule no configurado</td><td>Verificar <code>air_rate_schedule</code>, overrides y config del cliente.</td></tr>
+  </tbody>
+</table>
+
+<h3>8.4 Monitoreo y Logs</h3>
+<table>
+  <thead><tr><th>Herramienta</th><th>URL / Comando</th><th>Que Monitorear</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Firebase Console</strong></td><td>console.firebase.google.com/project/wms-mcl</td><td>Firestore, Auth, Storage, Functions</td></tr>
+    <tr><td><strong>Cloud Functions Logs</strong></td><td>Console &gt; Functions &gt; Logs</td><td>Errores de screening, timeouts</td></tr>
+    <tr><td><strong>Firestore Usage</strong></td><td>Console &gt; Firestore &gt; Usage</td><td>Reads/writes/deletes por dia</td></tr>
+    <tr><td><strong>Google Cloud Logging</strong></td><td>console.cloud.google.com</td><td>Logs detallados, metricas</td></tr>
+  </tbody>
+</table>
+<div class="note"><strong>Diagnostico del Screening Agent:</strong> La coleccion <code>screening_settings/config</code> tiene el campo <code>last_run_diag</code> con detalle por email procesado. Outcomes: <code>processed</code>, <code>already_processed</code>, <code>no_pdf</code>, <code>no_awb_lines</code>, <code>exception</code>.</div>
+
+<h3>8.5 Escalabilidad</h3>
+<table>
+  <thead><tr><th>Componente</th><th>Limite Actual</th><th>Como Escalar</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Firestore</strong></td><td>10K writes/sec, 1 write/doc/sec</td><td>Sharding, batch writes, denormalizacion</td></tr>
+    <tr><td><strong>Cloud Functions</strong></td><td>1000 instancias concurrentes</td><td>Aumentar cuota en Cloud Console</td></tr>
+    <tr><td><strong>Storage</strong></td><td>5TB por bucket (Blaze)</td><td>Sin limite practico con Blaze</td></tr>
+    <tr><td><strong>Hosting</strong></td><td>CDN global, auto-scaling</td><td>Sin accion necesaria</td></tr>
+    <tr><td><strong>Auth</strong></td><td>10K users (free tier)</td><td>Escala con Blaze</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================= -->
+<!-- SECTION 9 -->
+<!-- ============================================================= -->
+<h2 id="sec9">9. Riesgos Tecnicos y Recomendaciones</h2>
+
+<h3>9.1 Puntos Fuertes del Sistema</h3>
+<table>
+  <thead><tr><th>Fortaleza</th><th>Detalle</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Backups automaticos de Firestore</strong></td><td>Export diario a las 5:00 AM UTC al bucket <code>gs://wms-mcl-firestore-backups</code>. Todas las colecciones, ~32 MB, ~3,000 docs. Verificar periodicamente que los exports se ejecuten.</td></tr>
+    <tr><td><strong>Codigo versionado en GitHub</strong></td><td>Repositorio privado en <code>github.com/MinCurllogistics/mcl-wms</code>. Trazabilidad completa de cambios. Acceso para multiples desarrolladores.</td></tr>
+    <tr><td><strong>Infraestructura serverless</strong></td><td>Firebase Hosting + Cloud Functions. Escala automaticamente, sin servidores que mantener.</td></tr>
+    <tr><td><strong>Screening automatizado</strong></td><td>Agente que procesa emails K9 cada 5 minutos, con retry de eventos no matcheados y deduplicacion ULD.</td></tr>
+    <tr><td><strong>Billing automatico</strong></td><td>Cargos generados al despachar vuelo, con recalculo, revision de facturas y soporte para cargos manuales.</td></tr>
+  </tbody>
+</table>
+
+<h3>9.2 Riesgos Actuales</h3>
+<table>
+  <thead><tr><th>#</th><th>Riesgo</th><th>Severidad</th><th>Impacto</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><strong>Sin entorno de staging</strong></td><td><span class="sev-high">ALTO</span></td><td>Cambios se prueban directamente en produccion</td></tr>
+    <tr><td>2</td><td><strong>Secretos en .env local</strong> (Vision API key)</td><td><span class="sev-medium">MEDIO</span></td><td>Exposicion si el .env se comparte o commitea</td></tr>
+    <tr><td>3</td><td><strong>delivery_tracking permite update publico</strong></td><td><span class="sev-medium">MEDIO</span></td><td>Cualquiera puede modificar datos de tracking</td></tr>
+    <tr><td>4</td><td><strong>driver_queue permite create publico</strong></td><td><span class="sev-medium">MEDIO</span></td><td>Posible spam de entradas falsas</td></tr>
+    <tr><td>5</td><td><strong>vendors permite read publico</strong></td><td><span class="sev-low">BAJO</span></td><td>Lista de proveedores expuesta</td></tr>
+    <tr><td>6</td><td><strong>Sin tests automatizados</strong></td><td><span class="sev-high">ALTO</span></td><td>Riesgo de regresion en cada cambio</td></tr>
+    <tr><td>7</td><td><strong>Sin CI/CD pipeline</strong></td><td><span class="sev-high">ALTO</span></td><td>Deploys manuales propensos a error</td></tr>
+    <tr><td>8</td><td><strong>Dependencia de un solo desarrollador</strong></td><td><span class="sev-critical">CRITICO</span></td><td>Conocimiento no documentado (mitigado por este doc)</td></tr>
+    <tr><td>9</td><td><strong>Anthropic API key en Firestore</strong></td><td><span class="sev-medium">MEDIO</span></td><td>Deberia estar en Secret Manager</td></tr>
+    <tr><td>10</td><td><strong>html2pdf.js desde CDN externo</strong></td><td><span class="sev-low">BAJO</span></td><td>Dependencia de disponibilidad de CDN</td></tr>
+  </tbody>
+</table>
+
+<h3>9.3 Dependencias Criticas</h3>
+<table>
+  <thead><tr><th>Dependencia</th><th>Riesgo si Falla</th><th>Mitigacion</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Firebase (todos)</strong></td><td>Sistema completamente offline</td><td>Google SLA 99.95%. Plan de contingencia manual.</td></tr>
+    <tr><td><strong>Gmail API</strong></td><td>Screening agent deja de funcionar</td><td>Monitorear <code>last_run_status</code>. Renovar tokens.</td></tr>
+    <tr><td><strong>Phantom K9 email format</strong></td><td>Parser de screening falla</td><td>Regex robustos. Alertar ante formato desconocido.</td></tr>
+    <tr><td><strong>Claude API (Anthropic)</strong></td><td>AWB Cut deja de funcionar</td><td>Proceso manual como fallback.</td></tr>
+    <tr><td><strong>Dominio @mincurllogistics.com</strong></td><td>Auth MCL falla</td><td>Mantener DNS activo.</td></tr>
+  </tbody>
+</table>
+
+<h3>9.4 Puntos Unicos de Falla (SPOF)</h3>
+<ol>
+  <li><strong>Proyecto Firebase <code>wms-mcl</code>:</strong> Todo el sistema depende de este unico proyecto GCP.</li>
+  <li><strong>Cuenta Gmail de screening:</strong> Si se bloquea, el agente se detiene.</li>
+  <li><strong>Refresh token de Gmail:</strong> Si expira y no se renueva, screening y alertas fallan.</li>
+  <li><strong>Equipo de deploy:</strong> Codigo en GitHub pero deploy aun manual via CLI. Implementar CI/CD.</li>
+  <li><strong>Dominio MCL:</strong> Si el dominio expira, la autenticacion SSO falla.</li>
+</ol>
+
+<h3>9.5 Recomendaciones Prioritarias</h3>
+
+<h4><span class="sev-high">ALTO</span> — Implementar a corto plazo</h4>
+
+<p><strong>1. CI/CD con GitHub Actions</strong></p>
+<ul>
+  <li>Build automatico en cada push a <code>main</code></li>
+  <li>Deploy automatico a Firebase Hosting</li>
+  <li>Deploy de Functions con aprobacion manual</li>
+  <li>Elimina dependencia de laptop personal</li>
+</ul>
+
+<p><strong>2. Entorno de staging</strong></p>
+<ul>
+  <li>Crear segundo proyecto Firebase: <code>wms-mcl-staging</code></li>
+  <li>Deploy automatico de branches a Preview Channels</li>
+  <li>Probar cambios antes de produccion</li>
+</ul>
+
+<h4><span class="sev-high">ALTO</span> — Implementar en 30 dias</h4>
+
+<p><strong>3. Tests automatizados</strong></p>
+<ul>
+  <li>Unit tests para logica de billing (<code>billing.ts</code>, <code>airBilling.ts</code>)</li>
+  <li>Integration tests para Cloud Functions (screening parser)</li>
+  <li>E2E tests basicos para flujos criticos</li>
+</ul>
+
+<p><strong>5. Mover Anthropic API key a Secret Manager</strong></p>
+<ul><li>Eliminar de <code>config/anthropic_key</code> en Firestore. Agregar como Firebase Secret.</li></ul>
+
+<p><strong>6. Endurecer reglas de seguridad</strong></p>
+<ul>
+  <li><code>delivery_tracking</code>: Limitar updates a drivers con PIN valido</li>
+  <li><code>driver_queue</code>: Rate limiting o validacion de datos minimos</li>
+  <li><code>vendors</code>: Cambiar de <code>read: if true</code> a <code>read: if isLoggedIn()</code></li>
+</ul>
+
+<h4><span class="sev-medium">MEDIO</span> — Implementar en 90 dias</h4>
+
+<p><strong>7. Monitoreo y alertas</strong></p>
+<ul>
+  <li>Alertas de Cloud Monitoring para errores en Functions</li>
+  <li>Alerta si <code>processScreeningEmails</code> falla 2+ veces consecutivas</li>
+</ul>
+
+<p><strong>8. Documentacion de API interna</strong></p>
+<ul>
+  <li>Documentar formato esperado de emails de Phantom K9</li>
+  <li>Mantener <code>types/index.ts</code> como source of truth</li>
+</ul>
+
+<p><strong>9. Optimizacion de rendimiento</strong></p>
+<ul>
+  <li>Paginacion en listas grandes</li>
+  <li>Lazy loading de fotos/PDFs</li>
+  <li>Cache con React Query o SWR</li>
+</ul>
+
+<p><strong>10. Control de versiones de reglas</strong></p>
+<ul><li>Firestore y Storage rules se deben deployar via CI/CD. Nunca editar en consola.</li></ul>
+
+<h3>9.5 Sugerencia de Stack CI/CD</h3>
+<div class="diagram"><pre>
+GitHub repo
+    |
+    +-- Push a main ----------> GitHub Actions
+    |                           |
+    |                           +-- npm ci
+    |                           +-- npm run build
+    |                           +-- npm test
+    |                           +-- firebase deploy --only hosting
+    |                           +-- firebase deploy --only firestore:rules
+    |                           +-- firebase deploy --only storage
+    |
+    +-- Push a develop -------> GitHub Actions
+                                |
+                                +-- Deploy a Preview Channel
+                                +-- Notificar en Slack/Teams
+</pre></div>
+
+<!-- ============================================================= -->
+<!-- APPENDICES -->
+<!-- ============================================================= -->
+<h2 id="appendix-a">Apendice A: Variables de Entorno</h2>
+
+<h4>Frontend (.env)</h4>
+<pre>
+VITE_FIREBASE_API_KEY=                    # Firebase Web API Key
+VITE_FIREBASE_AUTH_DOMAIN=                # {project}.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=                 # wms-mcl
+VITE_FIREBASE_STORAGE_BUCKET=             # {project}.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=        # Sender ID
+VITE_FIREBASE_APP_ID=                     # App ID
+VITE_GOOGLE_VISION_API_KEY=               # Google Vision API Key
+</pre>
+
+<h4>Cloud Functions (Firebase Secret Manager)</h4>
+<pre>
+GMAIL_CLIENT_ID          # OAuth2 Client ID
+GMAIL_CLIENT_SECRET      # OAuth2 Client Secret
+GMAIL_REFRESH_TOKEN      # Persistent refresh token
+GMAIL_USER               # Email account for SMTP
+GMAIL_APP_PASSWORD       # Gmail App-specific password
+ANTHROPIC_API_KEY        # Claude API key
+</pre>
+
+<h2 id="appendix-b">Apendice B: Comandos Utiles</h2>
+<pre>
+# Desarrollo
+npm run dev                          # Dev server (localhost:5173)
+npm run build                        # Build produccion (dist/)
+npm run preview                      # Preview del build local
+
+# Firebase
+firebase login                       # Autenticar CLI
+firebase projects:list               # Listar proyectos
+firebase deploy --only hosting       # Deploy solo frontend
+firebase deploy --only functions     # Deploy solo Cloud Functions
+firebase deploy --only firestore:rules  # Deploy reglas Firestore
+firebase deploy --only storage       # Deploy reglas Storage
+firebase deploy                      # Deploy todo
+
+# Emuladores
+firebase emulators:start --only storage  # Solo Storage emulator
+firebase emulators:start             # Todos los emuladores
+
+# Logs
+firebase functions:log               # Ver logs de Cloud Functions
+
+# Firestore Backup/Restore
+gcloud firestore export gs://bucket       # Backup
+gcloud firestore import gs://bucket/path  # Restaurar
+</pre>
+
+<h2 id="appendix-c">Apendice C: Contactos y Accesos</h2>
+<table>
+  <thead><tr><th>Recurso</th><th>Acceso</th></tr></thead>
+  <tbody>
+    <tr><td>Firebase Console</td><td>console.firebase.google.com/project/wms-mcl</td></tr>
+    <tr><td>Google Cloud Console</td><td>console.cloud.google.com (proyecto wms-mcl)</td></tr>
+    <tr><td>Repositorio Git</td><td><code>https://github.com/MinCurllogistics/mcl-wms.git</code> (privado)</td></tr>
+    <tr><td>Dominio</td><td>wms-mcl.web.app (Firebase Hosting)</td></tr>
+    <tr><td>Cuenta screening</td><td>Configurada en <code>screening_settings/config</code></td></tr>
+  </tbody>
+</table>
+
+<br>
+<hr>
+<p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:20px;">
+  Documento generado el 8 de mayo de 2026. Actualizado el 11 de mayo de 2026 (v2.0: modulo airfreight, billing, screening agent, correccion riesgos). Mantener actualizado ante cambios arquitectonicos significativos.
+</p>
+
+</div><!-- /container -->
+</body>
+</html>

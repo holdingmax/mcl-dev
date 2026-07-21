@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planning 72h — MCL WMS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: { extend: { colors: { 'mcl-blue': '#1e40af', 'mcl-light': '#3b82f6' } } }
+    }
+  </script>
+  <style>
+    .gantt-bar { position: absolute; transition: all 0.2s; }
+    .gantt-bar:hover { filter: brightness(1.1); transform: scaleY(1.05); }
+    .gantt-bar.draggable { cursor: grab; }
+    .gantt-bar.draggable:active, .gantt-bar.dragging { cursor: grabbing; opacity: 0.85; z-index: 20; transform: scaleY(1.08); transition: none; }
+    .gantt-grid-line { position: absolute; top: 0; bottom: 0; width: 1px; background: #e5e7eb; }
+    .collapse-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .collapse-content.open { max-height: 8000px; }
+    .day-section-title { font-size: 1.25rem; font-weight: 700; }
+    .day-today { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <header class="bg-mcl-blue text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <h1 class="text-lg font-bold">Planning 72h</h1>
+        <span class="text-xs bg-white/20 px-2 py-0.5 rounded">DATOS REALES — 27 Mayo 18:38</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-white/70 mr-2">diego.garcia@mincurllogistics.com</span>
+        <button onclick="openConfig()" class="px-3 py-1.5 text-xs border border-white/30 rounded-lg hover:bg-white/10 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Config
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- KPIs por dia — 3 bloques -->
+  <div class="max-w-7xl mx-auto px-4 pt-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <!-- Dia 28 -->
+      <div class="bg-white rounded-xl border p-3">
+        <div class="text-sm font-bold text-gray-800 mb-2">Mie 28 Mayo <span class="text-xs font-normal text-gray-400">(ayer)</span></div>
+        <div class="grid grid-cols-5 gap-1.5">
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Armado</div><div class="text-sm font-extrabold">34,703</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">K9</div><div class="text-sm font-extrabold text-amber-600">~6h</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Entregas</div><div class="text-sm font-extrabold text-emerald-600">2</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">H-H</div><div class="text-sm font-extrabold">63.1</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Pers</div><div class="text-sm font-extrabold">8</div></div>
+        </div>
+      </div>
+      <!-- Dia 29 -->
+      <div class="bg-blue-50 rounded-xl border border-blue-200 p-3">
+        <div class="text-sm font-bold text-blue-800 mb-2">Jue 29 Mayo <span class="text-xs font-normal text-blue-500">(hoy)</span></div>
+        <div class="grid grid-cols-5 gap-1.5">
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Armado</div><div class="text-sm font-extrabold">6,980</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Pickups</div><div class="text-sm font-extrabold text-purple-600">9</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Desp</div><div class="text-sm font-extrabold text-red-600">2</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">H-H</div><div class="text-sm font-extrabold">12.7</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Pers</div><div class="text-sm font-extrabold">4</div></div>
+        </div>
+      </div>
+      <!-- Dia 30 -->
+      <div class="bg-white rounded-xl border p-3">
+        <div class="text-sm font-bold text-gray-800 mb-2">Vie 30 Mayo <span class="text-xs font-normal text-gray-400">(manana)</span></div>
+        <div class="grid grid-cols-5 gap-1.5">
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Armado</div><div class="text-sm font-extrabold">20,492</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Pickups</div><div class="text-sm font-extrabold text-purple-600">2</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Desp</div><div class="text-sm font-extrabold">1</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">H-H</div><div class="text-sm font-extrabold">37.3</div></div>
+          <div class="text-center"><div class="text-[9px] text-gray-400 uppercase">Pers</div><div class="text-sm font-extrabold">5</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 72h Gantt -->
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="bg-white rounded-xl border p-4 mb-2">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Timeline 72h — 28-29-30 Mayo</h3>
+      <div class="overflow-x-auto">
+        <!-- 72h = 3 days, each 33.33%. Using operational window 04:00-22:00 per day -->
+        <!-- Total width: 2400px for comfortable display -->
+        <div style="min-width:2000px">
+          <!-- Day headers -->
+          <div class="flex mb-0.5 ml-[120px]">
+            <div class="flex-1 text-center text-xs font-bold text-gray-600 border-b-2 border-blue-200 py-1 bg-blue-50/50 rounded-t">MIE 28 Mayo</div>
+            <div class="flex-1 text-center text-xs font-bold text-blue-700 border-b-2 border-blue-500 py-1 bg-blue-100/50 rounded-t">JUE 29 Mayo (hoy)</div>
+            <div class="flex-1 text-center text-xs font-bold text-gray-600 border-b-2 border-blue-200 py-1 bg-blue-50/50 rounded-t">VIE 30 Mayo</div>
+          </div>
+          <!-- Hour headers: 04-22 per day = 18h x 3 = 54 ticks -->
+          <!-- Each day = 33.33%, each hour within day = 33.33/18 = 1.852% -->
+          <div class="flex items-end mb-1 ml-[120px]">
+            <div class="flex-1 relative" style="height:14px;">
+              <!-- Day 28 hours: offset = h*1.852/100 where h=0 is 04:00 -->
+              <span class="absolute text-[8px] text-gray-400" style="left:0%">04</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:1.85%">05</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:3.7%">06</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:5.56%">07</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:7.41%">08</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:9.26%">09</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:11.11%">10</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:12.96%">11</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:14.81%">12</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:16.67%">13</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:18.52%">14</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:20.37%">15</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:22.22%">16</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:24.07%">17</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:25.93%">18</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:27.78%">19</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:29.63%">20</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:31.48%">21</span>
+              <!-- Day 29 hours: offset = 33.33 + h*1.852 -->
+              <span class="absolute text-[8px] text-gray-400" style="left:33.33%">04</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:35.19%">05</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:37.04%">06</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:38.89%">07</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:40.74%">08</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:42.59%">09</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:44.44%">10</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:46.30%">11</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:48.15%">12</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:50.00%">13</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:51.85%">14</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:53.70%">15</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:55.56%">16</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:57.41%">17</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:59.26%">18</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:61.11%">19</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:62.96%">20</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:64.81%">21</span>
+              <!-- Day 30 hours: offset = 66.67 + h*1.852 -->
+              <span class="absolute text-[8px] text-gray-400" style="left:66.67%">04</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:68.52%">05</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:70.37%">06</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:72.22%">07</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:74.07%">08</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:75.93%">09</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:77.78%">10</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:79.63%">11</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:81.48%">12</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:83.33%">13</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:85.19%">14</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:87.04%">15</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:88.89%">16</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:90.74%">17</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:92.59%">18</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:94.44%">19</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:96.30%">20</span>
+              <span class="absolute text-[8px] text-gray-400" style="left:98.15%">21</span>
+            </div>
+          </div>
+
+          <!-- UC-1105: Armado D28 06-14, K9 D28 14-18, Entrega D28 18-19, Despacho D29 06-08 -->
+          <!-- h_from_04 * 1.852% + day_offset. Day28=0, Day29=33.33, Day30=66.67 -->
+          <!-- D28 06:00 = 2*1.852=3.70%, D28 14:00=10*1.852=18.52%, etc -->
+          <div class="flex items-center mb-0.5">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <div class="text-[11px] font-semibold text-gray-700">UC-1105</div>
+              <div class="text-[9px] text-gray-400">EZE 25,433kg</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <!-- Day separators -->
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:66.67%"></div>
+              <!-- Armado D28 06-14: left=3.70%, width=14.81% (8h) -->
+              <div class="gantt-bar h-3.5 bg-blue-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:3.70%;width:14.81%;top:2px" title="Armado: D28 06:00-14:00 | 25,433 kg">ARMADO</div>
+              <!-- K9 D28 14-18: left=18.52%, width=7.41% (4h) -->
+              <div class="gantt-bar h-3.5 bg-amber-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:18.52%;width:7.41%;top:2px" title="K9: D28 14:00-18:00 | 4h">K9</div>
+              <!-- Entrega D28 18-19: left=25.93%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:25.93%;width:1.85%;top:2px" title="Entrega LATAM CAO: D28 18:00-19:00">E</div>
+              <!-- Despacho D29 06-08: left=37.04%, width=3.70% -->
+              <div class="gantt-bar h-3.5 bg-red-200 border border-red-400 rounded text-[7px] text-red-800 flex items-center justify-center font-medium" style="left:37.04%;width:3.70%;top:2px" title="Despacho ETD 29@10:05">DESP</div>
+              <!-- ETD marker D29 10:05: left=44.61% -->
+              <div class="absolute top-0 bottom-0 w-0.5 bg-gray-800 z-10" style="left:44.61%"><div class="absolute -bottom-2 -left-2 text-[6px] text-gray-600 font-bold">ETD</div></div>
+            </div>
+          </div>
+
+          <!-- QT-4099: Armado D28 06-10, K9 D28 10-12, Entrega D28 12-13, Despacho D29 -->
+          <div class="flex items-center mb-0.5">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <div class="text-[11px] font-semibold text-gray-700">QT-4099</div>
+              <div class="text-[9px] text-gray-400">EZE 9,270kg</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:66.67%"></div>
+              <!-- Armado D28 06-10: left=3.70%, width=7.41% -->
+              <div class="gantt-bar h-3.5 bg-blue-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:3.70%;width:7.41%;top:2px" title="Armado: D28 06:00-10:00 | 9,270 kg">ARMADO</div>
+              <!-- K9 D28 10-12: left=11.11%, width=3.70% -->
+              <div class="gantt-bar h-3.5 bg-amber-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:11.11%;width:3.70%;top:2px" title="K9: D28 10:00-12:00 | 2h">K9</div>
+              <!-- Entrega D28 12-13: left=14.81%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:14.81%;width:1.85%;top:2px" title="Entrega AVIANCA: D28 12:00-13:00">E</div>
+              <!-- Despacho D29 06-08: left=37.04%, width=3.70% -->
+              <div class="gantt-bar h-3.5 bg-red-200 border border-red-400 rounded text-[7px] text-red-800 flex items-center justify-center font-medium" style="left:37.04%;width:3.70%;top:2px" title="Despacho ETD 29 TBD">DESP</div>
+            </div>
+          </div>
+
+          <!-- UC-1617: Armado D29 08-12, K9 D29 12-14, Entrega D29 14-15, Despacho D30 -->
+          <div class="flex items-center mb-0.5">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <div class="text-[11px] font-semibold text-gray-700">UC-1617</div>
+              <div class="text-[9px] text-gray-400">MVD 6,980kg</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:66.67%"></div>
+              <!-- Armado D29 08-12: left=33.33+7.41=40.74%, width=7.41% -->
+              <div class="gantt-bar h-3.5 bg-blue-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:40.74%;width:7.41%;top:2px" title="Armado: D29 08:00-12:00 | 6,980 kg">ARMADO</div>
+              <!-- K9 D29 12-14: left=48.15%, width=3.70% -->
+              <div class="gantt-bar h-3.5 bg-amber-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:48.15%;width:3.70%;top:2px" title="K9: D29 12:00-14:00 | 2h">K9</div>
+              <!-- Entrega D29 14-15: left=51.85%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:51.85%;width:1.85%;top:2px" title="Entrega LATAM CAO: D29 14:00-15:00">E</div>
+              <!-- Despacho D30 06-08: left=70.37%, width=3.70% -->
+              <div class="gantt-bar h-3.5 bg-red-200 border border-red-400 rounded text-[7px] text-red-800 flex items-center justify-center font-medium" style="left:70.37%;width:3.70%;top:2px" title="Despacho ETD 30@15:00">DESP</div>
+              <!-- ETD D30 15:00: left=87.04% -->
+              <div class="absolute top-0 bottom-0 w-0.5 bg-gray-800 z-10" style="left:87.04%"><div class="absolute -bottom-2 -left-2 text-[6px] text-gray-600 font-bold">ETD</div></div>
+            </div>
+          </div>
+
+          <!-- QT-4091: Armado D30 06-12, K9 D30 12-15, Entrega D30 15-16 -->
+          <div class="flex items-center mb-0.5">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <div class="text-[11px] font-semibold text-gray-700">QT-4091</div>
+              <div class="text-[9px] text-gray-400">MVD 14,967kg</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:66.67%"></div>
+              <!-- Armado D30 06-12: left=70.37%, width=11.11% -->
+              <div class="gantt-bar h-3.5 bg-blue-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:70.37%;width:11.11%;top:2px" title="Armado: D30 06:00-12:00 | 14,967 kg">ARMADO</div>
+              <!-- K9 D30 12-15: left=81.48%, width=5.56% -->
+              <div class="gantt-bar h-3.5 bg-amber-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:81.48%;width:5.56%;top:2px" title="K9: D30 12:00-15:00 | 3h">K9</div>
+              <!-- Entrega D30 15-16: left=87.04%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:87.04%;width:1.85%;top:2px" title="Entrega AVIANCA: D30 15:00-16:00">E</div>
+            </div>
+          </div>
+
+          <!-- LA-0543: Armado D30 06-09, K9 D30 09-11, Entrega D30 11-12 -->
+          <div class="flex items-center mb-0.5">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <div class="text-[11px] font-semibold text-gray-700">LA-0543</div>
+              <div class="text-[9px] text-gray-400">EZE 5,525kg</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:66.67%"></div>
+              <!-- Armado D30 06-09: left=70.37%, width=5.56% -->
+              <div class="gantt-bar h-3.5 bg-blue-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:70.37%;width:5.56%;top:2px" title="Armado: D30 06:00-09:00 | 5,525 kg">ARMADO</div>
+              <!-- K9 D30 09-11: left=75.93%, width=3.70% -->
+              <div class="gantt-bar h-3.5 bg-amber-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:75.93%;width:3.70%;top:2px" title="K9: D30 09:00-11:00 | 2h">K9</div>
+              <!-- Entrega D30 11-12: left=79.63%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-500 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:79.63%;width:1.85%;top:2px" title="Entrega LATAM PAX: D30 11:00-12:00">E</div>
+            </div>
+          </div>
+
+          <!-- Pickups row -->
+          <div class="flex items-center mb-0.5">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <div class="text-[11px] font-semibold text-purple-600">PICKUPS</div>
+              <div class="text-[9px] text-gray-400">11 guias total</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-10" style="left:66.67%"></div>
+              <!-- D29 pickups 07-16: left=38.89%, width=16.67% (9h) -->
+              <div class="gantt-bar h-3.5 bg-purple-400 rounded text-[7px] text-white flex items-center justify-center font-medium" style="left:38.89%;width:16.67%;top:2px" title="9 pickups D29: WFS x7, AGI x1, LATAM x1 | 20,492 kg">9 PU (07-16)</div>
+              <!-- D30 pickups 07-10: left=72.22%, width=5.56% -->
+              <div class="gantt-bar h-3.5 bg-purple-300 rounded text-[7px] text-purple-800 flex items-center justify-center font-medium" style="left:72.22%;width:5.56%;top:2px" title="2 pickups D30: WFS, NAS | 5,500 kg">2 PU</div>
+            </div>
+          </div>
+
+          <!-- K9 Pool -->
+          <!-- Legend -->
+          <div class="flex items-center gap-4 mt-2 mb-1 ml-[120px] flex-wrap">
+            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-blue-500 rounded"></div><span class="text-[9px] text-gray-500">Armado</span></div>
+            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-amber-500 rounded"></div><span class="text-[9px] text-gray-500">K9</span></div>
+            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-emerald-500 rounded"></div><span class="text-[9px] text-gray-500">Entrega</span></div>
+            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-purple-400 rounded"></div><span class="text-[9px] text-gray-500">Recogida</span></div>
+            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-red-200 border border-red-400 rounded"></div><span class="text-[9px] text-gray-500">Despacho</span></div>
+            <div class="flex items-center gap-1"><div class="w-0.5 h-3 bg-gray-800"></div><span class="text-[9px] text-gray-500">ETD</span></div>
+          </div>
+
+          <div class="border-t mt-1.5 pt-1.5">
+            <div class="flex items-center h-7">
+              <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+                <div class="text-[11px] font-semibold text-amber-600">K9 POOL</div>
+                <div class="text-[9px] text-gray-400">~11h total</div>
+              </div>
+              <div class="flex-1 relative bg-amber-50 rounded h-5 border border-amber-200">
+                <div class="absolute top-0 bottom-0 w-px bg-amber-400 z-10" style="left:33.33%"></div>
+                <div class="absolute top-0 bottom-0 w-px bg-amber-400 z-10" style="left:66.67%"></div>
+                <!-- D28: QT 10-12 + UC 14-18 = 6h -->
+                <div class="gantt-bar top-0.5 h-4 bg-amber-400/70 rounded text-[7px] text-amber-900 flex items-center justify-center font-medium" style="left:11.11%;width:3.70%">2h</div>
+                <div class="gantt-bar top-0.5 h-4 bg-amber-400/70 rounded text-[7px] text-amber-900 flex items-center justify-center font-medium" style="left:18.52%;width:7.41%">4h</div>
+                <!-- D29: UC-1617 12-14 = 2h -->
+                <div class="gantt-bar top-0.5 h-4 bg-amber-400/70 rounded text-[7px] text-amber-900 flex items-center justify-center font-medium" style="left:48.15%;width:3.70%">2h</div>
+                <!-- D30: LA 09-11 + QT 12-15 = 5h -->
+                <div class="gantt-bar top-0.5 h-4 bg-amber-400/70 rounded text-[7px] text-amber-900 flex items-center justify-center font-medium" style="left:75.93%;width:3.70%">2h</div>
+                <div class="gantt-bar top-0.5 h-4 bg-amber-400/70 rounded text-[7px] text-amber-900 flex items-center justify-center font-medium" style="left:81.48%;width:5.56%">3h</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transport rows -->
+          <div class="border-t mt-1.5 pt-1.5">
+            <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide ml-[120px] mb-1">Plan de Transporte</div>
+          </div>
+
+          <!-- COT1 -->
+          <div class="flex items-center mb-0.5" id="truck-row-0">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <input type="text" value="COT1" class="w-16 text-[11px] font-semibold text-gray-700 text-right border-0 bg-transparent focus:border-b focus:border-blue-400 outline-none" title="Editar nombre camion">
+              <div class="text-[9px] text-gray-400">06:00-18:00</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-5" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-5" style="left:66.67%"></div>
+              <!-- D28: Entrega QT 12-13: left=14.81%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:14.81%;width:1.85%;top:2px" title="Entrega QT-4099 AVIANCA: D28 12:00-13:00">E-QT</div>
+              <!-- D28: Entrega UC 18-19: left=25.93%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:25.93%;width:1.85%;top:2px" title="Entrega UC-1105 LATAM: D28 18:00-19:00">E-UC</div>
+              <!-- D29: PU WFS 07-08:30: left=38.89%, width=2.78% -->
+              <div class="gantt-bar h-3.5 bg-purple-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:38.89%;width:2.78%;top:2px" title="PU-1 WFS: D29 07:00-08:30">PU-1</div>
+              <!-- D29: PU WFS 09-10:30: left=42.59%, width=2.78% -->
+              <div class="gantt-bar h-3.5 bg-purple-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:42.59%;width:2.78%;top:2px" title="PU-2 WFS: D29 09:00-10:30">PU-2</div>
+              <!-- D29: Entrega UC-1617 14-15: left=51.85%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:51.85%;width:1.85%;top:2px" title="Entrega UC-1617 LATAM: D29 14:00-15:00">E-1617</div>
+            </div>
+          </div>
+
+          <!-- COT2 -->
+          <div class="flex items-center mb-0.5" id="truck-row-1">
+            <div class="w-[120px] flex-shrink-0 pr-2 text-right">
+              <input type="text" value="COT2" class="w-16 text-[11px] font-semibold text-gray-700 text-right border-0 bg-transparent focus:border-b focus:border-blue-400 outline-none" title="Editar nombre camion">
+              <div class="text-[9px] text-gray-400">06:00-18:00</div>
+            </div>
+            <div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-5" style="left:33.33%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-blue-300 z-5" style="left:66.67%"></div>
+              <!-- D29: PU WFS 11-12:30: left=46.30%, width=2.78% -->
+              <div class="gantt-bar h-3.5 bg-purple-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:46.30%;width:2.78%;top:2px" title="PU-3 WFS: D29 11:00-12:30">PU-3</div>
+              <!-- D29: PU AGI 08-09:30: left=40.74%, width=2.78% -->
+              <div class="gantt-bar h-3.5 bg-orange-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:40.74%;width:2.78%;top:2px" title="PU AGI: D29 08:00-09:30">PU-AGI</div>
+              <!-- D30: Entrega UC-1617 06-07: left=70.37%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:70.37%;width:1.85%;top:2px" title="Entrega UC-1617 LATAM: D30 06:00-07:00">E-1617</div>
+              <!-- D30: Entrega QT-4091 15-16: left=87.04%, width=1.85% -->
+              <div class="gantt-bar h-3.5 bg-emerald-400 rounded text-[7px] text-white flex items-center justify-center font-medium draggable" style="left:87.04%;width:1.85%;top:2px" title="Entrega QT-4091 AVIANCA: D30 15:00-16:00">E-QT</div>
+            </div>
+          </div>
+
+          <div class="ml-[120px] mt-1">
+            <button onclick="addTruckRow()" class="text-[10px] text-mcl-blue hover:text-mcl-blue/80 border border-blue-200 rounded py-1 px-3 hover:bg-blue-50">+ Agregar camion</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 pb-16 pt-4">
+
+    <!-- Vuelos — lista plana ordenada por ETD -->
+    <div class="space-y-3">
+
+        <!-- UC-1105 BUILDUP + K9 + ENTREGA -->
+        <div class="bg-white rounded-xl border overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d28_uc1105')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">1. UC-1105</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">LATAM CAO</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">EZE</span>
+              <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">URGENTE</span>
+              <span class="text-xs text-gray-500">ETD <strong>10:05</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-red-600">05-28 (hoy)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500">25,433 kg | 100% on-hand | 46.2 h-h | 6 pers</span>
+              <svg id="d28_uc1105-chevron" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d28_uc1105-content" class="collapse-content open">
+            <div class="p-5 space-y-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span class="text-xs font-semibold text-gray-600 uppercase">Armado</span>
+                    <span class="text-[9px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded ml-auto">In Progress</span>
+                  </div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Kilos</span><span class="font-semibold">25,433</span></div>
+                    <div class="flex justify-between"><span>H-H</span><span class="font-semibold">46.2h</span></div>
+                    <div class="flex justify-between"><span>ULDs armados</span><span class="font-semibold text-blue-600">4 closed</span></div>
+                    <div class="flex justify-between"><span>ULDs pendientes</span><span class="font-semibold">~10</span></div>
+                    <div class="flex justify-between"><span>Personas</span><span class="font-semibold">6</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">06:00 - 16:00</span></div>
+                    <div class="flex justify-between"><span>2 BUP</span><span class="text-[10px] text-orange-600">cliente arma</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                    <span class="text-xs font-semibold text-gray-600 uppercase">K9</span>
+                  </div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>ULDs</span><span class="font-semibold">~14</span></div>
+                    <div class="flex justify-between"><span>Horas est.</span><span class="font-semibold">4-5h</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">10:00 - 15:00</span></div>
+                    <div class="flex justify-between"><span>Paralelo con armado</span><span class="font-semibold text-blue-600">Si</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <span class="text-xs font-semibold text-gray-600 uppercase">Entregas</span>
+                  </div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Destino</span><span class="font-semibold">LATAM CAO</span></div>
+                    <div class="flex justify-between"><span>RT</span><span class="font-semibold">45 min</span></div>
+                    <div class="flex justify-between"><span>Viajes</span><span class="font-semibold">3-4</span></div>
+                    <div class="flex justify-between"><span>Completar antes</span><span class="font-semibold text-red-600">22:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    <span class="text-xs font-semibold text-gray-600 uppercase">Status Carga</span>
+                  </div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>On-hand</span><span class="font-semibold text-emerald-600">100%</span></div>
+                    <div class="flex justify-between"><span>Doc recep.</span><span class="font-semibold text-emerald-600">10/10</span></div>
+                    <div class="flex justify-between"><span>Piezas</span><span class="font-semibold">1,006</span></div>
+                    <div class="flex justify-between"><span>Carga desde</span><span class="font-semibold">05-24</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AWB table -->
+              <details class="text-xs">
+                <summary class="text-gray-500 font-semibold uppercase tracking-wide cursor-pointer hover:text-gray-700">Detalle AWBs (10)</summary>
+                <table class="w-full mt-2">
+                  <thead><tr class="bg-gray-50 text-gray-500"><th class="text-left px-3 py-1.5">AWB</th><th class="text-center px-3 py-1.5">PCS</th><th class="text-center px-3 py-1.5">CW</th><th class="text-center px-3 py-1.5">Tipo</th><th class="text-left px-3 py-1.5">Pickup</th><th class="text-left px-3 py-1.5">Ready</th></tr></thead>
+                  <tbody class="divide-y">
+                    <tr><td class="px-3 py-1 font-mono">369-99784300</td><td class="text-center">49</td><td class="text-center">1,960</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-24</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-98153646</td><td class="text-center">80</td><td class="text-center">2,540</td><td class="text-center"><span class="text-orange-600 text-[10px]">BUP</span></td><td>WFS</td><td>05-24</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-98153915</td><td class="text-center">142</td><td class="text-center">2,983</td><td class="text-center"><span class="text-orange-600 text-[10px]">BUP</span></td><td>WFS</td><td>05-24</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-98061946</td><td class="text-center">103</td><td class="text-center">2,320</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-25</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-98154991</td><td class="text-center">106</td><td class="text-center">2,540</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-25</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-98061935</td><td class="text-center">138</td><td class="text-center">3,110</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-25</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-99784510</td><td class="text-center">129</td><td class="text-center">3,060</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-27</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-99784716</td><td class="text-center">55</td><td class="text-center">1,960</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-27</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-99784720</td><td class="text-center">70</td><td class="text-center">1,960</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-27</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-98155503</td><td class="text-center">134</td><td class="text-center">3,000</td><td class="text-center"><span class="text-blue-600 text-[10px]">LOOSE</span></td><td>WFS</td><td>05-27</td></tr>
+                  </tbody>
+                  <tfoot><tr class="bg-gray-800 text-white"><td class="px-3 py-1.5">10 AWBs</td><td class="text-center">1,006</td><td class="text-center">25,433</td><td class="text-center">2 BUP + 8 L</td><td colspan="2">All WFS</td></tr></tfoot>
+                </table>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- QT-4099 BUILDUP + K9 + ENTREGA -->
+        <div class="bg-white rounded-xl border overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d28_qt4099')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">2. QT-4099</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">AVIANCA</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">EZE</span>
+              <span class="text-xs text-gray-500">ETD <strong class="text-amber-600">Sin definir</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-red-600">05-28 (hoy)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500">9,270 kg | 100% on-hand | 16.9 h-h | 3 pers</span>
+              <svg id="d28_qt4099-chevron" class="w-5 h-5 text-gray-400 transition-transform -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d28_qt4099-content" class="collapse-content">
+            <div class="p-5 space-y-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Armado</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Kilos</span><span class="font-semibold">9,270</span></div>
+                    <div class="flex justify-between"><span>H-H</span><span class="font-semibold">16.9h</span></div>
+                    <div class="flex justify-between"><span>ULDs est.</span><span class="font-semibold">~6</span></div>
+                    <div class="flex justify-between"><span>Personas</span><span class="font-semibold">3</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">06:00 - 12:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-amber-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">K9</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>ULDs</span><span class="font-semibold">~6</span></div>
+                    <div class="flex justify-between"><span>Horas</span><span class="font-semibold">2h</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">12:00 - 14:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-emerald-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Entregas</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Destino</span><span class="font-semibold">AVIANCA</span></div>
+                    <div class="flex justify-between"><span>RT</span><span class="font-semibold">60 min</span></div>
+                    <div class="flex justify-between"><span>Viajes</span><span class="font-semibold">1-2</span></div>
+                    <div class="flex justify-between"><span>Completar antes</span><span class="font-semibold text-red-600">18:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-gray-400 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Status</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>On-hand</span><span class="font-semibold text-emerald-600">100%</span></div>
+                    <div class="flex justify-between"><span>Doc recep.</span><span class="font-semibold text-amber-600">3/4</span></div>
+                    <div class="flex justify-between"><span>Piezas</span><span class="font-semibold">391</span></div>
+                    <div class="flex justify-between"><span>Pickup</span><span class="font-semibold">WFS + NAS</span></div>
+                  </div>
+                </div>
+              </div>
+              <details class="text-xs">
+                <summary class="text-gray-500 font-semibold uppercase tracking-wide cursor-pointer hover:text-gray-700">Detalle AWBs (4)</summary>
+                <table class="w-full mt-2">
+                  <thead><tr class="bg-gray-50 text-gray-500"><th class="text-left px-3 py-1.5">AWB</th><th class="text-center px-3 py-1.5">PCS</th><th class="text-center px-3 py-1.5">CW</th><th class="text-left px-3 py-1.5">Pickup</th></tr></thead>
+                  <tbody class="divide-y">
+                    <tr><td class="px-3 py-1 font-mono">369-98155525</td><td class="text-center">134</td><td class="text-center">3,000</td><td>WFS</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-98155326</td><td class="text-center">90</td><td class="text-center">2,537</td><td>WFS</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">936-02243150</td><td class="text-center">103</td><td class="text-center">2,415</td><td>NAS</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">936-02685432</td><td class="text-center">64</td><td class="text-center">1,318</td><td>NAS</td></tr>
+                  </tbody>
+                  <tfoot><tr class="bg-gray-800 text-white"><td class="px-3 py-1.5">4 AWBs</td><td class="text-center">391</td><td class="text-center">9,270</td><td>WFS + NAS</td></tr></tfoot>
+                </table>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 29 flights -->
+
+        <!-- 1. UC-1105 — Despacho -->
+        <div class="bg-white rounded-xl border overflow-hidden border-l-4 border-l-red-400">
+          <div class="flex items-center justify-between px-5 py-3 cursor-pointer" onclick="toggleFlight('d29_uc1105')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">1. UC-1105</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">LATAM CAO</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">EZE</span>
+              <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">URGENTE</span>
+              <span class="text-xs text-gray-500">ETD <strong>10:05</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-red-600">05-28 (ayer)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-red-600 font-semibold">DESPACHO</span>
+              <svg id="d29_uc1105-chevron" class="w-5 h-5 text-gray-400 transition-transform -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d29_uc1105-content" class="collapse-content">
+            <div class="p-5 text-sm text-gray-600">
+              <div class="bg-red-50 rounded-lg p-3">
+                <div class="font-semibold mb-1">Entregas restantes a LATAM CAO</div>
+                <div class="text-xs">Ultimo viaje antes de las 09:00. RT 45 min.</div>
+                <div class="text-xs mt-1">25,433 kg | 10 AWBs | K9 completado ayer | 3-4 viajes entrega</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. QT-4099 — Despacho -->
+        <div class="bg-white rounded-xl border overflow-hidden border-l-4 border-l-red-400">
+          <div class="flex items-center justify-between px-5 py-3 cursor-pointer" onclick="toggleFlight('d29_qt4099')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">2. QT-4099</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">AVIANCA</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">EZE</span>
+              <span class="text-xs text-gray-500">ETD <strong class="text-amber-600">Sin definir</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-red-600">05-28 (ayer)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500">9,270 kg | 100% on-hand | 16.9 h-h | 3 pers</span>
+              <span class="text-xs text-red-600 font-semibold">DESPACHO</span>
+              <svg id="d29_qt4099-chevron" class="w-5 h-5 text-gray-400 transition-transform -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d29_qt4099-content" class="collapse-content">
+            <div class="p-5 text-sm text-gray-600">
+              <div class="bg-red-50 rounded-lg p-3">
+                <div class="font-semibold mb-1">Entregas restantes a AVIANCA</div>
+                <div class="text-xs">Coordinar hora con aerolinea. RT 60 min.</div>
+                <div class="text-xs mt-1">9,270 kg | 4 AWBs | K9 completado ayer | 1-2 viajes entrega</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. UC-1617 — Armado -->
+        <div class="bg-white rounded-xl border overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d29_uc1617')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">3. UC-1617</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">LATAM CAO</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">MVD</span>
+              <span class="text-xs text-gray-500">ETD <strong>30@15:00</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-amber-600">05-29 (hoy)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500">6,980 kg | 100% on-hand | 12.7 h-h | 2 pers</span>
+              <svg id="d29_uc1617-chevron" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d29_uc1617-content" class="collapse-content open">
+            <div class="p-5 space-y-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Armado</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Kilos</span><span class="font-semibold">6,980</span></div>
+                    <div class="flex justify-between"><span>H-H</span><span class="font-semibold">12.7h</span></div>
+                    <div class="flex justify-between"><span>ULDs est.</span><span class="font-semibold">~4</span></div>
+                    <div class="flex justify-between"><span>Personas</span><span class="font-semibold">2</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">07:00 - 14:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-amber-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">K9</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>ULDs</span><span class="font-semibold">~4</span></div>
+                    <div class="flex justify-between"><span>Horas</span><span class="font-semibold">1.5h</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">14:00 - 16:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-emerald-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Entregas</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Destino</span><span class="font-semibold">LATAM CAO</span></div>
+                    <div class="flex justify-between"><span>RT</span><span class="font-semibold">45 min</span></div>
+                    <div class="flex justify-between"><span>Viajes</span><span class="font-semibold">1</span></div>
+                    <div class="flex justify-between"><span>Completar antes</span><span class="font-semibold">18:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-gray-400 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Status</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>On-hand</span><span class="font-semibold text-emerald-600">100%</span></div>
+                    <div class="flex justify-between"><span>Doc recep.</span><span class="font-semibold text-emerald-600">3/3</span></div>
+                    <div class="flex justify-between"><span>Piezas</span><span class="font-semibold">320</span></div>
+                    <div class="flex justify-between"><span>Tipo</span><span class="font-semibold">All LOOSE</span></div>
+                  </div>
+                </div>
+              </div>
+              <details class="text-xs">
+                <summary class="text-gray-500 font-semibold uppercase tracking-wide cursor-pointer hover:text-gray-700">Detalle AWBs (3)</summary>
+                <table class="w-full mt-2">
+                  <thead><tr class="bg-gray-50 text-gray-500"><th class="text-left px-3 py-1.5">AWB</th><th class="text-center px-3 py-1.5">PCS</th><th class="text-center px-3 py-1.5">CW</th><th class="text-left px-3 py-1.5">Ready</th></tr></thead>
+                  <tbody class="divide-y">
+                    <tr><td class="px-3 py-1 font-mono">369-99784661</td><td class="text-center">91</td><td class="text-center">1,960</td><td>05-27</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-99784683</td><td class="text-center">91</td><td class="text-center">1,960</td><td>05-27</td></tr>
+                    <tr><td class="px-3 py-1 font-mono">369-99784425</td><td class="text-center">138</td><td class="text-center">3,060</td><td>05-27</td></tr>
+                  </tbody>
+                  <tfoot><tr class="bg-gray-800 text-white"><td class="px-3 py-1.5">3 AWBs</td><td class="text-center">320</td><td class="text-center">6,980</td><td>All WFS</td></tr></tfoot>
+                </table>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recogidas del 29 -->
+        <div class="bg-white rounded-xl border overflow-hidden border-l-4 border-l-purple-400 bg-purple-50/20">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d29_pu')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-purple-700">Recogidas del 29</span>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">9 guias</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">20,492 kg</span>
+              <span class="text-xs text-gray-500">Para vuelos del 31: QT-4091 (MVD) + LA-0543 (EZE)</span>
+            </div>
+            <svg id="d29_pu-chevron" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+          <div id="d29_pu-content" class="collapse-content open">
+            <div class="p-5">
+              <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-purple-50 rounded-lg px-3 py-2 text-center"><div class="text-[9px] text-purple-600 uppercase">WFS</div><div class="text-sm font-bold text-purple-700">7 guias | 18,525 kg</div><div class="text-[10px] text-gray-400">~3 viajes</div></div>
+                <div class="bg-orange-50 rounded-lg px-3 py-2 text-center"><div class="text-[9px] text-orange-600 uppercase">AGI</div><div class="text-sm font-bold text-orange-700">1 guia | 2,298 kg</div><div class="text-[10px] text-gray-400">1 viaje</div></div>
+                <div class="bg-blue-50 rounded-lg px-3 py-2 text-center"><div class="text-[9px] text-blue-600 uppercase">LATAM</div><div class="text-sm font-bold text-blue-700">1 guia | 669 kg</div><div class="text-[10px] text-red-500 font-bold">BATERIA</div></div>
+              </div>
+              <table class="w-full text-xs">
+                <thead><tr class="bg-gray-50 text-gray-500"><th class="text-left px-3 py-2">Vuelo destino</th><th class="text-left px-3 py-2">AWB</th><th class="text-left px-3 py-2">2nd Leg</th><th class="text-center px-3 py-2">PCS</th><th class="text-center px-3 py-2">CW</th><th class="text-left px-3 py-2">Desde</th><th class="text-center px-3 py-2">BAT</th></tr></thead>
+                <tbody class="divide-y">
+                  <tr class="bg-yellow-50/50"><td class="px-3 py-1.5 font-semibold text-blue-700">QT-4091</td><td class="px-3 py-1.5 font-mono">160-12940981</td><td class="px-3 py-1.5 font-mono text-gray-400">729-93889935</td><td class="text-center">30</td><td class="text-center font-semibold">669</td><td class="text-blue-600">LATAM</td><td class="text-center text-red-500 font-bold">YES</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold text-blue-700">QT-4091</td><td class="px-3 py-1.5 font-mono">369-99783950</td><td class="px-3 py-1.5 font-mono text-gray-400">729-93889946</td><td class="text-center">144</td><td class="text-center font-semibold">3,060</td><td>WFS</td><td class="text-center text-gray-300">-</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold text-blue-700">QT-4091</td><td class="px-3 py-1.5 font-mono">369-99784860</td><td class="px-3 py-1.5 font-mono text-gray-400">729-93889950</td><td class="text-center">126</td><td class="text-center font-semibold">3,060</td><td>WFS</td><td class="text-center text-gray-300">-</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold text-blue-700">QT-4091</td><td class="px-3 py-1.5 font-mono">369-99785173</td><td class="px-3 py-1.5 font-mono text-gray-400">729-93889961</td><td class="text-center">88</td><td class="text-center font-semibold">1,960</td><td>WFS</td><td class="text-center text-gray-300">-</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold text-blue-700">QT-4091</td><td class="px-3 py-1.5 font-mono">369-99785206</td><td class="px-3 py-1.5 font-mono text-gray-400">729-93889972</td><td class="text-center">93</td><td class="text-center font-semibold">1,960</td><td>WFS</td><td class="text-center text-gray-300">-</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold text-blue-700">QT-4091</td><td class="px-3 py-1.5 font-mono">369-99785210</td><td class="px-3 py-1.5 font-mono text-gray-400">729-93889983</td><td class="text-center">90</td><td class="text-center font-semibold">1,960</td><td>WFS</td><td class="text-center text-gray-300">-</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold text-blue-700">QT-4091</td><td class="px-3 py-1.5 font-mono">172-05137123</td><td class="px-3 py-1.5 font-mono text-gray-400">729-93889714</td><td class="text-center">134</td><td class="text-center font-semibold">2,298</td><td class="text-orange-600">AGI</td><td class="text-center text-gray-300">-</td></tr>
+                  <tr class="border-t-2"><td class="px-3 py-1.5 font-semibold text-emerald-700">LA-0543</td><td class="px-3 py-1.5 font-mono">369-98156015</td><td class="px-3 py-1.5 font-mono text-gray-400">045-22209423</td><td class="text-center">137</td><td class="text-center font-semibold">2,985</td><td>WFS</td><td class="text-center text-gray-300">-</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold text-emerald-700">LA-0543</td><td class="px-3 py-1.5 font-mono">369-98155713</td><td class="px-3 py-1.5 font-mono text-gray-400">045-20347946</td><td class="text-center">120</td><td class="text-center font-semibold">2,540</td><td>WFS</td><td class="text-center text-gray-300">-</td></tr>
+                </tbody>
+                <tfoot><tr class="bg-gray-800 text-white"><td class="px-3 py-2" colspan="3">9 guias</td><td class="text-center">962</td><td class="text-center">20,492</td><td>WFS(7) AGI(1) LATAM(1)</td><td class="text-center text-red-300">1 BAT</td></tr></tfoot>
+              </table>
+              <div class="mt-3 text-xs text-gray-500">
+                <strong>Viajes estimados:</strong> 3 WFS + 1 AGI + 1 LATAM (bat.) = <strong class="text-purple-700">5 viajes</strong> | ~7.5h camion
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 30 flights -->
+
+        <!-- UC-1617 — Despacho -->
+        <div class="bg-white rounded-xl border overflow-hidden border-l-4 border-l-red-400">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d30_disp')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">1. UC-1617</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">LATAM CAO</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">MVD</span>
+              <span class="text-xs text-gray-500">ETD <strong>15:00</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-red-600">05-29 (ayer)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500">6,980 kg | armado el 29 | entregar AM</span>
+              <span class="text-xs text-red-600 font-semibold">DESPACHO</span>
+              <svg id="d30_disp-chevron" class="w-5 h-5 text-gray-400 transition-transform -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d30_disp-content" class="collapse-content">
+            <div class="p-5">
+              <div class="grid grid-cols-3 gap-3 text-xs">
+                <div class="border rounded-lg p-3"><div class="text-gray-400 uppercase text-[10px] mb-1">Entrega a</div><div class="font-semibold">LATAM CAO</div><div class="text-gray-500">RT 45 min | 1 viaje</div></div>
+                <div class="border rounded-lg p-3"><div class="text-gray-400 uppercase text-[10px] mb-1">Completar antes</div><div class="font-semibold text-red-600">13:00</div><div class="text-gray-500">2h antes ETD 15:00</div></div>
+                <div class="border rounded-lg p-3"><div class="text-gray-400 uppercase text-[10px] mb-1">Carga</div><div class="font-semibold">3 AWBs | 320 pcs | 6,980 kg</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. QT-4091 — Armado -->
+        <div class="bg-white rounded-xl border overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d30_qt4091')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">2. QT-4091</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">AVIANCA</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">MVD</span>
+              <span class="text-xs text-gray-500">ETD <strong>31@13:50</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-amber-600">05-30 (hoy)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500">14,967 kg | 100% on-hand | 27.2 h-h | 4 pers</span>
+              <svg id="d30_qt4091-chevron" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d30_qt4091-content" class="collapse-content open">
+            <div class="p-5 space-y-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-purple-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Recogida</span><span class="text-[9px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded ml-auto">Completa</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Guias pendientes</span><span class="font-semibold text-emerald-600">0</span></div>
+                    <div class="flex justify-between"><span>Todo on-hand</span><span class="font-semibold text-emerald-600">Si</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Armado</span><span class="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded ml-auto">Pendiente</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>ULDs est.</span><span class="font-semibold">~9</span></div>
+                    <div class="flex justify-between"><span>H-H</span><span class="font-semibold">27.2h</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">06:00 - 12:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-amber-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">K9</span><span class="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded ml-auto">Pendiente</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>ULDs</span><span class="font-semibold">~9</span></div>
+                    <div class="flex justify-between"><span>Horas est.</span><span class="font-semibold">3h</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">12:00 - 15:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-emerald-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Entregas</span><span class="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded ml-auto">Pendiente</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Destino</span><span class="font-semibold">AVIANCA</span></div>
+                    <div class="flex justify-between"><span>RT</span><span class="font-semibold">60 min</span></div>
+                    <div class="flex justify-between"><span>Viajes</span><span class="font-semibold">2-3</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-[10px] text-red-500 font-semibold">1 guia con BATERIA (160-12940981) — requiere manejo especial</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. LA-0543 — Armado -->
+        <div class="bg-white rounded-xl border overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d30_la0543')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-gray-800">3. LA-0543</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">LATAM PAX</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">EZE</span>
+              <span class="text-xs text-gray-500">ETD <strong>31@23:40</strong></span>
+              <span class="text-xs text-gray-500">Cutoff <strong class="text-amber-600">05-30 (hoy)</strong></span>
+              <span class="text-xs text-gray-400">Express Line</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-500">5,525 kg | 100% on-hand | 10.0 h-h | 2 pers</span>
+              <svg id="d30_la0543-chevron" class="w-5 h-5 text-gray-400 transition-transform -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div id="d30_la0543-content" class="collapse-content">
+            <div class="p-5 space-y-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-purple-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Recogida</span><span class="text-[9px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded ml-auto">Completa</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Guias pendientes</span><span class="font-semibold text-emerald-600">0</span></div>
+                    <div class="flex justify-between"><span>Todo on-hand</span><span class="font-semibold text-emerald-600">Si</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Armado</span><span class="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded ml-auto">Pendiente</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>ULDs est.</span><span class="font-semibold">~3</span></div>
+                    <div class="flex justify-between"><span>H-H</span><span class="font-semibold">10.0h</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">06:00 - 09:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-amber-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">K9</span><span class="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded ml-auto">Pendiente</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>ULDs</span><span class="font-semibold">~3</span></div>
+                    <div class="flex justify-between"><span>Horas est.</span><span class="font-semibold">1h</span></div>
+                    <div class="flex justify-between"><span>Ventana</span><span class="font-semibold">09:00 - 11:00</span></div>
+                  </div>
+                </div>
+                <div class="border rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-emerald-500 rounded-full"></div><span class="text-xs font-semibold text-gray-600 uppercase">Entregas</span><span class="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded ml-auto">Pendiente</span></div>
+                  <div class="space-y-1 text-xs text-gray-600">
+                    <div class="flex justify-between"><span>Destino</span><span class="font-semibold">LATAM PAX</span></div>
+                    <div class="flex justify-between"><span>RT</span><span class="font-semibold">45 min</span></div>
+                    <div class="flex justify-between"><span>Viajes</span><span class="font-semibold">1</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recogidas del 30 -->
+        <div class="bg-white rounded-xl border overflow-hidden border-l-4 border-l-purple-400 bg-purple-50/20">
+          <div class="flex items-center justify-between px-5 py-3 border-b cursor-pointer" onclick="toggleFlight('d30_pu')">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-bold text-purple-700">Recogidas del 30</span>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">2 guias</span>
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">5,500 kg</span>
+              <span class="text-xs text-gray-500">Para UC-1105 futuro</span>
+            </div>
+            <svg id="d30_pu-chevron" class="w-5 h-5 text-gray-400 transition-transform -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+          <div id="d30_pu-content" class="collapse-content">
+            <div class="p-5">
+              <table class="w-full text-xs">
+                <thead><tr class="bg-gray-50 text-gray-500"><th class="text-left px-3 py-2">Vuelo</th><th class="text-left px-3 py-2">AWB</th><th class="text-left px-3 py-2">2nd Leg</th><th class="text-center px-3 py-2">PCS</th><th class="text-center px-3 py-2">CW</th><th class="text-left px-3 py-2">Desde</th></tr></thead>
+                <tbody class="divide-y">
+                  <tr><td class="px-3 py-1.5 font-semibold">UC-1105</td><td class="px-3 py-1.5 font-mono">369-98155993</td><td class="px-3 py-1.5 font-mono text-gray-400">045-20347902</td><td class="text-center">134</td><td class="text-center font-semibold">3,000</td><td>WFS</td></tr>
+                  <tr><td class="px-3 py-1.5 font-semibold">UC-1105</td><td class="px-3 py-1.5 font-mono">936-02685336</td><td class="px-3 py-1.5 font-mono text-gray-400">045-20347913</td><td class="text-center">122</td><td class="text-center font-semibold">2,500</td><td>NAS</td></tr>
+                </tbody>
+                <tfoot><tr class="bg-gray-800 text-white"><td class="px-3 py-2" colspan="3">2 guias</td><td class="text-center">256</td><td class="text-center">5,500</td><td>WFS + NAS</td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+
+  </main>
+
+  <!-- Config Modal -->
+  <div id="configModal" class="fixed inset-0 z-50 items-center justify-center bg-black/40" style="display:none">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="sticky top-0 bg-white px-6 py-4 border-b flex items-center justify-between z-10">
+        <h2 class="text-lg font-bold text-gray-800">Configuracion del Planning</h2>
+        <button onclick="closeConfig()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+      </div>
+      <div class="px-6 py-4 space-y-5">
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Productividad</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="text-xs text-gray-500">Productividad operacion (kg/h)</label><input type="number" value="550" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Horas turno estandar</label><input type="number" value="8" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+          </div>
+          <div class="mt-1 text-[10px] text-gray-400">Personal = (Kg totales / productividad) / horas turno</div>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Cutoff</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="text-xs text-gray-500">Horas antes de ETD</label><input type="number" value="6" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Transporte llegar antes de CO (h)</label><input type="number" value="2" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Biblioteca ULD</h3>
+          <div class="space-y-1">
+            <div class="grid grid-cols-3 gap-2 text-[10px] text-gray-400 font-semibold uppercase px-1"><span>Tipo</span><span>Capacidad (kg)</span><span>Posiciones</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">PMC</span><input type="number" value="1800" class="border rounded px-2 py-1 text-sm"><span class="px-1">1 pos</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">PAG</span><input type="number" value="3000" class="border rounded px-2 py-1 text-sm"><span class="px-1">1 pos</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">ALF</span><input type="number" value="5000" class="border rounded px-2 py-1 text-sm"><span class="px-1">1 pos</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">DQF</span><input type="number" value="2000" class="border rounded px-2 py-1 text-sm"><span class="px-1">1 pos</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">AKE</span><input type="number" value="700" class="border rounded px-2 py-1 text-sm"><span class="px-1">1/2 pos</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">AKH</span><input type="number" value="700" class="border rounded px-2 py-1 text-sm"><span class="px-1">1/2 pos</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">FQA</span><input type="number" value="700" class="border rounded px-2 py-1 text-sm"><span class="px-1">1/2 pos</span></div>
+            <div class="grid grid-cols-3 gap-2 items-center text-xs"><span class="font-medium px-1">PLA</span><input type="number" value="700" class="border rounded px-2 py-1 text-sm"><span class="px-1">1/2 pos</span></div>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Transporte</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="text-xs text-gray-500">Kg referencia por posicion</label><input type="number" value="1800" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Max posiciones por camion</label><input type="number" value="5" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Tiempo entrega round trip (min)</h3>
+          <div class="grid grid-cols-4 gap-3">
+            <div><label class="text-xs text-gray-500">LATAM</label><input type="number" value="45" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Avianca</label><input type="number" value="60" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Aerolineas</label><input type="number" value="50" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Otros</label><input type="number" value="60" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Recogida</h3>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label class="text-xs text-gray-500">Cap. kg/viaje</label><input type="number" value="3000" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Min/viaje (round trip)</label><input type="number" value="90" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Hora minima inicio</label><input type="time" value="07:00" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">K9 Screening</h3>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label class="text-xs text-gray-500">Min. horas/dia (contrato)</label><input type="number" value="3" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Max ULD/hora</label><input type="number" value="3" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+            <div><label class="text-xs text-gray-500">Bloque minimo (h)</label><input type="number" value="1" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky bottom-0 bg-white px-6 py-4 border-t flex justify-end gap-2">
+        <button onclick="closeConfig()" class="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50">Cancelar</button>
+        <button onclick="closeConfig()" class="px-4 py-2 text-sm bg-mcl-blue text-white rounded-lg hover:bg-mcl-blue/90">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Toggle flight cards ---
+    function toggleFlight(id) {
+      var c = document.getElementById(id + '-content')
+      var ch = document.getElementById(id + '-chevron')
+      if (c) c.classList.toggle('open')
+      if (ch) ch.classList.toggle('-rotate-90')
+    }
+
+    // --- Config modal ---
+    function openConfig() {
+      document.getElementById('configModal').style.display = 'flex'
+    }
+    function closeConfig() {
+      document.getElementById('configModal').style.display = 'none'
+    }
+    document.getElementById('configModal').addEventListener('click', closeConfig)
+
+    // --- Add truck row ---
+    var truckCount = 2
+    function addTruckRow() {
+      truckCount++
+      var container = document.querySelector('[id^="truck-row-"]').parentElement
+      var btn = container.querySelector('button[onclick="addTruckRow()"]').parentElement
+      var row = document.createElement('div')
+      row.className = 'flex items-center mb-0.5'
+      row.id = 'truck-row-' + (truckCount - 1)
+      row.innerHTML = '<div class="w-[120px] flex-shrink-0 pr-2 text-right">' +
+        '<input type="text" value="CAM' + truckCount + '" class="w-16 text-[11px] font-semibold text-gray-700 text-right border-0 bg-transparent focus:border-b focus:border-blue-400 outline-none" title="Editar nombre camion">' +
+        '<div class="text-[9px] text-gray-400">06:00-18:00</div></div>' +
+        '<div class="flex-1 relative bg-gray-50 rounded h-8 border border-gray-100">' +
+        '<div class="absolute top-0 bottom-0 w-px bg-blue-300 z-5" style="left:33.33%"></div>' +
+        '<div class="absolute top-0 bottom-0 w-px bg-blue-300 z-5" style="left:66.67%"></div></div>'
+      container.insertBefore(row, btn)
+    }
+
+    // --- Drag & drop for gantt bars ---
+    var dragBar = null, dragStartX = 0, dragOrigLeft = 0, dragParentW = 0
+
+    document.addEventListener('mousedown', function(e) {
+      var bar = e.target.closest('.gantt-bar.draggable')
+      if (!bar) return
+      e.preventDefault()
+      dragBar = bar
+      dragBar.classList.add('dragging')
+      dragParentW = bar.parentElement.offsetWidth
+      dragOrigLeft = parseFloat(bar.style.left) || 0
+      dragStartX = e.clientX
+    })
+
+    document.addEventListener('mousemove', function(e) {
+      if (!dragBar) return
+      e.preventDefault()
+      var dx = e.clientX - dragStartX
+      var dPct = (dx / dragParentW) * 100
+      var newLeft = dragOrigLeft + dPct
+      // Clamp between 0 and (100 - width)
+      var barW = parseFloat(dragBar.style.width) || 0
+      newLeft = Math.max(0, Math.min(100 - barW, newLeft))
+      dragBar.style.left = newLeft.toFixed(2) + '%'
+    })
+
+    document.addEventListener('mouseup', function() {
+      if (dragBar) {
+        dragBar.classList.remove('dragging')
+        dragBar = null
+      }
+    })
+  </script>
+</body>
+</html>

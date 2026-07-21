@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MCL — WS Invoice Mockup</title>
+<style>
+  @page { size: letter; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #e5e7eb; }
+
+  .page {
+    width: 8.5in; min-height: 11in; margin: 40px auto; background: #fff;
+    padding: 0.6in 0.7in; position: relative; box-shadow: 0 4px 24px rgba(0,0,0,.12);
+    page-break-after: always;
+  }
+
+  /* ── Header ── */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #0f1d3a; padding-bottom: 14px; margin-bottom: 18px; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo-box { width: 56px; height: 56px; background: #0f1d3a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 14px; letter-spacing: 1px; }
+  .company-name { font-size: 18px; font-weight: 800; color: #0f1d3a; }
+  .company-sub { font-size: 10px; color: #6b7280; margin-top: 2px; }
+  .doc-title-block { text-align: right; }
+  .doc-title { font-size: 26px; font-weight: 900; color: #dc2626; letter-spacing: 1px; }
+  .doc-number { font-size: 16px; font-weight: 700; color: #0f1d3a; font-family: 'Courier New', monospace; margin-top: 2px; }
+
+  /* ── Info grids ── */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; margin-bottom: 16px; }
+  .info-cell { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; }
+  .info-cell:nth-child(even) { border-right: none; }
+  .info-cell:last-child, .info-cell:nth-last-child(1), .info-cell:nth-last-child(2) { border-bottom: none; }
+  .info-label { font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .info-value { font-size: 11px; font-weight: 600; color: #1f2937; }
+  .info-value.mono { font-family: 'Courier New', monospace; }
+  .info-value.blue { color: #2563eb; }
+
+  /* ── Bill-to box ── */
+  .bill-to { background: #f7f7f7; border: 1px solid #ddd; border-radius: 6px; padding: 12px 16px; font-size: 11px; line-height: 1.6; margin-bottom: 16px; }
+  .bill-to-label { font-size: 9px; font-weight: 800; color: #dc2626; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+
+  /* ── Section titles ── */
+  .section-title { font-size: 10px; font-weight: 800; color: #0f1d3a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1.5px solid #e5e7eb; }
+
+  /* ── Table ── */
+  .charges-table { width: 100%; border-collapse: collapse; margin-bottom: 0; font-size: 10px; }
+  .charges-table thead th { background: #0f1d3a; color: #fff; padding: 7px 10px; text-align: left; font-weight: 700; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .charges-table thead th:first-child { border-radius: 4px 0 0 0; }
+  .charges-table thead th:last-child { border-radius: 0 4px 0 0; text-align: right; }
+  .charges-table thead th.right { text-align: right; }
+  .charges-table thead th.center { text-align: center; }
+  .charges-table tbody td { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; color: #374151; }
+  .charges-table tbody td.right { text-align: right; }
+  .charges-table tbody td.center { text-align: center; }
+  .charges-table tbody td.mono { font-family: 'Courier New', monospace; }
+  .charges-table tbody tr:last-child td { border-bottom: none; }
+
+  /* ── Totals ── */
+  .totals-block { margin-top: 0; display: flex; justify-content: flex-end; }
+  .totals-table { border-collapse: collapse; min-width: 240px; }
+  .totals-table td { padding: 5px 14px; font-size: 11px; }
+  .totals-table td.label { text-align: right; color: #6b7280; font-weight: 600; }
+  .totals-table td.value { text-align: right; font-weight: 600; color: #1f2937; font-family: 'Courier New', monospace; }
+  .totals-table tr.grand td { border-top: 2px solid #0f1d3a; font-size: 14px; font-weight: 900; color: #0f1d3a; padding-top: 8px; }
+  .totals-table tr.discount td { color: #dc2626; }
+
+  /* ── Note ── */
+  .note-box { margin-top: 16px; padding: 10px 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 10px; color: #4b5563; line-height: 1.6; }
+  .note-box strong { color: #1f2937; }
+
+  /* ── Bank ── */
+  .bank-box { margin-top: 20px; font-size: 9px; color: #6b7280; line-height: 1.7; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+  .bank-box strong { color: #374151; }
+
+  /* ── Footer ── */
+  .footer { position: absolute; bottom: 0.5in; left: 0.7in; right: 0.7in; text-align: center; font-size: 8px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 8px; }
+
+  .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 72px; font-weight: 900; color: rgba(0,0,0,0.03); letter-spacing: 10px; pointer-events: none; }
+
+  /* ── Status stamp ── */
+  .stamp { position: absolute; top: 200px; right: 60px; transform: rotate(-15deg); font-size: 36px; font-weight: 900; letter-spacing: 4px; padding: 6px 20px; border-radius: 8px; opacity: 0.15; pointer-events: none; }
+  .stamp-paid { color: #16a34a; border: 4px solid #16a34a; }
+  .stamp-draft { color: #9ca3af; border: 4px solid #9ca3af; }
+
+  h2.page-separator { text-align: center; padding: 30px; color: #6b7280; font-size: 14px; background: #e5e7eb; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     INVOICE 1: SO-260513-0001 — Bringer Air Cargo (Special Cargo)
+     Screening + Transport, no separate In/Out (absorbed by Special Cargo)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="watermark">INVOICE</div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">MCL</div>
+      <div>
+        <div class="company-name">MinCurl Logistics LLC</div>
+        <div class="company-sub">2323 NW 82nd Ave, Doral, FL 33122 &nbsp;|&nbsp; +1 (786) 534-5440</div>
+      </div>
+    </div>
+    <div class="doc-title-block">
+      <div class="doc-title">INVOICE</div>
+      <div class="doc-number">WS-INV-0001</div>
+    </div>
+  </div>
+
+  <!-- Bill-to + Invoice details side by side -->
+  <div style="display:flex; gap:16px; margin-bottom:16px;">
+    <!-- Bill To -->
+    <div class="bill-to" style="flex:1;">
+      <div class="bill-to-label">Bill To</div>
+      <strong>Bringer Air Cargo</strong><br>
+      7270 NW 12th Street, Suite 570<br>
+      Miami, FL 33126
+    </div>
+    <!-- Invoice details -->
+    <div style="flex:1;">
+      <div class="info-grid" style="margin-bottom:0;">
+        <div class="info-cell">
+          <div class="info-label">Invoice #</div>
+          <div class="info-value mono">WS-INV-0001</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Date</div>
+          <div class="info-value">05/14/2026</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Due Date</div>
+          <div class="info-value">06/13/2026</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Terms</div>
+          <div class="info-value">Net 30</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Service Order</div>
+          <div class="info-value mono blue">SO-260513-0001</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Account #</div>
+          <div class="info-value mono">WS-BRINGER</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SO Reference info -->
+  <div class="section-title">Service Order Details</div>
+  <div class="info-grid" style="margin-bottom:16px;">
+    <div class="info-cell">
+      <div class="info-label">AWB</div>
+      <div class="info-value mono">417-12788252</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Warehouse Receipt</div>
+      <div class="info-value mono blue">WS-000009</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Cargo Type</div>
+      <div class="info-value">Special Cargo &mdash; Local</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Reference</div>
+      <div class="info-value">&mdash;</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Received</div>
+      <div class="info-value">05/13/2026</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Completed</div>
+      <div class="info-value">05/13/2026</div>
+    </div>
+  </div>
+
+  <!-- Charges table -->
+  <div class="section-title">Charges</div>
+  <table class="charges-table">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th class="right">CBM</th>
+        <th class="right">Units</th>
+        <th class="right">Kg</th>
+        <th class="right">Rate</th>
+        <th class="right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Screening Special Cargo</strong></td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">1</td>
+        <td class="right mono">100.0</td>
+        <td class="right mono">Minimum charge</td>
+        <td class="right mono"><strong>$160.00</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Transport</strong></td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">100.0</td>
+        <td class="right mono">Minimum charge</td>
+        <td class="right mono"><strong>$120.00</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Totals -->
+  <div class="totals-block">
+    <table class="totals-table">
+      <tr>
+        <td class="label">Subtotal</td>
+        <td class="value">$280.00</td>
+      </tr>
+      <tr>
+        <td class="label">Tax</td>
+        <td class="value">$0.00</td>
+      </tr>
+      <tr class="grand">
+        <td class="label">TOTAL</td>
+        <td class="value">$280.00 USD</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Note -->
+  <div class="note-box">
+    <strong>NOTE:</strong> In/Out charges are included in the Screening Special Cargo rate.
+  </div>
+
+  <!-- Bank details -->
+  <div class="bank-box">
+    <strong>BANK DETAILS:</strong><br>
+    BANK NAME: JP MORGAN CHASE<br>
+    ROUTING NUMBER: 267084131<br>
+    ACCOUNT NUMBER: 818777270<br>
+    SWIFT: CHASUS33<br>
+    Name: MinCurl Logistics LLC
+  </div>
+
+  <div style="text-align:center; margin-top:15px; font-size:9px; color:#999;">ORIGINAL</div>
+
+  <div class="footer">
+    MinCurl Logistics LLC &nbsp;&bull;&nbsp; 2323 NW 82nd Ave, Doral, FL 33122 &nbsp;&bull;&nbsp; info@mincurllogistics.com &nbsp;&bull;&nbsp; +1 (786) 534-5440<br>
+    Thank you for your business.
+  </div>
+</div>
+
+
+<h2 class="page-separator">- - - Invoice 2: Multiple services, with discount - - -</h2>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     INVOICE 2: SO-260513-0002 — Usa International Freight Corp
+     Screening + In/Out + Storage, with discount applied
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="watermark">INVOICE</div>
+  <!-- Paid stamp example -->
+  <div class="stamp stamp-paid">PAID</div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">MCL</div>
+      <div>
+        <div class="company-name">MinCurl Logistics LLC</div>
+        <div class="company-sub">2323 NW 82nd Ave, Doral, FL 33122 &nbsp;|&nbsp; +1 (786) 534-5440</div>
+      </div>
+    </div>
+    <div class="doc-title-block">
+      <div class="doc-title">INVOICE</div>
+      <div class="doc-number">WS-INV-0002</div>
+    </div>
+  </div>
+
+  <!-- Bill-to + Invoice details -->
+  <div style="display:flex; gap:16px; margin-bottom:16px;">
+    <div class="bill-to" style="flex:1;">
+      <div class="bill-to-label">Bill To</div>
+      <strong>Usa International Freight Corp</strong><br>
+      8351 NW 21st St, Suite 100<br>
+      Doral, FL 33122
+    </div>
+    <div style="flex:1;">
+      <div class="info-grid" style="margin-bottom:0;">
+        <div class="info-cell">
+          <div class="info-label">Invoice #</div>
+          <div class="info-value mono">WS-INV-0002</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Date</div>
+          <div class="info-value">05/14/2026</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Due Date</div>
+          <div class="info-value">06/13/2026</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Terms</div>
+          <div class="info-value">Net 30</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Service Order</div>
+          <div class="info-value mono blue">SO-260513-0002</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Account #</div>
+          <div class="info-value mono">WS-USAINTL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SO Reference info -->
+  <div class="section-title">Service Order Details</div>
+  <div class="info-grid" style="margin-bottom:16px;">
+    <div class="info-cell">
+      <div class="info-label">AWB</div>
+      <div class="info-value">&mdash;</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Warehouse Receipt</div>
+      <div class="info-value mono blue">WS-000010</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Cargo Type</div>
+      <div class="info-value">General &mdash; Local</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Reference</div>
+      <div class="info-value">Invoice 9982 / 9971</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Received</div>
+      <div class="info-value">05/13/2026</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Completed</div>
+      <div class="info-value">05/13/2026</div>
+    </div>
+  </div>
+
+  <!-- Charges table -->
+  <div class="section-title">Charges</div>
+  <table class="charges-table">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th class="right">CBM</th>
+        <th class="right">Units</th>
+        <th class="right">Kg</th>
+        <th class="right">Rate</th>
+        <th class="right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>X-Ray Screening</strong></td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">100.0</td>
+        <td class="right mono">Minimum charge</td>
+        <td class="right mono"><strong>$120.00</strong></td>
+      </tr>
+      <tr>
+        <td><strong>In/Out Cargo</strong></td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">2</td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">$18.00/pallet</td>
+        <td class="right mono"><strong>$36.00</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Storage</strong></td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">2</td>
+        <td class="right mono">&mdash;</td>
+        <td class="right mono">$20.00/pallet</td>
+        <td class="right mono"><strong>$40.00</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Totals with discount -->
+  <div class="totals-block">
+    <table class="totals-table">
+      <tr>
+        <td class="label">Subtotal</td>
+        <td class="value">$196.00</td>
+      </tr>
+      <tr class="discount">
+        <td class="label">Discount (10%)</td>
+        <td class="value">-$19.60</td>
+      </tr>
+      <tr>
+        <td class="label">Tax</td>
+        <td class="value">$0.00</td>
+      </tr>
+      <tr class="grand">
+        <td class="label">TOTAL</td>
+        <td class="value">$176.40 USD</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Bank details -->
+  <div class="bank-box">
+    <strong>BANK DETAILS:</strong><br>
+    BANK NAME: JP MORGAN CHASE<br>
+    ROUTING NUMBER: 267084131<br>
+    ACCOUNT NUMBER: 818777270<br>
+    SWIFT: CHASUS33<br>
+    Name: MinCurl Logistics LLC
+  </div>
+
+  <div style="text-align:center; margin-top:15px; font-size:9px; color:#999;">ORIGINAL</div>
+
+  <div class="footer">
+    MinCurl Logistics LLC &nbsp;&bull;&nbsp; 2323 NW 82nd Ave, Doral, FL 33122 &nbsp;&bull;&nbsp; info@mincurllogistics.com &nbsp;&bull;&nbsp; +1 (786) 534-5440<br>
+    Thank you for your business.
+  </div>
+</div>
+
+</body>
+</html>

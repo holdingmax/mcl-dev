@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ULD Build-up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: { extend: { colors: { 'mcl-blue': '#1e40af', 'mcl-light': '#3b82f6' } } }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-mcl-blue text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="01-warehouse-dashboard.html" class="text-white/70 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <h1 class="text-lg font-bold">ULD Build-up</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="05-dist-pdf-awb.html" class="text-white/70 hover:text-white text-xs border border-white/30 px-3 py-2 rounded-lg flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          PDF Reports
+        </a>
+        <button class="bg-white text-mcl-blue px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-50 transition-colors">
+          + Nuevo ULD
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Flight Context Bar -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <div>
+            <p class="text-xs text-gray-400">Vuelo activo</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-black text-gray-800 tracking-tight">CM801</span>
+              <span class="text-sm font-bold text-mcl-blue">BOG</span>
+            </div>
+          </div>
+          <div class="h-10 w-px bg-gray-200"></div>
+          <div>
+            <p class="text-xs text-gray-400">Carrier</p>
+            <p class="font-bold text-gray-700">L7</p>
+          </div>
+          <div class="h-10 w-px bg-gray-200"></div>
+          <div>
+            <p class="text-xs text-gray-400">Fecha</p>
+            <p class="font-medium text-gray-700">17 May 2026</p>
+          </div>
+          <div class="h-10 w-px bg-gray-200"></div>
+          <div>
+            <p class="text-xs text-gray-400">AWBs disponibles</p>
+            <p class="font-bold text-gray-800">6 guias <span class="text-xs font-normal text-gray-400">/ 342 piezas</span></p>
+          </div>
+          <div class="h-10 w-px bg-gray-200"></div>
+          <div>
+            <p class="text-xs text-gray-400">Sin asignar</p>
+            <p class="font-bold text-amber-600">128 piezas</p>
+          </div>
+        </div>
+        <button class="text-sm text-mcl-blue border border-mcl-blue px-3 py-1.5 rounded-lg hover:bg-blue-50 font-medium">
+          Cambiar vuelo
+        </button>
+      </div>
+    </div>
+
+    <!-- Active ULDs Board -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- ULD 1: Open, active -->
+      <div class="bg-white rounded-xl border-2 border-purple-200 shadow-sm">
+        <div class="p-4 border-b border-gray-100">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-gray-800 font-mono text-lg">PMC-4521</h3>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-bold">MD</span>
+            </div>
+            <span class="text-xs bg-green-50 text-green-700 px-2.5 py-1 rounded-full font-medium">Abierto</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-gray-500">
+            <span>Vuelo: CM801</span>
+            <span>Destino: BOG</span>
+          </div>
+          <div class="mt-3 flex items-center gap-3">
+            <div class="flex-1">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span>Capacidad peso</span>
+                <span class="font-mono">1,850 / 3,000 kg</span>
+              </div>
+              <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-purple-500 rounded-full" style="width: 62%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pieces assigned -->
+        <div class="p-4 max-h-64 overflow-y-auto">
+          <p class="text-xs text-gray-400 font-medium mb-2">AWBs asignadas (3)</p>
+
+          <div class="space-y-2">
+            <div class="bg-gray-50 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-mono text-sm font-medium text-gray-800">057-12345678</span>
+                <span class="text-xs text-gray-500">40/45 pzas</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-400">Amazon Logistics</span>
+                <span class="text-xs font-mono text-gray-500">1,120 kg</span>
+              </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-mono text-sm font-medium text-gray-800">020-11223344</span>
+                <span class="text-xs text-gray-500">8/8 pzas</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-400">Mercado Libre</span>
+                <span class="text-xs font-mono text-gray-500">430 kg</span>
+              </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-mono text-sm font-medium text-gray-800">580-99887766</span>
+                <span class="text-xs text-gray-500">5/15 pzas</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-400">Ceva Logistics</span>
+                <span class="text-xs font-mono text-gray-500">300 kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ULD Actions -->
+        <div class="p-4 border-t border-gray-100 flex gap-2">
+          <button class="flex-1 bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700">
+            Asignar piezas
+          </button>
+          <button class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50" title="Cerrar ULD">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ULD 2: Open, less full -->
+      <div class="bg-white rounded-xl border-2 border-purple-200 shadow-sm">
+        <div class="p-4 border-b border-gray-100">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-gray-800 font-mono text-lg">AKE-7890</h3>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold">LD</span>
+            </div>
+            <span class="text-xs bg-green-50 text-green-700 px-2.5 py-1 rounded-full font-medium">Abierto</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-gray-500">
+            <span>Vuelo: AA950</span>
+            <span>Destino: MDE</span>
+          </div>
+          <div class="mt-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Capacidad peso</span>
+              <span class="font-mono">680 / 1,500 kg</span>
+            </div>
+            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full bg-purple-500 rounded-full" style="width: 45%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 max-h-64 overflow-y-auto">
+          <p class="text-xs text-gray-400 font-medium mb-2">AWBs asignadas (1)</p>
+          <div class="space-y-2">
+            <div class="bg-gray-50 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-mono text-sm font-medium text-gray-800">176-98765432</span>
+                <span class="text-xs text-gray-500">25/120 pzas</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-400">DHL Express</span>
+                <span class="text-xs font-mono text-gray-500">680 kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-100 flex gap-2">
+          <button class="flex-1 bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700">
+            Asignar piezas
+          </button>
+          <button class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ULD 3: Closed -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm opacity-75">
+        <div class="p-4 border-b border-gray-100">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-gray-800 font-mono text-lg">PMC-3310</h3>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-bold">MD</span>
+            </div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">Cerrado</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-gray-500">
+            <span>Vuelo: CM801</span>
+            <span>Destino: BOG</span>
+          </div>
+          <div class="mt-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Capacidad peso</span>
+              <span class="font-mono">2,890 / 3,000 kg</span>
+            </div>
+            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full bg-gray-400 rounded-full" style="width: 96%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 max-h-64 overflow-y-auto">
+          <p class="text-xs text-gray-400 font-medium mb-2">AWBs asignadas (4)</p>
+          <div class="space-y-2">
+            <div class="bg-gray-50 rounded-lg p-3">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-sm text-gray-600">045-55667788</span>
+                <span class="text-xs text-gray-500">30/30 pzas</span>
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-3">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-sm text-gray-600">033-44556677</span>
+                <span class="text-xs text-gray-500">22/22 pzas</span>
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-3">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-sm text-gray-600">057-12345678</span>
+                <span class="text-xs text-gray-500">5/45 pzas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-100">
+          <p class="text-xs text-gray-400 text-center">Cerrado: 15 May 2026 14:30</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assignment Modal (shown as inline for prototype) -->
+    <div class="mt-8 border-t-2 border-dashed border-gray-300 pt-8">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Modal: Asignar Piezas a ULD</h2>
+      <p class="text-sm text-gray-500 mb-4">Este modal aparece al hacer click en "Asignar piezas"</p>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-6 max-w-2xl">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-bold text-gray-800">Asignar a PMC-4521</h3>
+            <p class="text-xs text-gray-500">Capacidad restante: 1,150 kg</p>
+          </div>
+          <button class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Assignment Mode Tabs -->
+        <div class="flex border-b border-gray-200 mb-6">
+          <button class="px-4 py-2 text-sm font-medium border-b-2 border-mcl-blue text-mcl-blue">
+            Por Cantidad
+          </button>
+          <button class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gray-600">
+            Por Barcode (escaneo)
+          </button>
+        </div>
+
+        <!-- Mode 1: Bulk Quantity -->
+        <div>
+          <p class="text-xs text-gray-500 mb-3">Seleccione AWB y cantidad de piezas a asignar:</p>
+
+          <!-- AWB Selection -->
+          <div class="space-y-3">
+            <div class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="font-mono font-medium text-gray-800">580-99887766</p>
+                  <p class="text-xs text-gray-400">Ceva Logistics - 10 piezas disponibles</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <label class="text-xs text-gray-500">Asignar:</label>
+                <input type="number" value="10" min="1" max="10" class="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-center focus:outline-none focus:border-mcl-blue">
+                <span class="text-xs text-gray-400">de 10 disponibles</span>
+                <button class="ml-auto bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">
+                  Asignar
+                </button>
+              </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="font-mono font-medium text-gray-800">176-98765432</p>
+                  <p class="text-xs text-gray-400">DHL Express - 95 piezas disponibles</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <label class="text-xs text-gray-500">Asignar:</label>
+                <input type="number" value="40" min="1" max="95" class="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-center focus:outline-none focus:border-mcl-blue">
+                <span class="text-xs text-gray-400">de 95 disponibles</span>
+                <button class="ml-auto bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">
+                  Asignar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: Barcode Scan (hidden, shown for reference) -->
+        <div class="mt-8 pt-6 border-t border-dashed border-gray-200">
+          <p class="text-xs text-gray-400 mb-3 font-medium">Modo Barcode (alternativa):</p>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex gap-3 mb-3">
+              <input type="text" placeholder="Escanear o ingresar barcode..." class="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-mcl-blue">
+              <button class="bg-mcl-blue text-white px-4 py-2 rounded-lg text-sm font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                </svg>
+              </button>
+            </div>
+            <p class="text-xs text-gray-400">Escanee piezas individualmente. Cada pieza escaneada se asigna al ULD activo.</p>
+
+            <!-- Recent scans -->
+            <div class="mt-3 space-y-1">
+              <div class="flex items-center justify-between text-xs bg-white rounded px-2 py-1.5">
+                <span class="font-mono text-gray-600">MCL-057123-012</span>
+                <span class="text-green-600">Asignada</span>
+              </div>
+              <div class="flex items-center justify-between text-xs bg-white rounded px-2 py-1.5">
+                <span class="font-mono text-gray-600">MCL-057123-011</span>
+                <span class="text-green-600">Asignada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flight Selection Modal (inline for prototype) -->
+    <div class="mt-8 border-t-2 border-dashed border-gray-300 pt-8">
+      <h2 class="text-lg font-bold text-gray-800 mb-2">Paso 1: Seleccionar Vuelo</h2>
+      <p class="text-sm text-gray-500 mb-4">Primera pantalla al entrar a Build-up o al hacer click en "Cambiar vuelo"</p>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-6 max-w-lg">
+        <div class="mb-4">
+          <label class="block text-xs text-gray-500 mb-1 font-medium">Buscar vuelo</label>
+          <div class="flex gap-2">
+            <input type="text" placeholder="Numero de vuelo (ej: CM801) o destino" class="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-mcl-blue">
+            <button class="bg-mcl-blue text-white px-4 py-2 rounded-lg text-sm font-medium">Buscar</button>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-400 font-medium mb-2">Vuelos con guias pendientes de distribucion:</p>
+        <div class="space-y-2">
+          <div class="border-2 border-mcl-blue bg-blue-50 rounded-lg p-3 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-black text-gray-800">CM801</span>
+                <span class="text-sm font-bold text-mcl-blue">BOG</span>
+                <span class="text-xs text-gray-400">L7 - 17 May</span>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-800">6 AWBs</p>
+                <p class="text-xs text-amber-600 font-medium">128 pzas sin asignar</p>
+              </div>
+            </div>
+          </div>
+          <div class="border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-mcl-blue hover:bg-blue-50/30 transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-black text-gray-800">AA950</span>
+                <span class="text-sm font-bold text-mcl-blue">MDE</span>
+                <span class="text-xs text-gray-400">AA - 18 May</span>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-800">3 AWBs</p>
+                <p class="text-xs text-amber-600 font-medium">95 pzas sin asignar</p>
+              </div>
+            </div>
+          </div>
+          <div class="border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-mcl-blue hover:bg-blue-50/30 transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-black text-gray-800">QT4091</span>
+                <span class="text-sm font-bold text-mcl-blue">MVD</span>
+                <span class="text-xs text-gray-400">QT - 18 May</span>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-800">4 AWBs</p>
+                <p class="text-xs text-green-600 font-medium">0 pzas sin asignar</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full mt-4 bg-mcl-blue text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-800">
+          Entrar al vuelo seleccionado
+        </button>
+      </div>
+    </div>
+
+    <!-- New ULD Modal (inline for prototype) -->
+    <div class="mt-8 border-t-2 border-dashed border-gray-300 pt-8">
+      <h2 class="text-lg font-bold text-gray-800 mb-2">Paso 2: Crear Nuevo ULD</h2>
+      <p class="text-sm text-gray-500 mb-4">Dentro del vuelo CM801 BOG. Vuelo y destino ya estan definidos.</p>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-6 max-w-md">
+        <!-- Flight context reminder -->
+        <div class="bg-gray-50 rounded-lg px-3 py-2 mb-4 flex items-center gap-3 text-sm">
+          <span class="text-xs text-gray-400">Vuelo:</span>
+          <span class="font-bold text-gray-800">CM801</span>
+          <span class="font-bold text-mcl-blue">BOG</span>
+          <span class="text-xs text-gray-400 ml-auto">L7 - 17 May 2026</span>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1 font-medium">Numero ULD *</label>
+            <input type="text" placeholder="Ej: PMC45210CM" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-mcl-blue">
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-2 font-medium">Tipo de ULD *</label>
+            <div class="grid grid-cols-3 gap-3">
+              <label class="cursor-pointer">
+                <input type="radio" name="uld_type" value="md" class="peer hidden" checked>
+                <div class="border-2 border-gray-200 peer-checked:border-purple-500 peer-checked:bg-purple-50 rounded-xl py-3 text-center transition-all">
+                  <p class="text-lg font-bold text-purple-700">MD</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">Main Deck</p>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="uld_type" value="ld" class="peer hidden">
+                <div class="border-2 border-gray-200 peer-checked:border-blue-500 peer-checked:bg-blue-50 rounded-xl py-3 text-center transition-all">
+                  <p class="text-lg font-bold text-blue-700">LD</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">Lower Deck</p>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="uld_type" value="esp" class="peer hidden">
+                <div class="border-2 border-gray-200 peer-checked:border-amber-500 peer-checked:bg-amber-50 rounded-xl py-3 text-center transition-all">
+                  <p class="text-lg font-bold text-amber-700">ESP</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">Especial</p>
+                </div>
+              </label>
+            </div>
+          </div>
+          <button class="w-full bg-purple-600 text-white py-3 rounded-lg text-sm font-semibold hover:bg-purple-700">
+            Crear ULD
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend / Notes -->
+    <div class="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-4">
+      <h4 class="text-sm font-medium text-blue-800 mb-2">Notas del prototipo:</h4>
+      <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
+        <li><strong>Paso 1:</strong> Seleccionar vuelo - solo muestra vuelos con guias que ya pasaron recepcion fisica</li>
+        <li><strong>Paso 2:</strong> Dentro del vuelo se crean ULDs y se asignan piezas. Vuelo/destino heredados automaticamente</li>
+        <li>Un ULD se puede cerrar en cualquier momento, incluso con piezas pendientes de una AWB (la AWB puede estar en multiples ULDs)</li>
+        <li>Modo "Por Cantidad": el distribuidor selecciona AWB y digita cuantas piezas asignar (ej: 40 de 100)</li>
+        <li>Modo "Por Barcode": el distribuidor escanea pieza por pieza con lector o camara</li>
+        <li>Solo se pueden asignar piezas que ya pasaron recepcion fisica y tienen barcode</li>
+        <li>Tipo ULD: MD (Main Deck), LD (Lower Deck), ESP (Especial)</li>
+        <li>Genera 2 formatos PDF: "Distribucion" (AWB-first) y "Pallet Control" (ULD-first)</li>
+        <li>Para guias con MAWB, el formato muestra fila morada con MAWB y debajo las AWBs hijas</li>
+      </ul>
+    </div>
+  </main>
+</body>
+</html>

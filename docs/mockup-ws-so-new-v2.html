@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WS - New Service Order (v2)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { 'mcl-blue': '#0a1e3d' } } } }</script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<div class="max-w-2xl mx-auto px-4 py-6">
+  <!-- Toggle to preview both modes -->
+  <div class="mb-4 flex gap-2 items-center justify-center">
+    <span class="text-xs text-gray-500 font-semibold">Preview mode:</span>
+    <button onclick="setMode('normal')" id="btnNormal" class="text-xs px-3 py-1.5 rounded-full border font-semibold bg-mcl-blue text-white border-mcl-blue">Normal SO</button>
+    <button onclick="setMode('transport')" id="btnTransport" class="text-xs px-3 py-1.5 rounded-full border font-semibold bg-white text-gray-600 border-gray-200">Transport Only</button>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-bold text-gray-800">Service Order</h2>
+      <p class="text-xs text-gray-400 mt-1">Create a new warehouse service order</p>
+    </div>
+
+    <div class="px-6 py-5 space-y-5">
+
+      <!-- ========== STEP 1: CLIENT ========== -->
+      <div>
+        <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Client</label>
+        <div class="flex gap-2">
+          <select class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 flex-1">
+            <option>Select client...</option>
+            <option selected>Global Freight Corp</option>
+            <option>Acme Logistics</option>
+          </select>
+          <button class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg whitespace-nowrap">+ New</button>
+        </div>
+      </div>
+
+      <!-- ========== STEP 2: SERVICES ========== -->
+      <div>
+        <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Services</label>
+        <div class="space-y-3">
+          <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase mb-1.5">Screening</div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="toggleSvc(this,'screening_k9')" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Screening K9</button>
+              <button onclick="toggleSvc(this,'screening_xray')" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Screening X-Ray</button>
+              <button onclick="toggleSvc(this,'screening_manual')" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Screening Manual</button>
+            </div>
+          </div>
+          <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase mb-1.5">Transport</div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="toggleSvc(this,'transport')" id="svcTransport" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Transport</button>
+            </div>
+          </div>
+          <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase mb-1.5">Warehouse</div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="toggleSvc(this,'storage')" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Storage</button>
+              <button onclick="toggleSvc(this,'in_out')" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">In/Out</button>
+              <button onclick="toggleSvc(this,'repack')" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Repack</button>
+              <button onclick="toggleSvc(this,'dg_inspection')" class="svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">DG Inspection</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== STEP 3A: NORMAL SO (not transport-only) ========== -->
+      <div id="normalForm" class="space-y-5">
+        <!-- Reference + AWB -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Reference / PO</label>
+            <input placeholder="PO-12345" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">AWB (optional)</label>
+            <input placeholder="045-12345678" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+          </div>
+        </div>
+
+        <!-- Transport route (only if transport selected among other services) -->
+        <div id="normalTransportFields" class="hidden p-3 bg-gray-50 rounded-lg grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Pickup from</label>
+            <input placeholder="Origin address" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Deliver to</label>
+            <input placeholder="Destination address" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+          </div>
+        </div>
+
+        <!-- Declared Cargo -->
+        <div>
+          <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Declared Cargo</label>
+          <div class="grid grid-cols-3 gap-3">
+            <input type="number" min="1" placeholder="Pieces *" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+            <input type="number" min="0" step="0.1" placeholder="Weight (kg)" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+            <select class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+              <option>General</option>
+              <option>Special Cargo</option>
+              <option>Dangerous Goods</option>
+              <option>Perishable</option>
+              <option>Oversize</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-xs text-gray-500 font-semibold">Mode:</span>
+            <button class="text-xs px-3 py-1.5 rounded-full border bg-mcl-blue text-white border-mcl-blue">Local</button>
+            <button class="text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Bonded</button>
+          </div>
+          <input placeholder="Cargo description" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 mt-2">
+        </div>
+
+        <!-- Driver / Check-in -->
+        <div class="border-t border-gray-100 pt-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="accent-mcl-blue">
+            <span class="text-sm text-gray-700 font-semibold">Driver present (check-in now)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ========== STEP 3B: TRANSPORT ONLY ========== -->
+      <div id="transportForm" class="hidden space-y-5">
+        <!-- Cargo type, mode, description (one row) -->
+        <div>
+          <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Cargo</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">Type</span>
+              <select class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+                <option>General</option>
+                <option selected>Special Cargo</option>
+                <option>Dangerous Goods</option>
+                <option>Perishable</option>
+                <option>Oversize</option>
+              </select>
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">Mode</span>
+              <div class="flex gap-1 mt-0.5">
+                <button class="text-xs px-3 py-1.5 rounded-full border bg-mcl-blue text-white border-mcl-blue font-semibold">Local</button>
+                <button class="text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200">Bonded</button>
+              </div>
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">Description</span>
+              <input placeholder="Electronic parts" value="Electronic parts" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport Type: BUP / Loose -->
+        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-emerald-700 uppercase block mb-1">Transport Type *</label>
+            <div class="flex gap-2">
+              <button id="btnBup" onclick="setTransportType('bup')" class="text-xs px-4 py-2 rounded-full border font-semibold bg-mcl-blue text-white border-mcl-blue">BUP / ULD</button>
+              <button id="btnLoose" onclick="setTransportType('loose')" class="text-xs px-4 py-2 rounded-full border font-semibold bg-white text-gray-600 border-gray-200">Loose</button>
+            </div>
+          </div>
+
+          <!-- BUP count + ULD numbers (only when BUP) -->
+          <div id="bupFields" class="space-y-3">
+            <div>
+              <label class="text-xs font-semibold text-emerald-700 uppercase block mb-1">Number of BUPs *</label>
+              <input type="number" min="1" value="3" class="w-32 border border-emerald-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/40 bg-white font-semibold">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-emerald-700 uppercase block mb-1">ULD / BUP Numbers (optional)</label>
+              <div class="flex gap-2">
+                <input id="uldInput" placeholder="e.g. AKE12345AA" class="flex-1 border border-emerald-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-400/40 bg-white" onkeydown="if(event.key==='Enter'){event.preventDefault();addUld()}">
+                <button onclick="addUld()" class="text-xs bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-lg font-semibold">Add</button>
+              </div>
+              <div id="uldTags" class="flex flex-wrap gap-1.5 mt-2">
+                <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono">AKE12345AA <button onclick="this.parentElement.remove()" class="text-blue-400 hover:text-red-500">&times;</button></span>
+                <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono">AKE12346AA <button onclick="this.parentElement.remove()" class="text-blue-400 hover:text-red-500">&times;</button></span>
+                <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono">AKE12347AA <button onclick="this.parentElement.remove()" class="text-blue-400 hover:text-red-500">&times;</button></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route -->
+        <div>
+          <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Route</label>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">Pickup from *</span>
+              <input placeholder="Origin address" value="MCL Warehouse, 7320 NW 12th St" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">Deliver to *</span>
+              <input placeholder="Destination address" value="MIA Cargo Building 806" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+            </div>
+          </div>
+          <!-- Extra stops -->
+          <div id="extraStopsContainer" class="space-y-2 mt-2">
+          </div>
+          <button onclick="addExtraStop()" class="text-xs text-mcl-blue hover:underline mt-2">+ Add Extra Stop</button>
+        </div>
+
+        <!-- Cargo Lines -->
+        <div>
+          <label class="text-xs font-semibold text-gray-500 uppercase block mb-1">Cargo Lines</label>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" id="cargoTable">
+              <thead>
+                <tr class="text-[10px] text-gray-400 uppercase">
+                  <th class="text-left pb-1 pr-2 font-semibold">AWB</th>
+                  <th class="text-left pb-1 pr-2 font-semibold">Reference / PO</th>
+                  <th class="text-right pb-1 pr-2 font-semibold w-20">Pieces</th>
+                  <th class="text-right pb-1 pr-2 font-semibold w-24">Weight (kg)</th>
+                  <th class="text-left pb-1 pr-2 font-semibold">Note</th>
+                  <th class="w-8"></th>
+                </tr>
+              </thead>
+              <tbody id="cargoLines">
+                <tr class="cargo-line">
+                  <td class="pr-2 pb-2"><input value="417-12788252" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="045-12345678"></td>
+                  <td class="pr-2 pb-2"><input value="PO-99821" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="PO-12345"></td>
+                  <td class="pr-2 pb-2"><input type="number" value="50" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 cargo-pcs" oninput="updateTotals()"></td>
+                  <td class="pr-2 pb-2"><input type="number" step="0.1" value="820" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 cargo-kg" oninput="updateTotals()"></td>
+                  <td class="pr-2 pb-2"><input value="Fragile" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="Optional"></td>
+                  <td class="pb-2"><button onclick="this.closest('tr').remove(); updateTotals()" class="text-red-400 hover:text-red-600 text-lg leading-none">&times;</button></td>
+                </tr>
+                <tr class="cargo-line">
+                  <td class="pr-2 pb-2"><input value="417-12788253" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="045-12345678"></td>
+                  <td class="pr-2 pb-2"><input value="PO-99822" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="PO-12345"></td>
+                  <td class="pr-2 pb-2"><input type="number" value="30" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 cargo-pcs" oninput="updateTotals()"></td>
+                  <td class="pr-2 pb-2"><input type="number" step="0.1" value="450.5" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 cargo-kg" oninput="updateTotals()"></td>
+                  <td class="pr-2 pb-2"><input class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="Optional"></td>
+                  <td class="pb-2"><button onclick="this.closest('tr').remove(); updateTotals()" class="text-red-400 hover:text-red-600 text-lg leading-none">&times;</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button onclick="addCargoLine()" class="text-xs text-mcl-blue hover:underline mt-1">+ Add Line</button>
+
+          <!-- Totals -->
+          <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
+            <span class="text-sm text-gray-700">Total Pieces: <strong id="totalPcs">80</strong></span>
+            <span class="text-sm text-gray-700">Total Weight: <strong id="totalKg">1,270.5</strong> kg</span>
+            <span id="bupBadge" class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">BUP: 3 units</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+      <button class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+      <button id="btnCreateSO" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2 rounded-lg">Create SO</button>
+      <button id="btnCreateCheckIn" class="text-sm bg-mcl-blue hover:bg-blue-900 text-white font-semibold px-5 py-2 rounded-lg">Create SO + Check-in</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedServices = new Set();
+let currentMode = 'normal';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btnNormal').className = mode === 'normal'
+    ? 'text-xs px-3 py-1.5 rounded-full border font-semibold bg-mcl-blue text-white border-mcl-blue'
+    : 'text-xs px-3 py-1.5 rounded-full border font-semibold bg-white text-gray-600 border-gray-200';
+  document.getElementById('btnTransport').className = mode === 'transport'
+    ? 'text-xs px-3 py-1.5 rounded-full border font-semibold bg-mcl-blue text-white border-mcl-blue'
+    : 'text-xs px-3 py-1.5 rounded-full border font-semibold bg-white text-gray-600 border-gray-200';
+
+  // Reset all service buttons
+  document.querySelectorAll('.svc-btn').forEach(b => {
+    b.className = 'svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200';
+  });
+  selectedServices.clear();
+
+  if (mode === 'transport') {
+    // Auto-select transport only
+    const btn = document.getElementById('svcTransport');
+    btn.className = 'svc-btn text-xs px-3 py-1.5 rounded-full border bg-mcl-blue text-white border-mcl-blue';
+    selectedServices.add('transport');
+  }
+
+  updateVisibility();
+}
+
+function toggleSvc(btn, type) {
+  if (selectedServices.has(type)) {
+    selectedServices.delete(type);
+    btn.className = 'svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200';
+  } else {
+    // Only one screening at a time
+    if (type.startsWith('screening_')) {
+      document.querySelectorAll('.svc-btn').forEach(b => {
+        const t = b.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+        if (t && t.startsWith('screening_') && selectedServices.has(t)) {
+          selectedServices.delete(t);
+          b.className = 'svc-btn text-xs px-3 py-1.5 rounded-full border bg-white text-gray-600 border-gray-200';
+        }
+      });
+    }
+    selectedServices.add(type);
+    btn.className = 'svc-btn text-xs px-3 py-1.5 rounded-full border bg-mcl-blue text-white border-mcl-blue';
+  }
+  updateVisibility();
+}
+
+function updateVisibility() {
+  const isTransportOnly = selectedServices.size === 1 && selectedServices.has('transport');
+  const hasTransport = selectedServices.has('transport');
+
+  document.getElementById('normalForm').style.display = isTransportOnly ? 'none' : 'block';
+  document.getElementById('transportForm').style.display = isTransportOnly ? 'block' : 'none';
+  document.getElementById('normalTransportFields').style.display = (hasTransport && !isTransportOnly) ? 'grid' : 'none';
+
+  // Hide check-in button for transport-only
+  document.getElementById('btnCreateCheckIn').style.display = isTransportOnly ? 'none' : 'inline-flex';
+}
+
+function setTransportType(type) {
+  document.getElementById('btnBup').className = type === 'bup'
+    ? 'text-xs px-4 py-2 rounded-full border font-semibold bg-mcl-blue text-white border-mcl-blue'
+    : 'text-xs px-4 py-2 rounded-full border font-semibold bg-white text-gray-600 border-gray-200';
+  document.getElementById('btnLoose').className = type === 'loose'
+    ? 'text-xs px-4 py-2 rounded-full border font-semibold bg-mcl-blue text-white border-mcl-blue'
+    : 'text-xs px-4 py-2 rounded-full border font-semibold bg-white text-gray-600 border-gray-200';
+  document.getElementById('bupFields').style.display = type === 'bup' ? 'block' : 'none';
+  document.getElementById('bupBadge').style.display = type === 'bup' ? 'inline-flex' : 'none';
+}
+
+function addUld() {
+  const input = document.getElementById('uldInput');
+  const val = input.value.trim();
+  if (!val) return;
+  const container = document.getElementById('uldTags');
+  const span = document.createElement('span');
+  span.className = 'text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono';
+  span.innerHTML = `${val} <button onclick="this.parentElement.remove()" class="text-blue-400 hover:text-red-500">&times;</button>`;
+  container.appendChild(span);
+  input.value = '';
+  input.focus();
+}
+
+function addExtraStop() {
+  const container = document.getElementById('extraStopsContainer');
+  const idx = container.children.length;
+  const div = document.createElement('div');
+  div.className = 'flex gap-2 items-end';
+  div.innerHTML = `
+    <div class="flex-1">
+      <span class="text-[10px] text-gray-400 block mb-0.5">Extra Stop ${idx + 1}</span>
+      <input placeholder="Stop address" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30">
+    </div>
+    <button onclick="this.parentElement.remove()" class="text-xs text-red-400 hover:text-red-600 px-2 py-2">Remove</button>
+  `;
+  container.appendChild(div);
+}
+
+function addCargoLine() {
+  const tbody = document.getElementById('cargoLines');
+  const tr = document.createElement('tr');
+  tr.className = 'cargo-line';
+  tr.innerHTML = `
+    <td class="pr-2 pb-2"><input class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="045-12345678"></td>
+    <td class="pr-2 pb-2"><input class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="PO-12345"></td>
+    <td class="pr-2 pb-2"><input type="number" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 cargo-pcs" oninput="updateTotals()"></td>
+    <td class="pr-2 pb-2"><input type="number" step="0.1" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-mcl-blue/30 cargo-kg" oninput="updateTotals()"></td>
+    <td class="pr-2 pb-2"><input class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-mcl-blue/30" placeholder="Optional"></td>
+    <td class="pb-2"><button onclick="this.closest('tr').remove(); updateTotals()" class="text-red-400 hover:text-red-600 text-lg leading-none">&times;</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function updateTotals() {
+  let pcs = 0, kg = 0;
+  document.querySelectorAll('.cargo-pcs').forEach(i => pcs += parseFloat(i.value) || 0);
+  document.querySelectorAll('.cargo-kg').forEach(i => kg += parseFloat(i.value) || 0);
+  document.getElementById('totalPcs').textContent = pcs.toLocaleString();
+  document.getElementById('totalKg').textContent = kg.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 });
+}
+
+// Init
+updateVisibility();
+</script>
+
+</body>
+</html>

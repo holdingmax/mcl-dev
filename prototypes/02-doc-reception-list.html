@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recepcion Documental - Lista</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: { extend: { colors: { 'mcl-blue': '#1e40af', 'mcl-light': '#3b82f6' } } }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-mcl-blue text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="01-warehouse-dashboard.html" class="text-white/70 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <h1 class="text-lg font-bold">Recepcion Documental</h1>
+      </div>
+      <a href="02-doc-reception-new.html" class="bg-white text-mcl-blue px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-50 transition-colors">
+        + Nueva Recepcion
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <input type="text" placeholder="Buscar AWB..." class="border border-gray-200 rounded-lg px-3 py-2 text-sm w-64 focus:outline-none focus:border-mcl-blue">
+      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600">
+        <option>Todos los estados</option>
+        <option>Pendiente recepcion fisica</option>
+        <option>Documentos completos</option>
+        <option>Documentos incompletos</option>
+      </select>
+      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600">
+        <option>Todas las fechas</option>
+        <option>Hoy</option>
+        <option>Ultimos 7 dias</option>
+        <option>Este mes</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">AWB</th>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">Cliente</th>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">Tipo</th>
+            <th class="text-center px-3 py-3 font-medium text-gray-600">Piezas</th>
+            <th class="text-right px-3 py-3 font-medium text-gray-600">Peso (kg)</th>
+            <th class="text-right px-3 py-3 font-medium text-gray-600">Chg Wt (kg)</th>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">Almacen</th>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">Vuelo</th>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">Driver</th>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">Fecha</th>
+            <th class="text-left px-3 py-3 font-medium text-gray-600">Estado</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr class="hover:bg-gray-50 cursor-pointer">
+            <td class="px-3 py-3 font-mono font-medium text-mcl-blue">057-12345678</td>
+            <td class="px-3 py-3 text-gray-700">Amazon Logistics</td>
+            <td class="px-3 py-3"><span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">Loose</span></td>
+            <td class="px-3 py-3 text-center text-gray-700">45</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">1,250.00</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">1,450.00</td>
+            <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium">Bonded</span></td>
+            <td class="px-3 py-3 text-gray-600 font-mono text-xs">CM801</td>
+            <td class="px-3 py-3 text-gray-600">Juan Perez</td>
+            <td class="px-3 py-3 text-gray-500 text-xs">16 May, 08:30</td>
+            <td class="px-3 py-3"><span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium">Completo</span></td>
+          </tr>
+          <tr class="hover:bg-gray-50 cursor-pointer">
+            <td class="px-3 py-3 font-mono font-medium text-mcl-blue">176-98765432</td>
+            <td class="px-3 py-3 text-gray-700">DHL Express</td>
+            <td class="px-3 py-3"><span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">BUP - PMC4521</span></td>
+            <td class="px-3 py-3 text-center text-gray-700">120</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">3,200.00</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">3,850.00</td>
+            <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium">Bonded</span></td>
+            <td class="px-3 py-3 text-gray-600 font-mono text-xs">AA950</td>
+            <td class="px-3 py-3 text-gray-600">Carlos Ruiz</td>
+            <td class="px-3 py-3 text-gray-500 text-xs">16 May, 09:15</td>
+            <td class="px-3 py-3"><span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium">Completo</span></td>
+          </tr>
+          <tr class="hover:bg-gray-50 cursor-pointer">
+            <td class="px-3 py-3 font-mono font-medium text-mcl-blue">045-55667788</td>
+            <td class="px-3 py-3 text-gray-700">FedEx Corp</td>
+            <td class="px-3 py-3"><span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">BUP</span></td>
+            <td class="px-3 py-3 text-center text-gray-700">30</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">890.00</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">1,020.00</td>
+            <td class="px-3 py-3"><span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium">Local</span></td>
+            <td class="px-3 py-3 text-gray-600 font-mono text-xs">L72545</td>
+            <td class="px-3 py-3 text-gray-600">Miguel Torres</td>
+            <td class="px-3 py-3 text-gray-500 text-xs">16 May, 10:00</td>
+            <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium">Pend. Fisica</span></td>
+          </tr>
+          <tr class="hover:bg-gray-50 cursor-pointer">
+            <td class="px-3 py-3 font-mono font-medium text-mcl-blue">020-11223344</td>
+            <td class="px-3 py-3 text-gray-700">Mercado Libre</td>
+            <td class="px-3 py-3"><span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">Loose</span></td>
+            <td class="px-3 py-3 text-center text-gray-700">8</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">185.50</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">210.00</td>
+            <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium">Bonded</span></td>
+            <td class="px-3 py-3 text-gray-600 font-mono text-xs">CM801</td>
+            <td class="px-3 py-3 text-gray-600">Ana Garcia</td>
+            <td class="px-3 py-3 text-gray-500 text-xs">15 May, 16:45</td>
+            <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium">Pend. Fisica</span></td>
+          </tr>
+          <tr class="hover:bg-gray-50 cursor-pointer">
+            <td class="px-3 py-3 font-mono font-medium text-mcl-blue">580-99887766</td>
+            <td class="px-3 py-3 text-gray-700">Ceva Logistics</td>
+            <td class="px-3 py-3"><span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">Loose</span></td>
+            <td class="px-3 py-3 text-center text-gray-700">15</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">420.00</td>
+            <td class="px-3 py-3 text-right font-mono text-gray-700">520.00</td>
+            <td class="px-3 py-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium">Bonded</span></td>
+            <td class="px-3 py-3 text-gray-600 font-mono text-xs">QT4091</td>
+            <td class="px-3 py-3 text-gray-600">Roberto Silva</td>
+            <td class="px-3 py-3 text-gray-500 text-xs">15 May, 14:20</td>
+            <td class="px-3 py-3"><span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium">En Rec. Fisica</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

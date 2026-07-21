@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MCL — DO &amp; POD Mockups</title>
+<style>
+  @page { size: letter; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #e5e7eb; }
+
+  .page {
+    width: 8.5in; min-height: 11in; margin: 40px auto; background: #fff;
+    padding: 0.6in 0.7in; position: relative; box-shadow: 0 4px 24px rgba(0,0,0,.12);
+    page-break-after: always;
+  }
+
+  /* ── Header ── */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #0f1d3a; padding-bottom: 14px; margin-bottom: 18px; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo-box { width: 56px; height: 56px; background: #0f1d3a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 14px; letter-spacing: 1px; }
+  .company-name { font-size: 18px; font-weight: 800; color: #0f1d3a; }
+  .company-sub { font-size: 10px; color: #6b7280; margin-top: 2px; }
+  .doc-title-block { text-align: right; }
+  .doc-title { font-size: 22px; font-weight: 900; color: #0f1d3a; letter-spacing: 1px; }
+  .doc-number { font-size: 16px; font-weight: 700; color: #2563eb; font-family: 'Courier New', monospace; margin-top: 2px; }
+  .doc-date { font-size: 10px; color: #6b7280; margin-top: 4px; }
+
+  /* ── Info grids ── */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; margin-bottom: 16px; }
+  .info-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .info-cell { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; }
+  .info-cell:nth-child(even) { border-right: none; }
+  .info-grid-3 .info-cell:nth-child(3n) { border-right: none; }
+  .info-cell:last-child, .info-cell:nth-last-child(1), .info-cell:nth-last-child(2) { border-bottom: none; }
+  .info-grid-3 .info-cell:nth-last-child(3) { border-bottom: none; }
+  .info-label { font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .info-value { font-size: 11px; font-weight: 600; color: #1f2937; }
+  .info-value.mono { font-family: 'Courier New', monospace; }
+  .info-value.blue { color: #2563eb; }
+
+  /* ── Section titles ── */
+  .section-title { font-size: 10px; font-weight: 800; color: #0f1d3a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1.5px solid #e5e7eb; }
+
+  /* ── Route box ── */
+  .route-box { display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; }
+  .route-point { flex: 1; }
+  .route-label { font-size: 8px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+  .route-value { font-size: 11px; font-weight: 600; color: #1f2937; margin-top: 2px; }
+  .route-arrow { font-size: 20px; color: #2563eb; font-weight: 900; }
+
+  /* ── Table ── */
+  .cargo-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 10px; }
+  .cargo-table thead th { background: #0f1d3a; color: #fff; padding: 6px 8px; text-align: left; font-weight: 700; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cargo-table thead th:first-child { border-radius: 4px 0 0 0; }
+  .cargo-table thead th:last-child { border-radius: 0 4px 0 0; }
+  .cargo-table tbody td { padding: 6px 8px; border-bottom: 1px solid #e5e7eb; color: #374151; }
+  .cargo-table tbody tr:last-child td { border-bottom: none; }
+  .cargo-table tfoot td { padding: 6px 8px; font-weight: 700; background: #f3f4f6; border-top: 2px solid #d1d5db; color: #1f2937; }
+
+  /* ── Custody badge ── */
+  .custody-badge { display: inline-block; background: #dbeafe; color: #1e40af; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+
+  /* ── Signatures ── */
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
+  .sig-box { border-top: 1.5px solid #1f2937; padding-top: 6px; }
+  .sig-label { font-size: 9px; font-weight: 700; color: #6b7280; text-transform: uppercase; }
+  .sig-name { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+  .sig-space { height: 50px; }
+
+  /* ── Footer ── */
+  .footer { position: absolute; bottom: 0.5in; left: 0.7in; right: 0.7in; text-align: center; font-size: 8px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 8px; }
+
+  /* ── POD specifics ── */
+  .pod-receiver-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 14px 16px; margin-bottom: 16px; }
+  .services-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 10px; }
+  .services-table thead th { background: #065f46; color: #fff; padding: 6px 8px; text-align: left; font-weight: 700; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .services-table thead th:first-child { border-radius: 4px 0 0 0; }
+  .services-table thead th:last-child { border-radius: 0 4px 0 0; }
+  .services-table tbody td { padding: 6px 8px; border-bottom: 1px solid #e5e7eb; color: #374151; }
+  .status-badge { display: inline-block; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; }
+  .status-completed { background: #dcfce7; color: #166534; }
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-cancelled { background: #f3f4f6; color: #6b7280; }
+
+  .photo-placeholder { width: 120px; height: 90px; background: #f3f4f6; border: 1px dashed #d1d5db; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; }
+
+  .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 72px; font-weight: 900; color: rgba(0,0,0,0.03); letter-spacing: 10px; pointer-events: none; }
+
+  h2.page-separator { text-align: center; padding: 30px; color: #6b7280; font-size: 14px; background: #e5e7eb; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PAGE 1: DELIVERY ORDER — SO-260513-0001 (Bringer Air Cargo + Transport)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="watermark">DELIVERY ORDER</div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">MCL</div>
+      <div>
+        <div class="company-name">MinCurl Logistics LLC</div>
+        <div class="company-sub">2323 NW 82nd Ave, Doral, FL 33122 &nbsp;|&nbsp; +1 (786) 534-5440</div>
+      </div>
+    </div>
+    <div class="doc-title-block">
+      <div class="doc-title">DELIVERY ORDER</div>
+      <div class="doc-number">WS-DO-00001</div>
+      <div class="doc-date">Date: 13-05-2026</div>
+    </div>
+  </div>
+
+  <!-- Service Order & Client info -->
+  <div class="section-title">Order Information</div>
+  <div class="info-grid" style="margin-bottom:16px">
+    <div class="info-cell">
+      <div class="info-label">Service Order</div>
+      <div class="info-value mono blue">SO-260513-0001</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Client</div>
+      <div class="info-value">Bringer Air Cargo</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">AWB</div>
+      <div class="info-value mono">417-12788252</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Warehouse Receipt</div>
+      <div class="info-value mono blue">WS-000009</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Cargo Type</div>
+      <div class="info-value">General &mdash; Local</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Reference</div>
+      <div class="info-value">&mdash;</div>
+    </div>
+  </div>
+
+  <!-- Route -->
+  <div class="section-title">Route</div>
+  <div class="route-box">
+    <div class="route-point">
+      <div class="route-label">Origin (Pick-up)</div>
+      <div class="route-value">2323 NW 82nd Ave, Doral (MCL)</div>
+    </div>
+    <div class="route-arrow">&rarr;</div>
+    <div class="route-point">
+      <div class="route-label">Destination (Deliver to)</div>
+      <div class="route-value">Transportes Aereos Bolivianos<br>1601 NW 70th Ave, Miami FL 33126 US</div>
+    </div>
+  </div>
+
+  <!-- Transport Details -->
+  <div class="section-title">Transport Details</div>
+  <div class="info-grid info-grid-3" style="margin-bottom:16px">
+    <div class="info-cell">
+      <div class="info-label">Trucking Company</div>
+      <div class="info-value">CO-Transportation</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Driver</div>
+      <div class="info-value">JAVIER ROMERO</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Custody Method</div>
+      <div class="info-value"><span class="custody-badge">Tamper Seal</span></div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Seal Number</div>
+      <div class="info-value mono">10171619</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">MCL Agent</div>
+      <div class="info-value">diego.garcia</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Departure Time</div>
+      <div class="info-value">13-05-2026, 2:40 PM</div>
+    </div>
+  </div>
+
+  <!-- Cargo Table -->
+  <div class="section-title">Cargo Details</div>
+  <table class="cargo-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Type</th>
+        <th>Qty</th>
+        <th>L (cm)</th>
+        <th>W (cm)</th>
+        <th>H (cm)</th>
+        <th>CBM</th>
+        <th>Weight (kg)</th>
+        <th>Location</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Pallet</td>
+        <td>1</td>
+        <td>120</td>
+        <td>100</td>
+        <td>80</td>
+        <td>0.960</td>
+        <td>250.0</td>
+        <td>A-01</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">TOTAL</td>
+        <td>1</td>
+        <td colspan="3"></td>
+        <td>0.960</td>
+        <td>250.0 kg</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Signatures -->
+  <div class="sig-grid">
+    <div>
+      <div class="sig-space"></div>
+      <div class="sig-box">
+        <div class="sig-label">Released by (MCL Agent)</div>
+        <div class="sig-name">Name: ________________________</div>
+      </div>
+    </div>
+    <div>
+      <div class="sig-space"></div>
+      <div class="sig-box">
+        <div class="sig-label">Received by (Driver)</div>
+        <div class="sig-name">Name: ________________________</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    MinCurl Logistics LLC &nbsp;&bull;&nbsp; 2323 NW 82nd Ave, Doral, FL 33122 &nbsp;&bull;&nbsp; info@mincurllogistics.com &nbsp;&bull;&nbsp; +1 (786) 534-5440<br>
+    This document authorizes the release and transport of the cargo described above.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PAGE 2: POD — SO-260513-0002 (Usa International Freight Corp, sin transport)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="watermark">PROOF OF SERVICE</div>
+
+  <!-- Header -->
+  <div class="header" style="border-bottom-color: #065f46;">
+    <div class="header-left">
+      <div class="logo-box" style="background:#065f46;">MCL</div>
+      <div>
+        <div class="company-name" style="color:#065f46;">MinCurl Logistics LLC</div>
+        <div class="company-sub">2323 NW 82nd Ave, Doral, FL 33122 &nbsp;|&nbsp; +1 (786) 534-5440</div>
+      </div>
+    </div>
+    <div class="doc-title-block">
+      <div class="doc-title" style="color:#065f46;">PROOF OF SERVICE</div>
+      <div class="doc-number" style="color:#059669;">SO-260513-0002</div>
+      <div class="doc-date">Completed: 13-05-2026, 7:23 PM</div>
+    </div>
+  </div>
+
+  <!-- Order Info -->
+  <div class="section-title" style="border-bottom-color:#bbf7d0;">Order Information</div>
+  <div class="info-grid" style="margin-bottom:16px">
+    <div class="info-cell">
+      <div class="info-label">Service Order</div>
+      <div class="info-value mono blue">SO-260513-0002</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Client</div>
+      <div class="info-value">Usa International Freight Corp</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Warehouse Receipt</div>
+      <div class="info-value mono blue">WS-000010</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">AWB</div>
+      <div class="info-value">&mdash;</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Cargo Description</div>
+      <div class="info-value">Mudanzas - Screening Local sin certificado CCSF</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Reference</div>
+      <div class="info-value">&mdash;</div>
+    </div>
+  </div>
+
+  <!-- Cargo Summary -->
+  <div class="section-title" style="border-bottom-color:#bbf7d0;">Cargo Delivered</div>
+  <table class="cargo-table">
+    <thead>
+      <tr>
+        <th style="background:#065f46;">#</th>
+        <th style="background:#065f46;">Type</th>
+        <th style="background:#065f46;">Qty</th>
+        <th style="background:#065f46;">L (cm)</th>
+        <th style="background:#065f46;">W (cm)</th>
+        <th style="background:#065f46;">H (cm)</th>
+        <th style="background:#065f46;">CBM</th>
+        <th style="background:#065f46;">Weight (kg)</th>
+        <th style="background:#065f46;">Location</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Box</td>
+        <td>1</td>
+        <td>60</td>
+        <td>40</td>
+        <td>40</td>
+        <td>0.096</td>
+        <td>50.0</td>
+        <td>B-03</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Box</td>
+        <td>1</td>
+        <td>80</td>
+        <td>60</td>
+        <td>50</td>
+        <td>0.240</td>
+        <td>50.0</td>
+        <td>B-04</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" style="background:#f0fdf4;">TOTAL</td>
+        <td style="background:#f0fdf4;">2</td>
+        <td colspan="3" style="background:#f0fdf4;"></td>
+        <td style="background:#f0fdf4;">0.336</td>
+        <td style="background:#f0fdf4;">100.0 kg</td>
+        <td style="background:#f0fdf4;"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Services Performed -->
+  <div class="section-title" style="border-bottom-color:#bbf7d0;">Services Performed</div>
+  <table class="services-table">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Status</th>
+        <th>Completed</th>
+        <th>By</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Screening X-Ray</td>
+        <td><span class="status-badge status-completed">Completed</span></td>
+        <td>13-05-2026, 2:34 PM</td>
+        <td>wilber.machado</td>
+      </tr>
+      <tr>
+        <td>In/Out</td>
+        <td><span class="status-badge status-completed">Completed</span></td>
+        <td>13-05-2026, 7:23 PM</td>
+        <td>diego.garcia</td>
+      </tr>
+      <tr>
+        <td>Storage</td>
+        <td><span class="status-badge status-completed">Completed</span></td>
+        <td>13-05-2026, 7:23 PM</td>
+        <td>diego.garcia</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- POD Receiver -->
+  <div class="section-title" style="border-bottom-color:#bbf7d0;">Delivery Confirmation</div>
+  <div class="pod-receiver-box">
+    <div class="info-grid" style="border:none; margin:0;">
+      <div class="info-cell" style="border:none; padding: 4px 0;">
+        <div class="info-label">Received By</div>
+        <div class="info-value" style="font-size:14px;">Carlos Martinez</div>
+      </div>
+      <div class="info-cell" style="border:none; padding: 4px 0;">
+        <div class="info-label">ID / License</div>
+        <div class="info-value mono">FL-D123-456-789</div>
+      </div>
+      <div class="info-cell" style="border:none; padding: 4px 0;">
+        <div class="info-label">Date &amp; Time</div>
+        <div class="info-value">13-05-2026, 7:23:59 PM</div>
+      </div>
+      <div class="info-cell" style="border:none; padding: 4px 0;">
+        <div class="info-label">MCL Agent</div>
+        <div class="info-value">diego.garcia</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;">
+      <div class="info-label">Notes</div>
+      <div class="info-value" style="font-weight:400; font-style:italic;">Cargo entregado en buenas condiciones. Cliente confirma recepcion completa.</div>
+    </div>
+  </div>
+
+  <!-- Photo + Signatures -->
+  <div style="display:flex; gap:30px; align-items:flex-end; margin-top:20px;">
+    <div>
+      <div class="info-label" style="margin-bottom:6px;">Photo Evidence</div>
+      <div class="photo-placeholder">POD Photo</div>
+    </div>
+    <div style="flex:1;">
+      <div class="sig-grid" style="margin-top:0;">
+        <div>
+          <div class="sig-space" style="height:40px;"></div>
+          <div class="sig-box" style="border-top-color:#065f46;">
+            <div class="sig-label">Delivered by (MCL)</div>
+            <div class="sig-name">Name: ________________________</div>
+          </div>
+        </div>
+        <div>
+          <div class="sig-space" style="height:40px;"></div>
+          <div class="sig-box" style="border-top-color:#065f46;">
+            <div class="sig-label">Received by (Client)</div>
+            <div class="sig-name">Name: ________________________</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer" style="border-top-color:#bbf7d0;">
+    MinCurl Logistics LLC &nbsp;&bull;&nbsp; 2323 NW 82nd Ave, Doral, FL 33122 &nbsp;&bull;&nbsp; info@mincurllogistics.com &nbsp;&bull;&nbsp; +1 (786) 534-5440<br>
+    This document certifies the completion of services and receipt of the cargo described above.
+  </div>
+</div>
+
+</body>
+</html>

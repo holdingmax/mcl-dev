@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airfreight Warehouse Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          colors: {
+            'mcl-blue': '#1e40af',
+            'mcl-light': '#3b82f6',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-mcl-blue text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <!-- Module nav icons -->
+        <div class="flex items-center gap-2 mr-4">
+          <a href="#" class="p-1.5 rounded text-white/50 hover:text-white" title="Sea Freight">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17h18M3 17l2-7h14l2 7M5 10V7a2 2 0 012-2h10a2 2 0 012 2v3"/>
+            </svg>
+          </a>
+          <a href="#" class="p-1.5 rounded bg-white/20 text-white" title="Air Freight">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l-7-7 1.41-1.41L11 15.17V2h2v13.17l4.59-4.58L19 12l-7 7z"/>
+            </svg>
+          </a>
+          <a href="#" class="p-1.5 rounded text-white/50 hover:text-white" title="Warehouse Services">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
+            </svg>
+          </a>
+        </div>
+        <h1 class="text-lg font-bold">Airfreight Warehouse</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-white/70">Admin</span>
+        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-sm font-bold">A</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="max-w-7xl mx-auto px-4 py-3">
+    <nav class="text-sm text-gray-500">
+      <a href="#" class="hover:text-mcl-blue">Airfreight</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-800 font-medium">Warehouse</span>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 pb-12">
+    <p class="text-sm text-gray-500 mb-6">Modulos de gestion de bodega para carga aerea</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Document Reception -->
+      <a href="02-doc-reception-list.html" class="bg-white rounded-xl border border-gray-200 p-6 hover:border-mcl-blue hover:shadow-md transition-all group">
+        <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
+          <svg class="w-6 h-6 text-mcl-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-800 mb-1">Recepcion Documental</h3>
+        <p class="text-xs text-gray-400">Registro de guias aereas, verificacion de documentos y datos del driver</p>
+        <div class="mt-3 flex items-center gap-2">
+          <span class="text-xs bg-blue-50 text-mcl-blue px-2 py-0.5 rounded-full font-medium">3 pendientes</span>
+        </div>
+      </a>
+
+      <!-- Physical Reception -->
+      <a href="03-physical-reception.html" class="bg-white rounded-xl border border-gray-200 p-6 hover:border-mcl-blue hover:shadow-md transition-all group">
+        <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center mb-4 group-hover:bg-green-100 transition-colors">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-800 mb-1">Recepcion Fisica</h3>
+        <p class="text-xs text-gray-400">Conteo pieza por pieza, pesaje, medicion y etiquetado con barcode</p>
+        <div class="mt-3 flex items-center gap-2">
+          <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium">2 en proceso</span>
+        </div>
+      </a>
+
+      <!-- ULD Build-up -->
+      <a href="04-uld-buildup.html" class="bg-white rounded-xl border border-gray-200 p-6 hover:border-mcl-blue hover:shadow-md transition-all group">
+        <div class="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center mb-4 group-hover:bg-purple-100 transition-colors">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-800 mb-1">ULD Build-up</h3>
+        <p class="text-xs text-gray-400">Armado de ULDs, asignacion de piezas y cierre para despacho</p>
+        <div class="mt-3 flex items-center gap-2">
+          <span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">1 ULD abierto</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-gray-800">12</p>
+        <p class="text-xs text-gray-400 mt-1">AWBs en bodega</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-gray-800">87</p>
+        <p class="text-xs text-gray-400 mt-1">Piezas totales</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-gray-800">3</p>
+        <p class="text-xs text-gray-400 mt-1">ULDs abiertos</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-gray-800">5</p>
+        <p class="text-xs text-gray-400 mt-1">Pendientes recepcion</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
