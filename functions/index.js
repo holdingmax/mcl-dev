@@ -8,6 +8,7 @@ const Anthropic = require('@anthropic-ai/sdk')
 const nodemailer = require('nodemailer')
 const puppeteerCore = require('puppeteer-core')
 const chromium = require('@sparticuz/chromium').default
+const mysql = require('mysql2/promise')
 
 admin.initializeApp()
 
@@ -22,6 +23,31 @@ const ANTHROPIC_API_KEY = defineSecret('ANTHROPIC_API_KEY')
 const GMAIL_USER = defineSecret('GMAIL_USER')
 const GMAIL_APP_PASSWORD = defineSecret('GMAIL_APP_PASSWORD')
 const AV_GMAIL_REFRESH_TOKEN = defineSecret('AV_GMAIL_REFRESH_TOKEN')
+
+// MariaDB (Inmotion) — POC de migracion de facturacion/WR
+const MARIADB_HOST = defineSecret('MARIADB_HOST')
+const MARIADB_PORT = defineSecret('MARIADB_PORT')
+const MARIADB_DATABASE = defineSecret('MARIADB_DATABASE')
+const MARIADB_USER = defineSecret('MARIADB_USER')
+const MARIADB_PASSWORD = defineSecret('MARIADB_PASSWORD')
+
+// Pool de conexiones a MariaDB, creado una sola vez por instancia "warm" y
+// reutilizado entre invocaciones — nunca una conexion nueva por invocacion,
+// para no agotar el limite bajo de conexiones concurrentes del hosting compartido.
+let mariaDbPool = null
+function getMariaDbPool() {
+  if (mariaDbPool) return mariaDbPool
+  mariaDbPool = mysql.createPool({
+    host: MARIADB_HOST.value(),
+    port: Number(MARIADB_PORT.value()),
+    database: MARIADB_DATABASE.value(),
+    user: MARIADB_USER.value(),
+    password: MARIADB_PASSWORD.value(),
+    connectionLimit: 5,
+    waitForConnections: true,
+  })
+  return mariaDbPool
+}
 
 // ── Screening Agent Helpers ────────────────────────────────────────────────
 
@@ -6759,3 +6785,28 @@ for (const collName of MONITORED_COLLECTIONS) {
     })
   })
 }
+
+// ── getModuleMetrics (onCall v2) — POC MariaDB: conteos de solo lectura ────
+// Prueba end-to-end minima del circuito Cloud Function -> pool -> MariaDB
+// (Inmotion). Usada por src/pages/monitoring/ModuleMetrics.tsx.
+
+exports.getModuleMetrics = onCall({
+  timeoutSeconds: 30,
+  memory: '256MiB',
+  invoker: 'public',
+  secrets: [MARIADB_HOST, MARIADB_PORT, MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD],
+}, async (request) => {
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Must be logged in')
+  const callerEmail = request.auth.token.email || ''
+  if (!callerEmail.endsWith('@mincurllogistics.com')) throw new HttpsError('permission-denied', 'MCL only')
+
+  const pool = getMariaDbPool()
+
+  const [wrRows] = await pool.query('SELECT COUNT(*) AS total FROM warehouse_receipts')
+  const [billingRows] = await pool.query('SELECT COUNT(*) AS total FROM billing_charges')
+
+  return {
+    warehouse_receipts_total: wrRows[0].total,
+    billing_charges_total: billingRows[0].total,
+  }
+})

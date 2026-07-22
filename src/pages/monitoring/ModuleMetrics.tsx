@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { collection, query, where, orderBy, getDocs, limit, doc, getDoc } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
+import { httpsCallable } from 'firebase/functions'
+import { db, functions } from '../../lib/firebase'
 import Layout from '../../components/Layout'
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis,
@@ -51,6 +52,19 @@ export default function ModuleMetrics() {
   const [dailyData, setDailyData] = useState<DailyMetrics[]>([])
   const [clientMetrics, setClientMetrics] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  // ── POC MariaDB (Escenario B, paso 0) ──────────────────────
+  // Prueba end-to-end: Cloud Function `getModuleMetrics` -> pool -> MariaDB.
+  // No reemplaza ninguna metrica existente, es un chequeo aislado y acotado.
+  const [mariaDbPoc, setMariaDbPoc] = useState<{ warehouse_receipts_total: number; billing_charges_total: number } | null>(null)
+  const [mariaDbPocError, setMariaDbPocError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const getModuleMetricsFn = httpsCallable(functions, 'getModuleMetrics')
+    getModuleMetricsFn()
+      .then(res => setMariaDbPoc(res.data as { warehouse_receipts_total: number; billing_charges_total: number }))
+      .catch(err => setMariaDbPocError(err.message))
+  }, [])
 
   useEffect(() => {
     loadData()
@@ -201,6 +215,16 @@ export default function ModuleMetrics() {
               tab === m ? 'bg-mcl-blue text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}>{MODULE_LABELS[m]}</button>
         ))}
+      </div>
+
+      {/* ── POC MariaDB (Escenario B, paso 0) — bloque aislado, no reemplaza nada ── */}
+      <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 mb-6 text-xs text-purple-700">
+        <strong>POC MariaDB:</strong>{' '}
+        {mariaDbPocError
+          ? `error al llamar getModuleMetrics: ${mariaDbPocError}`
+          : mariaDbPoc
+            ? `warehouse_receipts=${mariaDbPoc.warehouse_receipts_total}, billing_charges=${mariaDbPoc.billing_charges_total}`
+            : 'cargando...'}
       </div>
 
       {loading ? (
