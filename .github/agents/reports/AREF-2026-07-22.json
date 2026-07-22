@@ -1,0 +1,37 @@
+{
+  "agent": "AREF",
+  "timestamp": "2026-07-22T11:52:27.528Z",
+  "status": "completed",
+  "task_id": "F6",
+  "actions_taken": [
+    "Created src/shared/types.ts with 7 interfaces: Hold, AWBLine, AirfreightBooking, AirfreightHold, AirfreightFlight, SheetSyncConfig, ParsedSheetRow, SheetDiff",
+    "Created parser.test.js with 5 test cases: header detection, continuation rows, AWB validation, hold value parsing, diff detection",
+    "Created diff.test.js with 6 test cases: SAFE_FIELDS classification, same-day hold separation"
+  ],
+  "changes": [
+    "Created src/shared/types.ts with 7 interfaces: Hold, AWBLine, AirfreightBooking, AirfreightHold, AirfreightFlight, SheetSyncConfig, ParsedSheetRow, SheetDiff",
+    "Created parser.test.js with 5 test cases: header detection, continuation rows, AWB validation, hold value parsing, diff detection",
+    "Created diff.test.js with 6 test cases: SAFE_FIELDS classification, same-day hold separation"
+  ],
+  "next_steps": [],
+  "task_meta": {
+    "id": "F6",
+    "name": "Tipos compartidos + tests del parser",
+    "description": "Crear shared/types.ts con interfaces de Booking, AWBLine, Hold, SyncConfig. Crear tests unitarios para parseSheetRows y computeDiffs con datos reales anonimizados.",
+    "risk": "low",
+    "files_modified": [],
+    "files_created": [
+      "src/shared/types.ts",
+      "functions/src/sheetSync/__tests__/parser.test.js",
+      "functions/src/sheetSync/__tests__/diff.test.js"
+    ],
+    "validation": "npx jest functions/src/sheetSync/__tests__/ debe pasar."
+  },
+  "files_modified": [],
+  "files_created": [
+    "src/shared/types.ts",
+    "functions/src/sheetSync/__tests__/parser.test.js",
+    "functions/src/sheetSync/__tests__/diff.test.js"
+  ],
+  "summary": "Task F6 (Tipos compartidos + tests del parser) completed. 3 changes made. PR will be created."
+}
