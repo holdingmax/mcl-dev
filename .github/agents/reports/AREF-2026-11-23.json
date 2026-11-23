@@ -1,0 +1,10 @@
+{
+  "agent": "AREF",
+  "timestamp": "2026-11-23T21:57:26.758Z",
+  "status": "skipped",
+  "task_id": "F6",
+  "actions_taken": [],
+  "changes": [],
+  "next_steps": [],
+  "summary": "Task F6 already has an open branch/PR. Skipping."
+}
